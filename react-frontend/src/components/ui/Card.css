@@ -1,0 +1,138 @@
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;  
+}
+
+.card {
+    width: 380px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin: 5px;
+}
+
+.card img {
+    width: 100%;
+    height:auto;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0
+}
+
+.card-content {
+    padding: 30px;
+}
+
+.card-content h4 {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+}
+
+.card-content .card-span{
+    font-size:18px;  
+    color: #e2a926;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.card-content .custom-hr {
+    border: none;
+    height: 2px;
+    background-color: #e2a926;
+    width: 100%;
+    margin: 5px auto;
+}
+
+.card-content  h2 {
+    color: #666;
+    font-size: 16px;
+    line-height: 1.3;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.card-content .class-button {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    color: #242425;
+}
+
+
+
+.class-button .btn-card  {
+    color: #551a8b;
+    cursor:pointer;
+}
+
+.class-button .btn-card:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    color: #08223d;
+}
+
+.button {
+  display: flex;
+  justify-content: center; 
+  margin-top: 2rem;       
+}
+
+
+/* Móviles pequeños (hasta 480px) */
+@media (max-width: 480px) {
+    .card-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .card img {
+        height: 180px;
+    }
+
+    .card-content {
+        padding: 15px;
+    }
+}
+
+/* Tablets (768px+) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .card-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    .card img {
+        height: 200px;
+    }
+}
+
+/* Desktop (1025px+) */
+@media (min-width: 1025px) {
+    .card-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    .card img {
+        height: 220px;
+    }
+}
