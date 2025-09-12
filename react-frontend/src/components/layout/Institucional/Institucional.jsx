@@ -10,7 +10,8 @@ const Institucional = () => {
           <ScheduleCard
             key={item.id}
             icon={item.icon}
-            title={item.title}            
+            title={item.title} 
+            subtitle={item.subtitle}            
             linkText={item.linkText}
           />
         ))}

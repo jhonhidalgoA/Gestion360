@@ -24,9 +24,9 @@ const NoticiasDetalle = () => {
   };
 
   return (
-    <div className="ensayo">
+    <div className="news-school">
       <Navbar />
-      <div className="noticias-detalle-container">
+      <div className="news-container">
         <div className="header">
           <h1>NOTICIAS</h1>
           <p>Noticias y actividades de nuestra Comunidad Educativa</p>

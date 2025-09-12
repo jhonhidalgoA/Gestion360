@@ -8,9 +8,6 @@
   max-width: 350px;
 }
 
-.news-card:hover {
-  transform: translateY(-5px);
-}
 
 .news-card img {
   width: 100%;
@@ -43,17 +40,13 @@
 }
 
 .card-button {
-  background: #e2a926;
+  background: var(--color-primary);
   color: white;
   border: none;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 20px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
 }
 
-.card-button:hover {
-  background: #d0971c;
-  transform: translateY(-2px);
-}

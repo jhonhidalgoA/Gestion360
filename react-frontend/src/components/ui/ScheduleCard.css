@@ -1,6 +1,7 @@
 .schedule-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    justify-content: center; 
     gap: 30px;
     padding: 0 20px;
     margin: 20px auto 0;
@@ -14,9 +15,10 @@
     justify-content: space-between;
     background-color:#f0f0f0;
     width: 100%;
-    max-width: 300px; 
+    max-width: 350px; 
     height: 250px;
     padding: 40px;
+    margin: 0 auto;
     border-radius: 10px;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -28,7 +30,7 @@
 .schedule-card:hover {
     background-color: #e2a926;
     transform: scale(1.05);
-    color: var(--background-dark);
+    
 }
 
 .schedule-card .icon {
@@ -46,16 +48,25 @@
     color: var(--color-primary-dark); 
 }
 
+.schedule-subtitle{
+    font-size: 0.9rem;
+    margin-top: 5px;
+    font-weight: 600;
+    color: blue; 
+}
+
 .schedule-link {
     font-size: 0.9rem;    
     text-align: center; 
     font-weight: 600;
     text-decoration: none;
     color: #DBD0BE;
-    align-self: flex-end; 
-    margin-top: auto; 
-    
+    align-self: center; 
+    margin-top: 30px;    
 }
+
+
+
 
 /* Móviles (hasta 480px) */
 @media (max-width: 480px) {
