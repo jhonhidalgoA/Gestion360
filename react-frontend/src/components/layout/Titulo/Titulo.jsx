@@ -1,4 +1,4 @@
-import './Title.css'
+import './Titulo.css'
 
 const Title = ({subTitle, title}) => {
   return (

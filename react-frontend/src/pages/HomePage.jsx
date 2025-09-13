@@ -3,7 +3,7 @@ import React from "react";
 import Navbar from "../components/layout/Navbar/Navbar";
 import Hero from "../components/layout/Hero/Hero";
 import Noticias from "../components/layout/Noticias/Noticias";
-import Title from "../components/layout/Title/Title";
+import Title from "../components/layout/Titulo/Titulo";
 import Eventos from "../components/layout/Eventos/Eventos";
 import Nosotros from "../components/layout/Nosotros/Nosotros";
 import Institucional from "../components/layout/Institucional/Institucional";

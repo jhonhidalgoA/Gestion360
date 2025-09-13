@@ -1,5 +1,5 @@
-import { eventsData } from "../../../data/eventsData";
-import EventCard from "../../ui/EventCard";
+import { eventsData } from "../../../data/EventsData";
+import EventCard from "../../ui/EventosCard";
 import "./Eventos.css";
 import white_arrow from '../../icons/white-arrow.png'
 

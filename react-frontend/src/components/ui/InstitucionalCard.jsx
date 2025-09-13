@@ -1,4 +1,4 @@
-import "./ScheduleCard.css";
+import "./InstitucionalCard.css";
 
 const ScheduleCard = ({ icon, title, subtitle, linkText = "",}) => {
   return (

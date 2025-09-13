@@ -1,4 +1,4 @@
-import "./EventCard.css"
+import "./EventosCard.css"
 
 const EventCard = ({day, month, year, time, name, location}) => {
   return (

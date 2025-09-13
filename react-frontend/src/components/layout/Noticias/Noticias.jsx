@@ -1,14 +1,16 @@
 import { Link } from "react-router-dom";
-import { newsData } from "../../../data/newsData";
-import Card from "../../ui/Card";
+import { newsData } from "../../../data/NoticiasData";
+import Card from "../../ui/NoticiasCard";
 import "./Noticias.css";
 import white_arrow from "../../icons/white-arrow.png";
 
-const Noticias = () => {
+const Noticias = ({ cardsToShow = 3, showButton = true }) => {
+   const displayedCards = newsData.slice(0, cardsToShow);
+
   return (
     <section className="news-section">
       <div className="card-container">
-        {newsData.map((item) => (
+        {displayedCards.map((item) => (
           <Card
             key={item.id}
             image={item.image}
@@ -20,11 +22,14 @@ const Noticias = () => {
           />
         ))}
       </div>
-      <div className="button">
+      {showButton && (
+        <div className="button">
         <Link to="/noticia-detalle" className="btn dark-btn">
-          Ver más <img src={white_arrow} alt="" />
+          Ver más <img src={white_arrow} alt="image" />
         </Link>
       </div>
+      )}
+      
     </section>
   );
 };

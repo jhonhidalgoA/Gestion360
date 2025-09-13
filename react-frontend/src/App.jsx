@@ -1,7 +1,5 @@
-// App.jsx
 import { BrowserRouter, Routes, Route, useLocation} from "react-router-dom";
 import { useState, useEffect } from "react";
-
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import Reset from "./pages/Reset";

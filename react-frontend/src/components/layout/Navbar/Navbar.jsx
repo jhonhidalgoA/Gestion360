@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link as ScrollLink } from "react-scroll"; // 👈 Renombramos para no confundir
 import { Link as RouterLink, useLocation } from "react-router-dom"; // 👈 Importamos Link de router
-import { MenuData } from "./MenuData";
+import { MenuData } from "../../../data/NavbarData";
 import "./Navbar.css";
 import logo from "../../icons/espiral.svg";
 
@@ -41,7 +41,7 @@ return (
         {MenuData.map((item, index) => (
           <li key={index}>
             {isHomePage ? (
-              // En página principal, usa scroll suave
+             
               <ScrollLink
                 to={item.to}
                 smooth={true}
@@ -55,7 +55,7 @@ return (
             ) : (
               // En otras páginas, navega a "/"
               <RouterLink
-                to={`/#${item.to}`} // 👈 Navega a la página principal + sección
+                to={`/#${item.to}`} 
                 className={item.cName}
                 onClick={handleClick}
               >

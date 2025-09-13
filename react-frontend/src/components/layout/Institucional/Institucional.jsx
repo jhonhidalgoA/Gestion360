@@ -1,5 +1,5 @@
-import { institutionalData } from "../../../data/institucionalData"
-import ScheduleCard from "../../ui/ScheduleCard"
+import { institutionalData } from "../../../data/InstitucionalData"
+import ScheduleCard from "../../ui/InstitucionalCard"
 import "./Institucional.css"
 
 const Institucional = () => {

@@ -1,4 +1,4 @@
-import "./Card.css"
+import "./NoticiasCard.css"
 
 const Card = ({image, school, title, date, buttonText= "Saber más", buttonLink ="#"}) => {
   return (
