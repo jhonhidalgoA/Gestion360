@@ -11,7 +11,7 @@ const EventCard = ({day, month, year, time, name, location}) => {
       <div className="event-details">
         <span className="event-time">{time}</span>
         <h3 className="event-name">{name}</h3>
-        <p className="event-location">Lugar: {location}</p>
+        <p className="event-location">Lugar: {location}</p>       
       </div>
     </div>
   )
