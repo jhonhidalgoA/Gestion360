@@ -1,6 +1,7 @@
 import "./NoticiasCard.css"
 
-const Card = ({image, school, title, date, buttonText= "Saber más", buttonLink ="#"}) => {
+const Card = ({image, school, title, date, buttonText= "Saber más", buttonLink = "#", showDetailsButton = true}) => {
+   
   return (
     <div className="card">
       <img src={image} alt={title} className="card-img" />
@@ -8,9 +9,11 @@ const Card = ({image, school, title, date, buttonText= "Saber más", buttonLink 
         <h4>{school} <span className="card-span">STEAM 360</span></h4>
         <hr className="custom-hr" />
         <h2>{title}</h2>
-        <div className="class-button">
-            <span className="date">{date}</span>
-            <a href={buttonLink} className="btn-card">{buttonText}</a>           
+         <div className="class-button">
+          <span className="date">{date}</span>
+          {showDetailsButton && (
+            <a href={buttonLink} className="btn-card">{buttonText}</a>
+          )}
         </div>
       </div>
     </div>

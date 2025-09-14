@@ -4,8 +4,8 @@ import Card from "../../ui/NoticiasCard";
 import "./Noticias.css";
 import white_arrow from "../../icons/white-arrow.png";
 
-const Noticias = ({ cardsToShow = 3, showButton = true }) => {
-   const displayedCards = newsData.slice(0, cardsToShow);
+const Noticias = ({ cardsToShow = 3, showDetailsButton = false }) => {
+  const displayedCards = newsData.slice(0, cardsToShow);
 
   return (
     <section className="news-section">
@@ -19,17 +19,15 @@ const Noticias = ({ cardsToShow = 3, showButton = true }) => {
             date={item.date}
             buttonText={item.buttonText}
             buttonLink={item.buttonLink}
+            showDetailsButton={showDetailsButton}
           />
         ))}
       </div>
-      {showButton && (
-        <div className="button">
+      <div className="button">
         <Link to="/noticia-detalle" className="btn dark-btn">
           Ver más <img src={white_arrow} alt="image" />
         </Link>
       </div>
-      )}
-      
     </section>
   );
 };
