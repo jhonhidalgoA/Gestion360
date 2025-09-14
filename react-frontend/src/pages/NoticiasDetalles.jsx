@@ -14,7 +14,7 @@ const NoticiasDetalle = () => {
         <h1>Noticias</h1>
         <p>Noticias y actividades de nuestra Comunidad Educativa</p>
       </div>
-      <Noticias cardsToShow={6} showDetailsButton={true} />
+      <Noticias cardsToShow={6} showDetailsButton={true} showMoreButton={false} />
     </div>
   );
 };
