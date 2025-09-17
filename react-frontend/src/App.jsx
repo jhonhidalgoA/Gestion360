@@ -1,4 +1,3 @@
-// App.jsx
 import { BrowserRouter, Routes, Route, useLocation} from "react-router-dom";
 import { useState, useEffect } from "react";
 import HomePage from "./pages/HomePage";
@@ -7,6 +6,12 @@ import Reset from "./pages/Reset";
 import InfoMatricula from "./pages/InfoMatricula";
 import NoticiasDetalles from "./pages/NoticiasDetalles";
 import EventosDetalles from "./pages/EventosDetalles";
+import Circulares from "./pages/CircularesDetalles";
+import VerManual from "./pages/VerManual";
+import VerPEI from "./pages/VerPEI";
+
+//prueba de navbarAdmin //
+import Administrador from "./pages/Administrador";
 
 const ScrollToSection = () => {
   const location = useLocation();
@@ -44,6 +49,12 @@ function App() {
         <Route path="/info-matricula" element={<InfoMatricula />} />
         <Route path="/noticia-detalle" element={<NoticiasDetalles />} />
         <Route path="/evento-detalle" element={<EventosDetalles />} />
+        <Route path="/circulares" element={<Circulares />} />
+        <Route path="/manual-convivencia" element={<VerManual />} />
+        <Route path="/pei" element={<VerPEI />} />
+        <Route path="administrador" element={<Administrador/>} />
+
+
       </Routes>
     </BrowserRouter>
   );

@@ -1,13 +1,12 @@
+// Eventos.jsx (NO TOCAR)
 import { Link } from "react-router-dom";
-import { eventsData } from "../../../data/EventosData";
+import { eventsData } from "../../../data/EventosData"; 
 import EventCard from "../../ui/EventosCard";
 import "./Eventos.css";
-import white_arrow from '../../icons/white-arrow.png'
+import white_arrow from '../../icons/white-arrow.png';
 
-const Eventos = ({cardsToShow = 2,
-  showDetailsButton = false,
-  showMoreButton = true,}) => {
-     const displayedEvents = eventsData.slice(0, cardsToShow);
+const Eventos = ({ cardsToShow = 2, showDetailsButton = false, showMoreButton = true }) => {
+  const displayedEvents = eventsData.slice(0, cardsToShow); 
 
   return (
     <div className="event-container">

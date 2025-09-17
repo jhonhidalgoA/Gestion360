@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link as ScrollLink } from "react-scroll"; // 👈 Renombramos para no confundir
-import { Link as RouterLink, useLocation } from "react-router-dom"; // 👈 Importamos Link de router
+import { Link as ScrollLink } from "react-scroll"; 
+import { Link as RouterLink, useLocation } from "react-router-dom"; 
 import { MenuData } from "../../../data/NavbarData";
 import "./Navbar.css";
 import logo from "../../icons/espiral.svg";

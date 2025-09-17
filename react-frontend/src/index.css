@@ -149,9 +149,10 @@ h3
    cursor:pointer;
    border:0;
    outline:0;
-   display:inline-flex;
+   display:flex;
    align-items: center;
-   justify-content: center;     
+   justify-content: center;
+        
 }
 
 .btn img {
@@ -162,7 +163,8 @@ h3
 .btn.dark-btn{
     background: #212EA0;
     color: #ffff; 
-    width:200px; 
+    width:250px;
+    height:50px; 
 } 
 
 

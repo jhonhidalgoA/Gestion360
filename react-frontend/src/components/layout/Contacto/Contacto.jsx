@@ -22,7 +22,7 @@ const Contacto = () => {
           <ul>
             <li>
               <img src={mail_icon} alt="" />
-              contact@zirel.com
+              contacto@zirel.com
             </li>
             <li>
               {" "}
@@ -37,25 +37,25 @@ const Contacto = () => {
         </div>
         <div className="contact-col">
           <form action="">
-            <label htmlFor="">Tu Nombree</label>
+            <label htmlFor="">Tu Nombre</label>
             <input
               type="text"
               name="name"
-              placeholder="Escribe tu nombre"
+              placeholder="ej: Juan P"
               required
             />
             <label htmlFor="">Teléfono</label>
-            <input
-              type="tel"
+             <input
+              type="text"
               name="phone"
-              placeholder="Escribe tu número de teléfono"
+              placeholder="ej: 310 XXX XXX" 
               required
             />
-            <label htmlFor="">Escribre tu mensaje</label>
+            <label htmlFor="">Escribe tu mensaje</label>
             <textarea
               name="message"
               rows="6"
-              placeholder="Escribre tu mensaje"
+              placeholder="Escribe tu mensaje"
               required
             ></textarea>
             <button type="submit" className="btn dark-btn">

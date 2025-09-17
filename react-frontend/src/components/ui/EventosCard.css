@@ -7,10 +7,6 @@
     transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-.event-card:hover {
-    transform: translateX(1%);
-}
-
 .event-date {
     padding: 10px 20px;
     width: 180px;
@@ -64,37 +60,38 @@
 @media (max-width: 480px) {
     .event-card {
         flex-direction: row;
-        gap: 20px;
+        gap: 10px;
         justify-content: center;
         align-items: flex-start;
-        width: 100%;
+        width: 90%;        
+        margin: 20px auto;
         padding: 0;
         box-sizing: border-box;
     }
 
     .event-date {
-        width: 80px;
-        height: auto;
+        width: 90px;
+        height: 100px;
         padding: 8px;        
     }
 
     .event-day {
-        font-size: 24px;
+        font-size: 26px;
         margin-bottom: 3px;
     }
 
     .event-month {
-        font-size: 10px;
+        font-size: 12px;
         margin-bottom: 1px;
     }
 
     .event-year {
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .event-details {
         width: calc(100% - 100px);
-        height:auto;
+        height:100px;
         padding: 12px;
         font-size: 13px;
     }
@@ -110,7 +107,7 @@
     }
 
     .event-location {
-        font-size: 13px;
+        font-size: 10px;
         margin-top: 8px;
     }
 }
@@ -118,6 +115,8 @@
 /* Tablets (768px+) */
 @media (min-width: 768px) and (max-width: 1024px) {
     .event-card {
+        width: 95%; 
+        margin: 20px auto;
         gap: 40px;
     }
 
@@ -127,15 +126,17 @@
     }
 
     .event-day {
-        font-size: 40px;
+        font-size: 46px;
     }
 
     .event-month {
-        font-size: 16px;       
+         margin-top:20px;
+        font-size: 18px;       
     }
 
     .event-year {
-        font-size: 18px;
+        margin-top:20px;
+        font-size: 20px;
     }
 
     .event-details {

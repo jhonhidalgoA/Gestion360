@@ -1,3 +1,4 @@
+import {Link} from "react-router-dom"
 import { institutionalData } from "../../../data/InstitucionalData"
 import ScheduleCard from "../../ui/InstitucionalCard"
 import "./Institucional.css"
@@ -7,6 +8,7 @@ const Institucional = () => {
     <div>
         <div className="schedule-container">
         {institutionalData.map((item) => (
+          <Link to={item.path} key={item.id} style={{ textDecoration: 'none' }}>
           <ScheduleCard
             key={item.id}
             icon={item.icon}
@@ -14,6 +16,7 @@ const Institucional = () => {
             subtitle={item.subtitle}            
             linkText={item.linkText}
           />
+          </Link>
         ))}
       </div>    
     </div>

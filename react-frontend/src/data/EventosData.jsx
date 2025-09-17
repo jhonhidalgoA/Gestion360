@@ -1,3 +1,4 @@
+// EventosData.jsx
 export const eventsData = [
   {
     id: "evento1",

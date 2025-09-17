@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 import "./Hero.css";
-import white_arrow from '../../icons/white-arrow.png'
+import white_arrow from "../../icons/white-arrow.png";
 
 const Hero = () => {
   return (
@@ -8,13 +8,16 @@ const Hero = () => {
       <div className="hero-text">
         <h1>Matrículas Abiertas 2026 </h1>
         <p>
-          Forma parte de nuestra comunidad educativa con enfoque en innovación
-          y excelencia académica, un proyecto que transforma vidas y abre
-          oportunidades para el futuro. 
+          Forma parte de nuestra comunidad educativa con enfoque en innovación y
+          excelencia académica, un proyecto que transforma vidas y abre
+          oportunidades para el futuro.
         </p>
-        <Link to="/info-matricula" className="btn dark-btn">
-          Más información <img src={white_arrow} alt="" className="dark-arrow" />
-        </Link>
+        <div className="button hero-button">
+          <Link to="/info-matricula" className="btn dark-btn">
+            Más información
+            <img src={white_arrow} alt="" className="dark-arrow" />
+          </Link>
+        </div>
       </div>
     </div>
   );

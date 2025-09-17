@@ -1,0 +1,28 @@
+.pei-container {
+  min-height: 100vh;
+  background: linear-gradient(rgba(8, 0, 58, 0.3), rgba(8, 0, 25, 0.3)), url('../../assets/images/fondo_10.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  padding-top: 80px;
+}
+
+.pdf-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.pdf-container iframe {
+  width: 100%;
+  height: 90vh;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
