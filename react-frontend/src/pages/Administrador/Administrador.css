@@ -2,7 +2,7 @@
     width:100%;
     min-height:100vh;
     background:100vh;
-    background:linear-gradient(rgba(8,0,58,0.4),rgba(8,0,25,0.4)),url('../assets/images/fondo_8.jpg');
+    background:linear-gradient(rgba(8,0,58,0.3),rgba(8,0,25,0.3)),url('../../assets/images/fondo_8.jpg');
     background-size:cover;
     background-position:center;
     background-repeat: no-repeat; 
@@ -17,7 +17,7 @@
 .card-container { 
   max-width: 1200px;   
   width:100%;
-  margin:0 auto;
+  margin: 0 auto;
   text-align: center;
   padding: 0 20px;
 }

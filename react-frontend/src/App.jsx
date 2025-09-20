@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation} from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
@@ -9,15 +9,16 @@ import EventosDetalles from "./pages/EventosDetalles";
 import Circulares from "./pages/CircularesDetalles";
 import VerManual from "./pages/VerManual";
 import VerPEI from "./pages/VerPEI";
+import Matricula  from "./pages/Administrador/Matricula/Matricula"
 
 //prueba de navbarAdmin //
-import Administrador from "./pages/Administrador";
-import Docente from "./pages/Docente"
+import Administrador from "./pages/Administrador/Administrador";
+import Docente from "./pages/Docente";
 
 const ScrollToSection = () => {
   const location = useLocation();
 
-   useEffect(() => {
+  useEffect(() => {
     if (location.hash) {
       const scrollToSection = () => {
         const element = document.getElementById(location.hash.substring(1));
@@ -27,10 +28,10 @@ const ScrollToSection = () => {
             behavior: "smooth",
           });
         }
-      };      
+      };
       setTimeout(() => {
         requestAnimationFrame(scrollToSection);
-      }, 100); 
+      }, 100);
     }
   }, [location]);
 
@@ -42,9 +43,14 @@ function App() {
 
   return (
     <BrowserRouter>
-      <ScrollToSection /> 
+      <ScrollToSection />
       <Routes>
-        <Route path="/" element={<HomePage playState={playState} setPlayState={setPlayState} />} />
+        <Route
+          path="/"
+          element={
+            <HomePage playState={playState} setPlayState={setPlayState} />
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/reset" element={<Reset />} />
         <Route path="/info-matricula" element={<InfoMatricula />} />
@@ -53,9 +59,9 @@ function App() {
         <Route path="/circulares" element={<Circulares />} />
         <Route path="/manual-convivencia" element={<VerManual />} />
         <Route path="/pei" element={<VerPEI />} />
-        <Route path="administrador" element={<Administrador/>} />
-        <Route path="docente" element={<Docente/>} />
-
+        <Route path="administrador" element={<Administrador />} />
+        <Route path="docente" element={<Docente />} />
+        <Route path="/matricula" element={<Matricula />} />
 
       </Routes>
     </BrowserRouter>

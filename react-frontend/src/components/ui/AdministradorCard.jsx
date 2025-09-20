@@ -10,8 +10,7 @@ const AdminCard = ({ icon, title, path, gradient }) => {
           style={{
             backgroundImage: gradient,
             backgroundSize: "cover",
-            backgroundPosition: "center",
-            height: "200px",                     
+            backgroundPosition: "center",                                
             borderRadius: "12px",
             border: "none",
           }}

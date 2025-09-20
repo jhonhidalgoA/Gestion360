@@ -1,6 +1,6 @@
-import NavbarAdmin from "../components/layout/Navbar/NavbarAdmin";
-import {adminData} from "../data/AdministradorData";
-import AdministradorCard from ".././components/ui/AdministradorCard"
+import NavbarAdmin from "../../components/layout/Navbar/NavbarAdmin";
+import { adminData } from "../../data/AdministradorData";
+import AdministradorCard from "../../components/ui/AdministradorCard";
 import "./Administrador.css";
 
 const Administrador = () => {
