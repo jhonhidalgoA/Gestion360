@@ -12,6 +12,7 @@ import VerPEI from "./pages/VerPEI";
 
 //prueba de navbarAdmin //
 import Administrador from "./pages/Administrador";
+import Docente from "./pages/Docente"
 
 const ScrollToSection = () => {
   const location = useLocation();
@@ -53,6 +54,7 @@ function App() {
         <Route path="/manual-convivencia" element={<VerManual />} />
         <Route path="/pei" element={<VerPEI />} />
         <Route path="administrador" element={<Administrador/>} />
+        <Route path="docente" element={<Docente/>} />
 
 
       </Routes>
