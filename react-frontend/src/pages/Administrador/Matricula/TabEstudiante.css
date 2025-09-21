@@ -80,26 +80,6 @@
     border: 2px dashed #adb5bd;
 }
 
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.error-message {
-  color: #ef4444;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: block;
-  font-weight: 500;
-  animation: fadeIn 0.3s ease-in-out;
-}
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
@@ -150,7 +130,7 @@
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 18px;
   transition: border-color 0.3s ease;
 }
 
@@ -177,4 +157,9 @@
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2); 
 }
 
+.field-error{
+  display: block;
+  color: red;
+  font-size: 0.7rem;
+}
 

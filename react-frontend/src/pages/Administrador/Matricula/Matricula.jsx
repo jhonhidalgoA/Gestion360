@@ -11,6 +11,7 @@ import "./Matricula.css";
 const Matricula = () => {
   const [activeTab, setActiveTab] = useState("estudiante");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
 
   const generateStudentCode = () => {
     const year = new Date().getFullYear();
@@ -30,6 +31,7 @@ const Matricula = () => {
   } = useForm({
     mode: "onBlur",
     defaultValues: {
+
       // Datos Estudiante
       registerDate: todayDate,
       codigo: generateStudentCode(),
@@ -89,7 +91,7 @@ const Matricula = () => {
         "studentBlood",
       ];
       
-      // Validación personalizada para la foto
+      
       const formData = getValues();
       if (!formData.studentPhoto) {
         hasErrors = true;
@@ -113,15 +115,14 @@ const Matricula = () => {
 
   const handleConfirmModal = () => {
     setIsModalOpen(false);
-    
-    // Buscar el primer campo con error y hacer focus
+       
     const firstErrorField = Object.keys(errors)[0]; 
     if (firstErrorField) {
-      // Esperar un momento para que el DOM se actualice
+     
       setTimeout(() => {
         const element = document.getElementById(firstErrorField) || 
                       document.querySelector(`[name="${firstErrorField}"]`) ||
-                      document.querySelector('.photo-label'); // Para la foto
+                      document.querySelector('.photo-label'); 
         
         if (element) {
           element.focus();
@@ -175,7 +176,12 @@ const Matricula = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="formStudent">
         {activeTab === "estudiante" && (
-          <TabEstudiante register={register} errors={errors} setValue={setValue} />
+          <TabEstudiante 
+            register={register} 
+            errors={errors} 
+            setValue={setValue}
+            trigger={trigger}
+          />
         )}
         {activeTab === "academica" && (
           <TabAcademica register={register} errors={errors} />

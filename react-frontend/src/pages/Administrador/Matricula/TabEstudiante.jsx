@@ -52,6 +52,7 @@ const TabEstudiante = ({ register, errors, setValue }) => {
   const [age, setAge] = useState("");
   const [photoFile, setPhotoFile] = useState(null);
   const [photoError, setPhotoError] = useState("");
+  const [showPhotoError, setShowPhotoError] = useState(false);
 
   // Efecto para validar la foto cuando cambia
   useEffect(() => {
@@ -60,9 +61,25 @@ const TabEstudiante = ({ register, errors, setValue }) => {
       setPhotoError("");
     } else {
       setValue("studentPhoto", null, { shouldValidate: true });
-      setPhotoError("Debe subir una foto del estudiante");
+     
+      if (showPhotoError) {
+        setPhotoError("Debe subir una foto del estudiante");
+      }
     }
-  }, [photoFile, setValue]);
+  }, [photoFile, setValue, showPhotoError]);
+
+ 
+  useEffect(() => {
+    const handleValidatePhoto = () => {
+      if (!photoFile) {
+        setShowPhotoError(true);
+        setPhotoError("Debe subir una foto del estudiante");
+      }
+    };
+
+    window.addEventListener('validatePhoto', handleValidatePhoto);
+    return () => window.removeEventListener('validatePhoto', handleValidatePhoto);
+  }, [photoFile]);
 
   const calculateAge = (birthDateString) => {
     if (!birthDateString) return "";
@@ -92,6 +109,7 @@ const TabEstudiante = ({ register, errors, setValue }) => {
   };
 
   const handlePhotoChange = (e) => {
+    setShowPhotoError(true); 
     const file = e.target.files[0];
     
     if (!file) {
@@ -134,6 +152,7 @@ const TabEstudiante = ({ register, errors, setValue }) => {
   const clearPhoto = () => {
     setPreview(null);
     setPhotoFile(null);
+    setShowPhotoError(true); 
     setPhotoError("Debe subir una foto del estudiante");
     const fileInput = document.getElementById("student-photo");
     if (fileInput) {
@@ -148,7 +167,7 @@ const TabEstudiante = ({ register, errors, setValue }) => {
           htmlFor="student-photo"
           className={`photo-label ${photoError ? "photo-error" : ""}`}
         >
-          {!preview && <span></span>}
+          {!preview && <span>Foto del Estudiante</span>}
           <input
             type="file"
             id="student-photo"
@@ -173,8 +192,7 @@ const TabEstudiante = ({ register, errors, setValue }) => {
             }}
           >
             {!preview && (
-              <div style={{ textAlign: "center", color: photoError ? "#dc3545" : "#6c757d" }}>
-                <div style={{ fontSize: "2rem" }}>📷</div>                
+              <div style={{ textAlign: "center", color: photoError ? "#dc3545" : "#6c757d" }}>                            
               </div>
             )}
           </div>
@@ -189,18 +207,18 @@ const TabEstudiante = ({ register, errors, setValue }) => {
               marginTop: "0.5rem",
               padding: "0.25rem 0.5rem",
               fontSize: "0.8rem",
-              backgroundColor: "#08f884ff",
+              backgroundColor: "#dc3545",
               color: "white",
               border: "none",
               borderRadius: "4px",
               cursor: "pointer"
             }}
           >
-           Cambiar foto
+            Quitar foto
           </button>
         )}
         
-        {photoError && (
+        {photoError && showPhotoError && (
           <span
             className="error-message"
             style={{ 
@@ -247,8 +265,8 @@ const TabEstudiante = ({ register, errors, setValue }) => {
             errors={errors}
             required
             validation={{
-              minLength: { value: 2, message: "Mínimo 2 caracteres" },
-              maxLength: { value: 50, message: "Máximo 50 caracteres" },
+              minLength: { value: 3, message: "Mínimo 3 caracteres" },
+              maxLength: { value: 20, message: "Máximo 20 caracteres" },
               pattern: {
                 value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
                 message: "Solo letras y espacios",
@@ -262,8 +280,8 @@ const TabEstudiante = ({ register, errors, setValue }) => {
             errors={errors}
             required
             validation={{
-              minLength: { value: 2, message: "Mínimo 2 caracteres" },
-              maxLength: { value: 50, message: "Máximo 50 caracteres" },
+              minLength: { value: 3, message: "Mínimo 3 caracteres" },
+              maxLength: { value: 20, message: "Máximo 20 caracteres" },
               pattern: {
                 value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
                 message: "Solo letras y espacios",
@@ -291,16 +309,18 @@ const TabEstudiante = ({ register, errors, setValue }) => {
                   validAge: (value) => {
                     if (!value) return true;
                     const age = calculateAge(value);
-                    return age >= 3 && age <= 25 || "La edad debe estar entre 3 y 25 años";
+                    return age >= 6 && age <= 99 || "La edad debe estar entre 6 y 99 años";
                   }
                 }
               })}
               onChange={handleBirthDateChange}
               className={`input-line ${errors.studentBirthDate ? "error" : ""}`}
-              max={new Date().toISOString().split('T')[0]}
+              max={new Date().toISOString().split('T')[0]}             
             />
             {errors.studentBirthDate && (
-              <p className="field-error">{errors.studentBirthDate.message}</p>
+              <span className="field-error">        
+                {errors.studentBirthDate.message}
+              </span>
             )}
           </div>
           <div className="group">
@@ -406,8 +426,8 @@ const TabEstudiante = ({ register, errors, setValue }) => {
             errors={errors}
             required
             validation={{
-              minLength: { value: 2, message: "Mínimo 2 caracteres" },
-              maxLength: { value: 50, message: "Máximo 50 caracteres" },
+              minLength: { value: 3, message: "Mínimo 3 caracteres" },
+              maxLength: { value: 20 , message: "Máximo 20 caracteres" },
             }}
           />
           <SelectField
