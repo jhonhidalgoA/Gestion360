@@ -54,23 +54,10 @@
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #333;
+  font-size: 14px;
 }
 
-.group input,
-.group select {
-  padding: 0.75rem;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
 
-.group input:focus,
-.group select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
 
 .input-error {
   border-color: #ef4444 !important;

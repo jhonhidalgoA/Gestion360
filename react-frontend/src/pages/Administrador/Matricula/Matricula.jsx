@@ -11,7 +11,8 @@ import "./Matricula.css";
 const Matricula = () => {
   const [activeTab, setActiveTab] = useState("estudiante");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);  
 
   const generateStudentCode = () => {
     const year = new Date().getFullYear();
@@ -136,18 +137,30 @@ const Matricula = () => {
     setIsModalOpen(false);
   };
 
+  const handleClosePhotoModal = () => {
+  setIsPhotoModalOpen(false);
+};
+
+const handleSuccessModalClose = () => {
+  setIsSuccessModalOpen(false);
+  // Opcional: puedes redirigir, resetear el formulario, etc.
+  // reset(); 
+};
+
   const onSubmit = (data) => {
-    console.log("Formulario válido. Datos:", data);
-    
-    // Validación adicional antes del envío
-    if (!data.studentPhoto) {
-      alert("Por favor, suba una foto del estudiante.");
-      return;
-    }
-    
-    // Aquí envías al backend
-    alert("¡Matrícula registrada con éxito!");
-  };
+  console.log("Formulario válido. Datos:", data);
+  
+  // Validación adicional antes del envío
+  if (!data.studentPhoto) {
+    setIsPhotoModalOpen(true); // Mostrar modal de error de foto
+    return;
+  }
+  
+  // Aquí enviarías al backend (simulado)
+  // Ejemplo: await sendToBackend(data);
+
+  setIsSuccessModalOpen(true); // Mostrar modal de éxito
+};
 
   return (
     <div className="student-registration">
@@ -218,6 +231,43 @@ const Matricula = () => {
           },
         ]}
       />
+      {/* Modal de error: Foto requerida */}
+<Modal
+  isOpen={isPhotoModalOpen}
+  onClose={handleClosePhotoModal}
+  title={
+    <>
+      Colegio <span className="modal-title-360"> STEAM 360</span>
+    </>
+  }
+  message="Por favor, suba una foto del estudiante."
+  buttons={[
+    {
+      text: "Entendido",
+      variant: "danger",
+      onClick: handleClosePhotoModal,
+    },
+  ]}
+/>
+
+{/* Modal de éxito */}
+<Modal
+  isOpen={isSuccessModalOpen}
+  onClose={handleSuccessModalClose}
+  title={
+    <>
+      Colegio <span className="modal-title-360"> STEAM 360</span>
+    </>
+  }
+  message="¡Matrícula registrada con éxito!"
+  buttons={[
+    {
+      text: "Aceptar",
+      variant: "success",
+      onClick: handleSuccessModalClose,
+    },
+  ]}
+/>
     </div>
   );
 };
