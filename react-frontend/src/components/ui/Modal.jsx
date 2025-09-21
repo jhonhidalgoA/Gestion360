@@ -1,7 +1,7 @@
 import { IoClose } from "react-icons/io5";
 import "./Modal.css";
 
-const Modal = ({ isOpen, onClose, title, message, buttons }) => {
+const Modal = ({ isOpen, onClose, title, message, buttons = [] }) => {
   if (!isOpen) return null;
 
   return (

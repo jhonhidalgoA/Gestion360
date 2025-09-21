@@ -5,10 +5,12 @@ import TabAcademica from "./TabAcademica";
 import TabFamilia from "./TabFamilia";
 import NavbarSection from "../../../components/layout/Navbar/NavbarSection";
 import Botones from "../../../components/ui/Botones";
+import Modal from "../../../components/ui/Modal"; 
 import "./Matricula.css";
 
 const Matricula = () => {
   const [activeTab, setActiveTab] = useState("estudiante");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const generateStudentCode = () => {
     const year = new Date().getFullYear();
@@ -22,11 +24,12 @@ const Matricula = () => {
     register,
     handleSubmit,
     formState: { errors, isValid },
-    trigger,    
+    trigger, 
+    setValue,
+    getValues,   
   } = useForm({
     mode: "onBlur",
     defaultValues: {
-
       // Datos Estudiante
       registerDate: todayDate,
       codigo: generateStudentCode(),
@@ -34,6 +37,7 @@ const Matricula = () => {
       name: "",
       lastname: "",
       studentBirthDate: "",
+      studentAge: "", 
       studentGender: "",
       studentBirthPlace: "",
       studentDocument: "",
@@ -45,13 +49,13 @@ const Matricula = () => {
       studentGroup: "",
       studentBlood: "",
 
-      // Datos Académicos (para completar luego)
+      // Datos Académicos 
       grado: "",
       jornada: "",
       fechaIngreso: "",
       observaciones: "",
 
-      // Datos Familiares (para completar luego)
+      // Datos Familiares 
       nombrePadre: "",
       telefonoPadre: "",
       emailPadre: "",
@@ -66,6 +70,7 @@ const Matricula = () => {
 
   const handleTabChange = async (tab) => {
     let fieldsToValidate = [];
+    let hasErrors = false;
 
     if (activeTab === "estudiante") {
       fieldsToValidate = [
@@ -73,6 +78,7 @@ const Matricula = () => {
         "lastname",
         "studentBirthDate",
         "studentGender",
+        "studentBirthPlace",
         "studentDocument",
         "studentDocumentNumber",
         "studentphone",
@@ -82,15 +88,22 @@ const Matricula = () => {
         "studentGroup",
         "studentBlood",
       ];
+      
+      // Validación personalizada para la foto
+      const formData = getValues();
+      if (!formData.studentPhoto) {
+        hasErrors = true;
+      }
+    } else if (activeTab === "academica") {
+      fieldsToValidate = ["grado", "jornada", "fechaIngreso"];
+    } else if (activeTab === "familia") {
+      fieldsToValidate = ["nombrePadre", "telefonoPadre", "nombreMadre", "telefonoMadre"];
     }
 
-    
     if (fieldsToValidate.length > 0) {
       const isValidTab = await trigger(fieldsToValidate);
-      if (!isValidTab) {
-        alert(
-          "Por favor completa los campos obligatorios antes de cambiar de pestaña."
-        );
+      if (!isValidTab || hasErrors) {        
+        setIsModalOpen(true);
         return;
       }
     }
@@ -98,8 +111,39 @@ const Matricula = () => {
     setActiveTab(tab);
   };
 
+  const handleConfirmModal = () => {
+    setIsModalOpen(false);
+    
+    // Buscar el primer campo con error y hacer focus
+    const firstErrorField = Object.keys(errors)[0]; 
+    if (firstErrorField) {
+      // Esperar un momento para que el DOM se actualice
+      setTimeout(() => {
+        const element = document.getElementById(firstErrorField) || 
+                      document.querySelector(`[name="${firstErrorField}"]`) ||
+                      document.querySelector('.photo-label'); // Para la foto
+        
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   const onSubmit = (data) => {
     console.log("Formulario válido. Datos:", data);
+    
+    // Validación adicional antes del envío
+    if (!data.studentPhoto) {
+      alert("Por favor, suba una foto del estudiante.");
+      return;
+    }
+    
     // Aquí envías al backend
     alert("¡Matrícula registrada con éxito!");
   };
@@ -131,7 +175,7 @@ const Matricula = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="formStudent">
         {activeTab === "estudiante" && (
-          <TabEstudiante register={register} errors={errors} />
+          <TabEstudiante register={register} errors={errors} setValue={setValue} />
         )}
         {activeTab === "academica" && (
           <TabAcademica register={register} errors={errors} />
@@ -150,6 +194,24 @@ const Matricula = () => {
           />
         </div>
       </form>
+      
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title={
+          <>
+            Colegio <span className="modal-title-360"> STEAM 360</span>
+          </>
+        }
+        message="Por favor completar todos los campos requeridos antes de cambiar de pestaña."
+        buttons={[
+          {
+            text: "Entendido",
+            variant: "success",            
+            onClick: handleConfirmModal,
+          },
+        ]}
+      />
     </div>
   );
 };

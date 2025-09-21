@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState, useEffect } from "react";
 import "./TabEstudiante.css";
 import InputField from "../../../components/ui/InputField";
 import SelectField from "../../../components/ui/SelectField";
@@ -17,7 +17,7 @@ const TabEstudiante = ({ register, errors, setValue }) => {
     { value: "", label: "Seleccionar" },
     { value: "masculino", label: "Masculino" },
     { value: "femenino", label: "Femenino" },
-    { value: "binario", label: "No Binario" },
+    { value: "no-binario", label: "No Binario" },
   ];
 
   const bloodOptions = [
@@ -50,39 +50,94 @@ const TabEstudiante = ({ register, errors, setValue }) => {
 
   const [preview, setPreview] = useState(null);
   const [age, setAge] = useState("");
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoError, setPhotoError] = useState("");
+
+  // Efecto para validar la foto cuando cambia
+  useEffect(() => {
+    if (photoFile) {
+      setValue("studentPhoto", photoFile, { shouldValidate: true });
+      setPhotoError("");
+    } else {
+      setValue("studentPhoto", null, { shouldValidate: true });
+      setPhotoError("Debe subir una foto del estudiante");
+    }
+  }, [photoFile, setValue]);
 
   const calculateAge = (birthDateString) => {
     if (!birthDateString) return "";
+    
     const birthDate = new Date(birthDateString);
     const today = new Date();
+    
+    if (birthDate > today) {
+      return "";
+    }
+    
     let calculatedAge = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       calculatedAge--;
     }
-    return calculatedAge > 0 ? calculatedAge : "";
+    
+    return calculatedAge >= 0 ? calculatedAge : "";
   };
 
   const handleBirthDateChange = (e) => {
     const value = e.target.value;
     const calculatedAge = calculateAge(value);
-    setAge(calculatedAge);   
+    setAge(calculatedAge);
     setValue("studentAge", calculatedAge);
   };
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    } else {
+    
+    if (!file) {
       setPreview(null);
+      setPhotoFile(null);
+      setPhotoError("Debe subir una foto del estudiante");
+      return;
+    }
+
+    // Verifica si es una imagen
+    if (!file.type.startsWith("image/")) {
+      alert("Solo se permiten archivos de imagen (JPG, PNG, GIF).");
+      e.target.value = "";
+      setPreview(null);
+      setPhotoFile(null);
+      setPhotoError("Debe ser un archivo de imagen");
+      return;
+    }
+
+    // Verifica tamaño
+    if (file.size > 5 * 1024 * 1024) {
+      alert("La imagen debe pesar menos de 5MB.");
+      e.target.value = "";
+      setPreview(null);
+      setPhotoFile(null);
+      setPhotoError("La imagen debe pesar menos de 5MB");
+      return;
+    }
+
+    // Leer y mostrar la imagen
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result);
+      setPhotoFile(file);
+      setPhotoError("");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearPhoto = () => {
+    setPreview(null);
+    setPhotoFile(null);
+    setPhotoError("Debe subir una foto del estudiante");
+    const fileInput = document.getElementById("student-photo");
+    if (fileInput) {
+      fileInput.value = "";
     }
   };
 
@@ -91,34 +146,13 @@ const TabEstudiante = ({ register, errors, setValue }) => {
       <div className="photo-container">
         <label
           htmlFor="student-photo"
-          className={`photo-label ${errors.studentPhoto ? "photo-error" : ""}`}
+          className={`photo-label ${photoError ? "photo-error" : ""}`}
         >
-          <span>{preview ? "" : "Foto del Estudiante"}</span>
+          {!preview && <span></span>}
           <input
             type="file"
             id="student-photo"
-            {...register("studentPhoto", {
-              required: "Debe subir una foto del estudiante",
-              validate: {
-                isImage: (files) => {
-                  if (!files || files.length === 0)
-                    return "Debe subir una foto";
-                  const file = files[0];
-                  return (
-                    file.type.startsWith("image/") ||
-                    "Solo se permiten imágenes"
-                  );
-                },
-                maxSize: (files) => {
-                  if (!files || files.length === 0) return true;
-                  const file = files[0];
-                  return (
-                    file.size <= 5 * 1024 * 1024 ||
-                    "La imagen debe pesar menos de 5MB"
-                  );
-                },
-              },
-            })}
+            name="studentPhoto"
             accept="image/*"
             onChange={handlePhotoChange}
             className="visually-hidden"
@@ -129,17 +163,54 @@ const TabEstudiante = ({ register, errors, setValue }) => {
               backgroundImage: preview ? `url(${preview})` : "none",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              border: preview ? "none" : "2px dashed #adb5bd",
+              border: preview ? "2px solid #28a745" : photoError ? "2px dashed #dc3545" : "2px dashed #adb5bd",
+              minHeight: "150px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              borderRadius: "8px"
             }}
-          >            
+          >
+            {!preview && (
+              <div style={{ textAlign: "center", color: photoError ? "#dc3545" : "#6c757d" }}>
+                <div style={{ fontSize: "2rem" }}>📷</div>                
+              </div>
+            )}
           </div>
         </label>
-        {errors.studentPhoto && (
+        
+        {preview && (
+          <button 
+            type="button" 
+            onClick={clearPhoto}
+            className="clear-photo-btn"
+            style={{
+              marginTop: "0.5rem",
+              padding: "0.25rem 0.5rem",
+              fontSize: "0.8rem",
+              backgroundColor: "#08f884ff",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer"
+            }}
+          >
+           Cambiar foto
+          </button>
+        )}
+        
+        {photoError && (
           <span
             className="error-message"
-            style={{ display: "block", marginTop: "0.5rem" }}
+            style={{ 
+              display: "block", 
+              marginTop: "0.5rem",
+              color: "#dc3545",
+              fontSize: "0.875rem"
+            }}
           >
-            {errors.studentPhoto.message}
+            {photoError}
           </span>
         )}
       </div>
@@ -153,6 +224,7 @@ const TabEstudiante = ({ register, errors, setValue }) => {
               type="date"
               className="input-autofill"
               id="register-date"
+              name="registerDate"
               {...register("registerDate")}
               readOnly
             />
@@ -163,6 +235,7 @@ const TabEstudiante = ({ register, errors, setValue }) => {
               type="text"
               className="input-autofill"
               id="codigo"
+              name="codigo"
               {...register("codigo")}
               readOnly
             />
@@ -198,33 +271,44 @@ const TabEstudiante = ({ register, errors, setValue }) => {
             }}
           />
         </div>
-        
+
         <div className="field-row">
           <div className="group">
             <label htmlFor="studentBirthDate">Fecha de Nacimiento</label>
             <input
               type="date"
               id="studentBirthDate"
+              name="studentBirthDate"
               {...register("studentBirthDate", {
-                required: "Requerido",
-                validate: (value) => {
-                  if (!value) return "Requerido";
-                  const date = new Date(value);
-                  return !isNaN(date) || "Fecha inválida";
-                },
+                required: "La fecha de nacimiento es requerida",
+                validate: {
+                  notFuture: (value) => {
+                    if (!value) return true;
+                    const date = new Date(value);
+                    const today = new Date();
+                    return date <= today || "La fecha no puede ser futura";
+                  },
+                  validAge: (value) => {
+                    if (!value) return true;
+                    const age = calculateAge(value);
+                    return age >= 3 && age <= 25 || "La edad debe estar entre 3 y 25 años";
+                  }
+                }
               })}
               onChange={handleBirthDateChange}
               className={`input-line ${errors.studentBirthDate ? "error" : ""}`}
+              max={new Date().toISOString().split('T')[0]}
             />
             {errors.studentBirthDate && (
               <p className="field-error">{errors.studentBirthDate.message}</p>
             )}
-          </div>         
+          </div>
           <div className="group">
             <label htmlFor="studentAge">Edad:</label>
             <input
               type="number"
               id="studentAge"
+              name="studentAge"
               value={age}
               readOnly
               className="input-line"
@@ -247,11 +331,11 @@ const TabEstudiante = ({ register, errors, setValue }) => {
             required
             validation={{
               minLength: { value: 3, message: "Mínimo 3 caracteres" },
+              maxLength: { value: 100, message: "Máximo 100 caracteres" },
             }}
           />
         </div>
 
-        {/* Fila 3 */}
         <div className="field-row">
           <SelectField
             label="Tipo de Documento:"
@@ -305,8 +389,7 @@ const TabEstudiante = ({ register, errors, setValue }) => {
             }}
           />
         </div>
-
-        {/* Fila 4 */}
+        
         <div className="field-row">
           <SelectField
             label="Grupo Sanguíneo:"
@@ -322,6 +405,10 @@ const TabEstudiante = ({ register, errors, setValue }) => {
             register={register}
             errors={errors}
             required
+            validation={{
+              minLength: { value: 2, message: "Mínimo 2 caracteres" },
+              maxLength: { value: 50, message: "Máximo 50 caracteres" },
+            }}
           />
           <SelectField
             label="Grado al que ingresa"
