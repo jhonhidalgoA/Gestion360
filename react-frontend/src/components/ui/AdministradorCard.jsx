@@ -8,9 +8,8 @@ const AdminCard = ({ icon, title, path, gradient }) => {
         <div
           className="card-content"
           style={{
-            backgroundImage: gradient,
-            backgroundSize: "cover",
-            backgroundPosition: "center",                                
+            backgroundImage: gradient,            
+            height:"200px",                               
             borderRadius: "12px",
             border: "none",
           }}

@@ -1,15 +1,149 @@
+import {useState} from "react";
 import "./TabEstudiante.css";
+import InputField from "../../../components/ui/InputField";
+import SelectField from "../../../components/ui/SelectField";
 
-const TabEstudiante = ({ formData, handleChange }) => {
+const TabEstudiante = ({ register, errors, setValue }) => {
+  const documentOptions = [
+    { value: "", label: "Seleccionar" },
+    { value: "RC", label: "Registro Civil (RC)" },
+    { value: "TI", label: "Tarjeta de Identidad (TI)" },
+    { value: "CC", label: "Cédula de Ciudadanía (CC)" },
+    { value: "CE", label: "Cédula de Extranjería (CE)" },
+    { value: "PEP", label: "Permiso Especial de Permanencia (PEP)" },
+  ];
+
+  const genderOptions = [
+    { value: "", label: "Seleccionar" },
+    { value: "masculino", label: "Masculino" },
+    { value: "femenino", label: "Femenino" },
+    { value: "binario", label: "No Binario" },
+  ];
+
+  const bloodOptions = [
+    { value: "", label: "Seleccionar" },
+    { value: "A+", label: "A+" },
+    { value: "A-", label: "A-" },
+    { value: "B+", label: "B+" },
+    { value: "B-", label: "B-" },
+    { value: "AB+", label: "AB+" },
+    { value: "AB-", label: "AB-" },
+    { value: "O+", label: "O+" },
+    { value: "O-", label: "O-" },
+  ];
+
+  const gradeOptions = [
+    { value: "", label: "Seleccionar" },
+    { value: "preescolar", label: "Preescolar" },
+    { value: "primero", label: "Primero" },
+    { value: "segundo", label: "Segundo" },
+    { value: "tercero", label: "Tercero" },
+    { value: "cuarto", label: "Cuarto" },
+    { value: "quinto", label: "Quinto" },
+    { value: "sexto", label: "Sexto" },
+    { value: "septimo", label: "Séptimo" },
+    { value: "octavo", label: "Octavo" },
+    { value: "noveno", label: "Noveno" },
+    { value: "decimo", label: "Décimo" },
+    { value: "undecimo", label: "Undécimo" },
+  ];
+
+  const [preview, setPreview] = useState(null);
+  const [age, setAge] = useState("");
+
+  const calculateAge = (birthDateString) => {
+    if (!birthDateString) return "";
+    const birthDate = new Date(birthDateString);
+    const today = new Date();
+    let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      calculatedAge--;
+    }
+    return calculatedAge > 0 ? calculatedAge : "";
+  };
+
+  const handleBirthDateChange = (e) => {
+    const value = e.target.value;
+    const calculatedAge = calculateAge(value);
+    setAge(calculatedAge);   
+    setValue("studentAge", calculatedAge);
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPreview(null);
+    }
+  };
+
   return (
     <div className="tab-content">
       <div className="photo-container">
-        <label htmlFor="photo" className="photo-label">
-          <span>Foto del Estudiante</span>
-          <input type="file" id="photo" name="student_photo" accept="image/*" />
-          <div className="photo-preview"></div>
+        <label
+          htmlFor="student-photo"
+          className={`photo-label ${errors.studentPhoto ? "photo-error" : ""}`}
+        >
+          <span>{preview ? "" : "Foto del Estudiante"}</span>
+          <input
+            type="file"
+            id="student-photo"
+            {...register("studentPhoto", {
+              required: "Debe subir una foto del estudiante",
+              validate: {
+                isImage: (files) => {
+                  if (!files || files.length === 0)
+                    return "Debe subir una foto";
+                  const file = files[0];
+                  return (
+                    file.type.startsWith("image/") ||
+                    "Solo se permiten imágenes"
+                  );
+                },
+                maxSize: (files) => {
+                  if (!files || files.length === 0) return true;
+                  const file = files[0];
+                  return (
+                    file.size <= 5 * 1024 * 1024 ||
+                    "La imagen debe pesar menos de 5MB"
+                  );
+                },
+              },
+            })}
+            accept="image/*"
+            onChange={handlePhotoChange}
+            className="visually-hidden"
+          />
+          <div
+            className="photo-preview"
+            style={{
+              backgroundImage: preview ? `url(${preview})` : "none",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              border: preview ? "none" : "2px dashed #adb5bd",
+            }}
+          >            
+          </div>
         </label>
+        {errors.studentPhoto && (
+          <span
+            className="error-message"
+            style={{ display: "block", marginTop: "0.5rem" }}
+          >
+            {errors.studentPhoto.message}
+          </span>
+        )}
       </div>
+
       <div className="register-fields">
         <h3>Datos del estudiante</h3>
         <div className="field-row">
@@ -17,148 +151,200 @@ const TabEstudiante = ({ formData, handleChange }) => {
             <label htmlFor="register-date">Fecha de Matrícula:</label>
             <input
               type="date"
-              name="register-date"
+              className="input-autofill"
               id="register-date"
+              {...register("registerDate")}
               readOnly
             />
           </div>
           <div className="group">
             <label htmlFor="codigo">Código</label>
-            <input type="number" name="codigo" id="codigo" />
-          </div>
-          <div className="group">
-            <label htmlFor="name">Nombres:</label>
             <input
               type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
+              className="input-autofill"
+              id="codigo"
+              {...register("codigo")}
+              readOnly
             />
           </div>
-          <div className="group">
-            <label htmlFor="lastname">Apellidos:</label>
-            <input
-              type="text"
-              name="lastname"
-              id="lastname"
-              value={formData.lastname}
-              onChange={handleChange}
-            />
-          </div>
+          <InputField
+            label="Nombres:"
+            id="name"
+            register={register}
+            errors={errors}
+            required
+            validation={{
+              minLength: { value: 2, message: "Mínimo 2 caracteres" },
+              maxLength: { value: 50, message: "Máximo 50 caracteres" },
+              pattern: {
+                value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+                message: "Solo letras y espacios",
+              },
+            }}
+          />
+          <InputField
+            label="Apellidos:"
+            id="lastname"
+            register={register}
+            errors={errors}
+            required
+            validation={{
+              minLength: { value: 2, message: "Mínimo 2 caracteres" },
+              maxLength: { value: 50, message: "Máximo 50 caracteres" },
+              pattern: {
+                value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+                message: "Solo letras y espacios",
+              },
+            }}
+          />
         </div>
+        
         <div className="field-row">
           <div className="group">
-            <label htmlFor="studentBirthDate">Fecha de Nacimiento:</label>
+            <label htmlFor="studentBirthDate">Fecha de Nacimiento</label>
             <input
               type="date"
-              name="studentBirthDate"
               id="studentBirthDate"
-              value={formData.studentBirthDate}
+              {...register("studentBirthDate", {
+                required: "Requerido",
+                validate: (value) => {
+                  if (!value) return "Requerido";
+                  const date = new Date(value);
+                  return !isNaN(date) || "Fecha inválida";
+                },
+              })}
+              onChange={handleBirthDateChange}
+              className={`input-line ${errors.studentBirthDate ? "error" : ""}`}
             />
-          </div>
+            {errors.studentBirthDate && (
+              <p className="field-error">{errors.studentBirthDate.message}</p>
+            )}
+          </div>         
           <div className="group">
             <label htmlFor="studentAge">Edad:</label>
-            <input type="number" name="studentAge" id="studentAge" />
-          </div>
-          <div className="group">
-            <label htmlFor="studentGender">Género</label>
-            <select
-              name="studentGender"
-              id="studentGender"
-              value={formData.studentGender}
-              onChange={handleChange}
-            >
-              <option value="">Seleccionar</option>
-              <option value="masculino">Masculino</option>
-              <option value="femenino">Femenino</option>
-              <option value="binario">No Binario</option>
-            </select>
-          </div>
-          <div className="group">
-            <label htmlFor="studentBirthPlace">Lugar de Nacimiento:</label>
             <input
-              type="text"
-              name="studentBirthPlace"
-              id="studentBirthPlace"
-              value={formData.studentBirthPlace}
-              onChange={handleChange}
+              type="number"
+              id="studentAge"
+              value={age}
+              readOnly
+              className="input-line"
+              placeholder="Auto"
             />
           </div>
+          <SelectField
+            label="Género"
+            id="studentGender"
+            register={register}
+            errors={errors}
+            required
+            options={genderOptions}
+          />
+          <InputField
+            label="Lugar de Nacimiento:"
+            id="studentBirthPlace"
+            register={register}
+            errors={errors}
+            required
+            validation={{
+              minLength: { value: 3, message: "Mínimo 3 caracteres" },
+            }}
+          />
         </div>
+
+        {/* Fila 3 */}
         <div className="field-row">
-          <div className="group">
-            <label htmlFor="studentDocument">Tipo de Documento:</label>
-            <select
-              id="studentDocument"
-              name="studentDocument"
-              value={formData.studentDocument}
-              onChange={handleChange}
-            >
-              <option value="">Seleccionar</option>
-              <option value="RC">Registro Civil (RC)</option>
-              <option value="TI">Tarjeta de Identidad (TI)</option>
-              <option value="CC">Cédula de Ciudadanía (CC)</option>
-              <option value="CE">Cédula de Extranjería (CE)</option>
-              <option value="PEP">Permiso Especial de Permanencia (PEP)</option>
-            </select>
-          </div>
-          <div className="group">
-            <label htmlFor="studentDocumentNumber">Número de Documento:</label>
-            <input
-              type="number"
-              name="studentDocumentNumber"
-              id="studentDocumentNumber"
-              value={formData.studentDocumentNumber}
-              onChange={handleChange}
-            />
-          </div>    
-          <div className="group">
-            <label htmlFor="studentphone">Teléfono:</label>
-            <input
-              type="number"
-              name="studentphone"
-              id="studentphone"
-              value={formData.studentphone}
-              onChange={handleChange}
-            />
-          </div>     
-          <div className="group">
-            <label htmlFor="studentEmail">Correo Electrónico:</label>
-            <input
-              type="text"
-              name="studentEmail"
-              id="studentEmail"
-              placeholder="ejemplo@dominio.com"
-              value={formData.studentEmail}
-              onChange={handleChange}
-            />
-          </div>        
+          <SelectField
+            label="Tipo de Documento:"
+            id="studentDocument"
+            register={register}
+            errors={errors}
+            required
+            options={documentOptions}
+          />
+          <InputField
+            label="Número de Documento:"
+            id="studentDocumentNumber"
+            type="text"
+            register={register}
+            errors={errors}
+            required
+            validation={{
+              pattern: {
+                value: /^\d{5,15}$/,
+                message: "Debe ser numérico (5-15 dígitos)",
+              },
+            }}
+          />
+          <InputField
+            label="Teléfono:"
+            id="studentphone"
+            type="text"
+            register={register}
+            errors={errors}
+            required
+            validation={{
+              pattern: {
+                value: /^\d{7,15}$/,
+                message: "Teléfono inválido (7-15 dígitos)",
+              },
+            }}
+          />
+          <InputField
+            label="Correo Electrónico:"
+            id="studentEmail"
+            type="email"
+            register={register}
+            errors={errors}
+            required
+            placeholder="ejemplo@dominio.com"
+            validation={{
+              pattern: {
+                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                message: "Formato de correo inválido",
+              },
+            }}
+          />
         </div>
-          <div className="field-row">
-            <div className="group">
-              <label htmlFor="studendBlood">Grupo Sanguíneo:</label>
-              <select name="studentBlood" id="studentBlood" value={formData.studentBlood}
-              onChange={handleChange}>
-                 <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-              </select>
-            </div>
-            <div className="group">
-              <label htmlFor="studentEPS">EPS:</label>
-              <input type="text" name="studentEPS" id="studentEPS" value={formData.studentEPS}
-              onChange={handleChange} />
-            </div>
-            <div className="group">
-              
-            </div>
-          </div>
+
+        {/* Fila 4 */}
+        <div className="field-row">
+          <SelectField
+            label="Grupo Sanguíneo:"
+            id="studentBlood"
+            register={register}
+            errors={errors}
+            required
+            options={bloodOptions}
+          />
+          <InputField
+            label="EPS:"
+            id="studentEPS"
+            register={register}
+            errors={errors}
+            required
+          />
+          <SelectField
+            label="Grado al que ingresa"
+            id="studentGrade"
+            register={register}
+            errors={errors}
+            required
+            options={gradeOptions}
+          />
+          <InputField
+            label="Grupo:"
+            id="studentGroup"
+            register={register}
+            errors={errors}
+            required
+            validation={{
+              pattern: {
+                value: /^[A-Z]{1}$/,
+                message: "Debe ser una letra mayúscula (A, B, C...)",
+              },
+            }}
+          />
+        </div>
       </div>
     </div>
   );

@@ -64,7 +64,7 @@ return (
             )}
           </li>
         ))}
-        <li className="btn btn-mobile">
+        <li className="btns btn-mobile">
           <RouterLink to="/login" className="btn-ingresar" onClick={handleClick}>
             Ingresar
           </RouterLink>

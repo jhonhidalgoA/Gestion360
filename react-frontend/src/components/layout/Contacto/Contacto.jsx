@@ -58,7 +58,7 @@ const Contacto = () => {
               placeholder="Escribe tu mensaje"
               required
             ></textarea>
-            <button type="submit" className="btn dark-btn">
+            <button type="submit" className="btns dark-btn">
               Enviar mensaje
               <img src={white_arrow} alt="" />
             </button>

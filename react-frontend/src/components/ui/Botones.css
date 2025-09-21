@@ -1,0 +1,54 @@
+.action-buttons {
+  display: flex;
+  gap: 25px;
+  margin-top: 30px;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px !important;
+  font-weight: 600;
+  cursor: pointer; 
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 180px;
+  text-align: center;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Colores */
+.btn-primary {
+  background-color: #27ae60;
+  
+}
+
+.btn-secondary {
+  background-color: #f39c12;
+  
+}
+
+.btn-danger {
+  background-color: #e74c3c;
+  
+}
+
+.btn-info {
+  background-color: #9b59b6;
+  
+}
+
+
+.btn svg {
+  width: 24px;
+  height: 24px;
+}

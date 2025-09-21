@@ -29,7 +29,7 @@ const Noticias = ({
       </div>
       {showMoreButton && (
         <div className="button">
-          <Link to="/noticia-detalle" className="btn dark-btn">
+          <Link to="/noticia-detalle" className="btns dark-btn">
             Ver más <img src={white_arrow} alt="image" />
           </Link>
         </div>

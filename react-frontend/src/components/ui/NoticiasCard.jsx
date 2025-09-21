@@ -8,7 +8,7 @@ const Card = ({image, school, title, date, buttonText= "Saber más", buttonLink 
       <div className="card-content">
         <h4>{school} <span className="card-span">STEAM 360</span></h4>
         <hr className="custom-hr" />
-        <h2>{title}</h2>
+        <h4>{title}</h4>
          <div className="class-button">
           <span className="date">{date}</span>
           {showDetailsButton && (

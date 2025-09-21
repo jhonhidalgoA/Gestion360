@@ -13,7 +13,7 @@ const Hero = () => {
           oportunidades para el futuro.
         </p>
         <div className="button hero-button">
-          <Link to="/info-matricula" className="btn dark-btn">
+          <Link to="/info-matricula" className="btns dark-btn">
             Más información
             <img src={white_arrow} alt="" className="dark-arrow" />
           </Link>

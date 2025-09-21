@@ -24,7 +24,7 @@ const Eventos = ({ cardsToShow = 2, showDetailsButton = false, showMoreButton = 
       ))}
       {showMoreButton && (
         <div className="button">
-          <Link to="/evento-detalle" className="btn dark-btn">
+          <Link to="/evento-detalle" className="btns dark-btn">
             Ver detalles <img src={white_arrow} alt="" />
           </Link>
         </div>
