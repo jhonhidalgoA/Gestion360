@@ -1,22 +1,22 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import TabEstudiante from "./TabEstudiante";
-import TabAcademica from "./TabAcademica";
-import TabFamilia from "./TabFamilia";
+import TabAcademica from "./TabGeneral";
+import TabFamiliar from "./TabFamiliar";
 import NavbarSection from "../../../components/layout/Navbar/NavbarSection";
 import Botones from "../../../components/ui/Botones";
-import Modal from "../../../components/ui/Modal"; 
+import Modal from "../../../components/ui/Modal";
 import "./Matricula.css";
 
 const Matricula = () => {
   const [activeTab, setActiveTab] = useState("estudiante");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);  
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const generateStudentCode = () => {
     const year = new Date().getFullYear();
-    const random = Math.floor(10000 + Math.random() * 90000); 
+    const random = Math.floor(10000 + Math.random() * 90000);
     return `MAT-${year}-${random}`;
   };
 
@@ -26,13 +26,12 @@ const Matricula = () => {
     register,
     handleSubmit,
     formState: { errors, isValid },
-    trigger, 
+    trigger,
     setValue,
-    getValues,   
+    getValues,
   } = useForm({
     mode: "onBlur",
     defaultValues: {
-
       // Datos Estudiante
       registerDate: todayDate,
       codigo: generateStudentCode(),
@@ -40,34 +39,49 @@ const Matricula = () => {
       name: "",
       lastname: "",
       studentBirthDate: "",
-      studentAge: "", 
+      studentAge: "",
       studentGender: "",
       studentBirthPlace: "",
       studentDocument: "",
       studentDocumentNumber: "",
       studentphone: "",
-      studentEmail: "",
-      studentEPS: "",
+      studentEmail: "",     
       studentGrade: "",
-      studentGroup: "",
+      studentGroup: "",      
+      studentShift: "",
+      studentRegister: "",
+     
+
+      // Datos Generales
       studentBlood: "",
+      studentEPS: "",
+      studentEthnic: "",
+      studentReference: "",
+      studentAddress: "",
+      studentNeiborhood: "",
+      studentLocality: "",
+      studentStatus: "",
+      studentZone: "",   
+     
+      // Datos Familiares - Madre
+      motherName: "",
+      motherLastname: "",
+      motherTypeDocument: "",
+      motherDocument: "",
+      motherPhone: "",
+      motherEmail: "",
+      motherProfesion: "",
+      motherOcupation: "",
 
-      // Datos Académicos 
-      grado: "",
-      jornada: "",
-      fechaIngreso: "",
-      observaciones: "",
-
-      // Datos Familiares 
-      nombrePadre: "",
-      telefonoPadre: "",
-      emailPadre: "",
-      nombreMadre: "",
-      telefonoMadre: "",
-      emailMadre: "",
-      acudiente: "",
-      telefonoAcudiente: "",
-      emailAcudiente: "",
+      // Datos Familiares - Padre
+      fatherName: "",
+      fatherLastname: "",
+      fatherTypeDocument: "",
+      fatherDocument: "",
+      fatherPhone: "",
+      fatherEmail: "",
+      fatherProfesion: "",
+      fatherOcupation: "",
     },
   });
 
@@ -75,6 +89,7 @@ const Matricula = () => {
     let fieldsToValidate = [];
     let hasErrors = false;
 
+    // Validación por pestaña
     if (activeTab === "estudiante") {
       fieldsToValidate = [
         "name",
@@ -85,27 +100,56 @@ const Matricula = () => {
         "studentDocument",
         "studentDocumentNumber",
         "studentphone",
-        "studentEmail",
-        "studentEPS",
+        "studentEmail",        
         "studentGrade",
         "studentGroup",
         "studentBlood",
+        "studentShift",
+        "studentEthnic",
+        "studentReference",
+        "studentRegister"
       ];
-      
-      
+
       const formData = getValues();
       if (!formData.studentPhoto) {
         hasErrors = true;
       }
-    } else if (activeTab === "academica") {
-      fieldsToValidate = ["grado", "jornada", "fechaIngreso"];
+    } else if (activeTab === "academica") { 
+      fieldsToValidate = [
+        "studentBlood",
+        "studentEPS",
+        "studentEthnic",
+        "studentReference",
+        "studentAddress",
+        "studentNeiborhood", 
+        "studentLocality",
+        "studentStatus",
+        "studentZone"
+      ];
     } else if (activeTab === "familia") {
-      fieldsToValidate = ["nombrePadre", "telefonoPadre", "nombreMadre", "telefonoMadre"];
+      fieldsToValidate = [
+        "motherName",
+        "motherLastname",
+        "motherTypeDocument",
+        "motherDocument",
+        "motherPhone",
+        "motherEmail",
+        "motherProfesion",
+        "motherOcupation",
+        "fatherName",
+        "fatherLastname",
+        "fatherTypeDocument",
+        "fatherDocument",
+        "fatherPhone",
+        "fatherEmail",
+        "fatherProfesion",
+        "fatherOcupation",
+      ];
     }
 
     if (fieldsToValidate.length > 0) {
       const isValidTab = await trigger(fieldsToValidate);
-      if (!isValidTab || hasErrors) {        
+      if (!isValidTab || hasErrors) {
         setIsModalOpen(true);
         return;
       }
@@ -116,18 +160,18 @@ const Matricula = () => {
 
   const handleConfirmModal = () => {
     setIsModalOpen(false);
-       
-    const firstErrorField = Object.keys(errors)[0]; 
+
+    const firstErrorField = Object.keys(errors)[0];
     if (firstErrorField) {
-     
       setTimeout(() => {
-        const element = document.getElementById(firstErrorField) || 
-                      document.querySelector(`[name="${firstErrorField}"]`) ||
-                      document.querySelector('.photo-label'); 
-        
+        const element =
+          document.getElementById(firstErrorField) ||
+          document.querySelector(`[name="${firstErrorField}"]`) ||
+          document.querySelector(".photo-label");
+
         if (element) {
           element.focus();
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 100);
     }
@@ -138,29 +182,91 @@ const Matricula = () => {
   };
 
   const handleClosePhotoModal = () => {
-  setIsPhotoModalOpen(false);
-};
+    setIsPhotoModalOpen(false);
+  };
 
-const handleSuccessModalClose = () => {
-  setIsSuccessModalOpen(false);
-  // Opcional: puedes redirigir, resetear el formulario, etc.
-  // reset(); 
-};
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
+  };
 
   const onSubmit = (data) => {
-  console.log("Formulario válido. Datos:", data);
-  
-  // Validación adicional antes del envío
-  if (!data.studentPhoto) {
-    setIsPhotoModalOpen(true); // Mostrar modal de error de foto
-    return;
-  }
-  
-  // Aquí enviarías al backend (simulado)
-  // Ejemplo: await sendToBackend(data);
+    console.log("🚀 Formulario ENVIADO - Datos completos:", data);
+    console.table(data);
 
-  setIsSuccessModalOpen(true); // Mostrar modal de éxito
-};
+    if (!data.studentPhoto) {
+      setIsPhotoModalOpen(true);
+      return;
+    }
+
+    // Aquí puedes preparar los datos para enviar a la base de datos
+    const formattedData = {
+      // Información básica
+      registerDate: data.registerDate,
+      codigo: data.codigo,
+      
+      // Datos del estudiante
+      student: {
+        photo: data.studentPhoto,
+        name: data.name,
+        lastname: data.lastname,
+        birthDate: data.studentBirthDate,
+        age: data.studentAge,
+        gender: data.studentGender,
+        birthPlace: data.studentBirthPlace,
+        documentType: data.studentDocument,
+        documentNumber: data.studentDocumentNumber,
+        phone: data.studentphone,
+        email: data.studentEmail,
+        eps: data.studentEPS,
+        grade: data.studentGrade,
+        group: data.studentGroup,
+        bloodType: data.studentBlood,
+        shift: data.studentShift,
+        ethnicGroup: data.studentEthnic,
+        reference: data.studentReference,
+      },
+
+      // Datos generales/académicos
+      academic: {
+        address: data.studentAddress,
+        neighborhood: data.studentNeiborhood,
+        locality: data.studentLocality,
+        status: data.studentStatus,
+        zone: data.studentZone,
+      },
+
+      // Datos familiares
+      family: {
+        mother: {
+          name: data.motherName,
+          lastname: data.motherLastname,
+          documentType: data.motherTypeDocument,
+          document: data.motherDocument,
+          phone: data.motherPhone,
+          email: data.motherEmail,
+          profession: data.motherProfesion,
+          occupation: data.motherOcupation,
+        },
+        father: {
+          name: data.fatherName,
+          lastname: data.fatherLastname,
+          documentType: data.fatherTypeDocument,
+          document: data.fatherDocument,
+          phone: data.fatherPhone,
+          email: data.fatherEmail,
+          profession: data.fatherProfesion,
+          occupation: data.fatherOcupation,
+        },
+      },
+    };
+
+    console.log("📤 Datos formateados para BD:", formattedData);
+    
+    // Aquí harías la llamada a tu API/base de datos
+    // await submitToDatabase(formattedData);
+    
+    setIsSuccessModalOpen(true);
+  };
 
   return (
     <div className="student-registration">
@@ -177,7 +283,7 @@ const handleSuccessModalClose = () => {
           className={activeTab === "academica" ? "active" : ""}
           onClick={() => handleTabChange("academica")}
         >
-          Información Académica
+          Información General
         </button>
         <button
           className={activeTab === "familia" ? "active" : ""}
@@ -189,10 +295,11 @@ const handleSuccessModalClose = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="formStudent">
         {activeTab === "estudiante" && (
-          <TabEstudiante 
-            register={register} 
-            errors={errors} 
+          <TabEstudiante
+            register={register}
+            errors={errors}
             setValue={setValue}
+            getValues={getValues}
             trigger={trigger}
           />
         )}
@@ -200,7 +307,7 @@ const handleSuccessModalClose = () => {
           <TabAcademica register={register} errors={errors} />
         )}
         {activeTab === "familia" && (
-          <TabFamilia register={register} errors={errors} />
+          <TabFamiliar register={register} errors={errors} />
         )}
 
         <div className="form-actions">
@@ -213,7 +320,7 @@ const handleSuccessModalClose = () => {
           />
         </div>
       </form>
-      
+
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -226,48 +333,47 @@ const handleSuccessModalClose = () => {
         buttons={[
           {
             text: "Entendido",
-            variant: "success",            
+            variant: "success",
             onClick: handleConfirmModal,
           },
         ]}
       />
-      {/* Modal de error: Foto requerida */}
-<Modal
-  isOpen={isPhotoModalOpen}
-  onClose={handleClosePhotoModal}
-  title={
-    <>
-      Colegio <span className="modal-title-360"> STEAM 360</span>
-    </>
-  }
-  message="Por favor, suba una foto del estudiante."
-  buttons={[
-    {
-      text: "Entendido",
-      variant: "danger",
-      onClick: handleClosePhotoModal,
-    },
-  ]}
-/>
 
-{/* Modal de éxito */}
-<Modal
-  isOpen={isSuccessModalOpen}
-  onClose={handleSuccessModalClose}
-  title={
-    <>
-      Colegio <span className="modal-title-360"> STEAM 360</span>
-    </>
-  }
-  message="¡Matrícula registrada con éxito!"
-  buttons={[
-    {
-      text: "Aceptar",
-      variant: "success",
-      onClick: handleSuccessModalClose,
-    },
-  ]}
-/>
+      <Modal
+        isOpen={isPhotoModalOpen}
+        onClose={handleClosePhotoModal}
+        title={
+          <>
+            Colegio <span className="modal-title-360"> STEAM 360</span>
+          </>
+        }
+        message="Por favor, suba una foto del estudiante."
+        buttons={[
+          {
+            text: "Entendido",
+            variant: "danger",
+            onClick: handleClosePhotoModal,
+          },
+        ]}
+      />
+
+      <Modal
+        isOpen={isSuccessModalOpen}
+        onClose={handleSuccessModalClose}
+        title={
+          <>
+            Colegio <span className="modal-title-360"> STEAM 360</span>
+          </>
+        }
+        message="¡Matrícula registrada con éxito!"
+        buttons={[
+          {
+            text: "Aceptar",
+            variant: "success",
+            onClick: handleSuccessModalClose,
+          },
+        ]}
+      />
     </div>
   );
 };

@@ -14,7 +14,7 @@
 .photo-container {
     width: 170px;
     height: 220px;
-    margin-top:60px;
+    margin-top:30px;
     flex-shrink: 0;
     position: relative;
 }
@@ -29,18 +29,12 @@
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    background-color: #f8f8f8;
-   
+    background-color: #f8f8f8;   
 }
 
 .photo-label:hover {
   background: #f8f9fa;
   border-color: #3b82f6;
-}
-
-.photo-label.photo-error {
-  border-color: #ef4444 !important;
-  background-color: #fef2f2;
 }
 
 .photo-label span {
@@ -90,26 +84,14 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;  
+    gap: 30px;  
 
-}
-
-.register-fields h3 {
-  margin-bottom: 5px;
-  margin-left:-180px;
-  color: #2c3e50;
-  font-size: 18px;
-  font-weight: 600;
 }
 
 .field-row {
   display: flex;
   gap: 10px;
-  margin-bottom: 5px;
-}
-
-.field-row:last-child {
-  margin-bottom: 0;
+  margin-top: 5px;
 }
 
 .group {
@@ -118,7 +100,7 @@
 
 .group label {
   display: block;
-  margin-bottom: 10px;
+  margin: 0  0  5px 10px;
   font-weight: 600;
   color: #000000;
   font-size: 14px;
@@ -127,31 +109,37 @@
 .group input,
 .group select {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
+  padding: 8px;
+  border: 2px solid #ccc;
   border-radius: 6px;
-  font-size: 18px;
+  font-size: 14px;
   transition: border-color 0.3s ease;
 }
 
 .group input:focus,
 .group select:focus {
   outline: none;
-  border-color: #2e86c1;
-  box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.2);
+  border-color: #2e86c1;  
 }
 
 .input-autofill {
   background-color: #f0fdf4 !important; 
-  border-color: #22c55e !important;      
-  color: #166534;                       
+  border-color: #22c55e !important;    
   font-weight: 500;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius:30px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}             
+  
+.clear-photo-btn{
+  background:red;
+  border:none;
+  color:white;
+  padding:5px;
+  border-radius:3px;
+  margin:5px 0 0 40px;
+
 }
-
-
-.field-error{
-  display: block;
-  color: red;
-  font-size: 0.7rem;
-}
-

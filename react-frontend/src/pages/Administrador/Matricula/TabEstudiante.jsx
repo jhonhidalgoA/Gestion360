@@ -3,7 +3,7 @@ import "./TabEstudiante.css";
 import InputField from "../../../components/ui/InputField";
 import SelectField from "../../../components/ui/SelectField";
 
-const TabEstudiante = ({ register, errors, setValue }) => {
+const TabEstudiante = ({ register, errors, setValue, getValues }) => {
   const documentOptions = [
     { value: "", label: "Seleccionar" },
     { value: "RC", label: "Registro Civil (RC)" },
@@ -18,18 +18,6 @@ const TabEstudiante = ({ register, errors, setValue }) => {
     { value: "masculino", label: "Masculino" },
     { value: "femenino", label: "Femenino" },
     { value: "no-binario", label: "No Binario" },
-  ];
-
-  const bloodOptions = [
-    { value: "", label: "Seleccionar" },
-    { value: "A+", label: "A+" },
-    { value: "A-", label: "A-" },
-    { value: "B+", label: "B+" },
-    { value: "B-", label: "B-" },
-    { value: "AB+", label: "AB+" },
-    { value: "AB-", label: "AB-" },
-    { value: "O+", label: "O+" },
-    { value: "O-", label: "O-" },
   ];
 
   const gradeOptions = [
@@ -48,56 +36,51 @@ const TabEstudiante = ({ register, errors, setValue }) => {
     { value: "undecimo", label: "Undécimo" },
   ];
 
+  const gradeShift = [
+    { value: "", label: "Seleccionar" },
+    { value: "unica", label: "Única" },
+    { value: "manana", label: "Mañana" },
+    { value: "tarde", label: "Tarde" },
+    { value: "nocturna", label: "Nocturna" },
+    { value: "sabatino", label: "Sabatino" },
+  ];
+
+  const gradeRegister = [
+    { value: "", label: "Seleccionar" },
+    { value: "nueva", label: "Nuevo" },
+    { value: "repite", label: "Repitente" },
+    { value: "promovido", label: "Promovido" },
+    { value: "reingreso", label: "Re-ingreso" },
+    { value: "validacion", label: "Validación" },
+  ];
+
   const [preview, setPreview] = useState(null);
   const [age, setAge] = useState("");
-  const [photoFile, setPhotoFile] = useState(null);
-  const [photoError, setPhotoError] = useState("");
-  const [showPhotoError, setShowPhotoError] = useState(false);
 
-  // Efecto para validar la foto cuando cambia
   useEffect(() => {
-    if (photoFile) {
-      setValue("studentPhoto", photoFile, { shouldValidate: true });
-      setPhotoError("");
-    } else {
-      setValue("studentPhoto", null, { shouldValidate: true });
-     
-      if (showPhotoError) {
-        setPhotoError("Debe subir una foto del estudiante");
-      }
+    const currentPhoto = getValues("studentPhoto");
+    if (currentPhoto) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(currentPhoto);
     }
-  }, [photoFile, setValue, showPhotoError]);
-
- 
-  useEffect(() => {
-    const handleValidatePhoto = () => {
-      if (!photoFile) {
-        setShowPhotoError(true);
-        setPhotoError("Debe subir una foto del estudiante");
-      }
-    };
-
-    window.addEventListener('validatePhoto', handleValidatePhoto);
-    return () => window.removeEventListener('validatePhoto', handleValidatePhoto);
-  }, [photoFile]);
+  }, [getValues]);
 
   const calculateAge = (birthDateString) => {
     if (!birthDateString) return "";
-    
     const birthDate = new Date(birthDateString);
     const today = new Date();
-    
-    if (birthDate > today) {
-      return "";
-    }
-    
+    if (birthDate > today) return "";
     let calculatedAge = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       calculatedAge--;
     }
-    
     return calculatedAge >= 0 ? calculatedAge : "";
   };
 
@@ -109,13 +92,12 @@ const TabEstudiante = ({ register, errors, setValue }) => {
   };
 
   const handlePhotoChange = (e) => {
-    setShowPhotoError(true); 
     const file = e.target.files[0];
-    
+
     if (!file) {
       setPreview(null);
-      setPhotoFile(null);
-      setPhotoError("Debe subir una foto del estudiante");
+
+      setValue("studentPhoto", null);
       return;
     }
 
@@ -124,8 +106,8 @@ const TabEstudiante = ({ register, errors, setValue }) => {
       alert("Solo se permiten archivos de imagen (JPG, PNG, GIF).");
       e.target.value = "";
       setPreview(null);
-      setPhotoFile(null);
-      setPhotoError("Debe ser un archivo de imagen");
+
+      setValue("studentPhoto", null);
       return;
     }
 
@@ -134,8 +116,8 @@ const TabEstudiante = ({ register, errors, setValue }) => {
       alert("La imagen debe pesar menos de 5MB.");
       e.target.value = "";
       setPreview(null);
-      setPhotoFile(null);
-      setPhotoError("La imagen debe pesar menos de 5MB");
+
+      setValue("studentPhoto", null);
       return;
     }
 
@@ -143,17 +125,16 @@ const TabEstudiante = ({ register, errors, setValue }) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result);
-      setPhotoFile(file);
-      setPhotoError("");
+
+      setValue("studentPhoto", file);
     };
     reader.readAsDataURL(file);
   };
 
   const clearPhoto = () => {
     setPreview(null);
-    setPhotoFile(null);
-    setShowPhotoError(true); 
-    setPhotoError("Debe subir una foto del estudiante");
+
+    setValue("studentPhoto", null);
     const fileInput = document.getElementById("student-photo");
     if (fileInput) {
       fileInput.value = "";
@@ -165,7 +146,7 @@ const TabEstudiante = ({ register, errors, setValue }) => {
       <div className="photo-container">
         <label
           htmlFor="student-photo"
-          className={`photo-label ${photoError ? "photo-error" : ""}`}
+          className={`photo-label ${errors.studentPhoto ? "photo-error" : ""}`}
         >
           {!preview && <span>Foto del Estudiante</span>}
           <input
@@ -182,59 +163,46 @@ const TabEstudiante = ({ register, errors, setValue }) => {
               backgroundImage: preview ? `url(${preview})` : "none",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              border: preview ? "2px solid #28a745" : photoError ? "2px dashed #dc3545" : "2px dashed #adb5bd",
+              border: preview
+                ? "2px solid #28a745"
+                : errors.studentPhoto
+                ? "2px dashed #dc3545"
+                : "2px dashed #adb5bd",
               minHeight: "150px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               position: "relative",
-              borderRadius: "8px"
+              borderRadius: "8px",
             }}
           >
             {!preview && (
-              <div style={{ textAlign: "center", color: photoError ? "#dc3545" : "#6c757d" }}>                            
-              </div>
+              <div
+                style={{
+                  textAlign: "center",
+                  color: errors.studentPhoto ? "#dc3545" : "#6c757d",
+                }}
+              />
             )}
           </div>
         </label>
-        
+
         {preview && (
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={clearPhoto}
             className="clear-photo-btn"
-            style={{
-              marginTop: "0.5rem",
-              padding: "0.25rem 0.5rem",
-              fontSize: "0.8rem",
-              backgroundColor: "#dc3545",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer"
-            }}
           >
             Quitar foto
           </button>
         )}
-        
-        {photoError && showPhotoError && (
-          <span
-            className="error-message"
-            style={{ 
-              display: "block", 
-              marginTop: "0.5rem",
-              color: "#dc3545",
-              fontSize: "0.875rem"
-            }}
-          >
-            {photoError}
-          </span>
+
+        {errors.studentPhoto && (
+          <span className="error-message">{errors.studentPhoto.message}</span>
         )}
       </div>
 
       <div className="register-fields">
-        <h3>Datos del estudiante</h3>
         <div className="field-row">
           <div className="group">
             <label htmlFor="register-date">Fecha de Matrícula:</label>
@@ -258,38 +226,41 @@ const TabEstudiante = ({ register, errors, setValue }) => {
               readOnly
             />
           </div>
-          <InputField
-            label="Nombres:"
-            id="name"
-            register={register}
-            errors={errors}
-            required
-            validation={{
-              minLength: { value: 3, message: "Mínimo 3 caracteres" },
-              maxLength: { value: 20, message: "Máximo 20 caracteres" },
-              pattern: {
-                value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
-                message: "Solo letras y espacios",
-              },
-            }}
-          />
-          <InputField
-            label="Apellidos:"
-            id="lastname"
-            register={register}
-            errors={errors}
-            required
-            validation={{
-              minLength: { value: 3, message: "Mínimo 3 caracteres" },
-              maxLength: { value: 20, message: "Máximo 20 caracteres" },
-              pattern: {
-                value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
-                message: "Solo letras y espacios",
-              },
-            }}
-          />
+          <div className="group">
+            <InputField
+              label="Nombres:"
+              id="name"
+              register={register}
+              errors={errors}
+              required
+              validation={{
+                minLength: { value: 3, message: "Mínimo 3 caracteres" },
+                maxLength: { value: 20, message: "Máximo 20 caracteres" },
+                pattern: {
+                  value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+                  message: "Solo letras y espacios",
+                },
+              }}
+            />
+          </div>
+          <div className="group">
+            <InputField
+              label="Apellidos:"
+              id="lastname"
+              register={register}
+              errors={errors}
+              required
+              validation={{
+                minLength: { value: 3, message: "Mínimo 3 caracteres" },
+                maxLength: { value: 20, message: "Máximo 20 caracteres" },
+                pattern: {
+                  value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+                  message: "Solo letras y espacios",
+                },
+              }}
+            />
+          </div>
         </div>
-
         <div className="field-row">
           <div className="group">
             <label htmlFor="studentBirthDate">Fecha de Nacimiento</label>
@@ -309,16 +280,21 @@ const TabEstudiante = ({ register, errors, setValue }) => {
                   validAge: (value) => {
                     if (!value) return true;
                     const age = calculateAge(value);
-                    return age >= 6 && age <= 99 || "La edad debe estar entre 6 y 99 años";
-                  }
-                }
+                    return (
+                      (age >= 6 && age <= 99) ||
+                      "La edad debe estar entre 6 y 99 años"
+                    );
+                  },
+                },
               })}
               onChange={handleBirthDateChange}
-              className={`input-line ${errors.studentBirthDate ? "error" : ""}`}
-              max={new Date().toISOString().split('T')[0]}             
+              className={`input-line ${
+                errors.studentBirthDate ? "input-error" : ""
+              }`}
+              max={new Date().toISOString().split("T")[0]}
             />
             {errors.studentBirthDate && (
-              <span className="field-error">        
+              <span className="error-message">
                 {errors.studentBirthDate.message}
               </span>
             )}
@@ -332,7 +308,6 @@ const TabEstudiante = ({ register, errors, setValue }) => {
               value={age}
               readOnly
               className="input-line"
-              placeholder="Auto"
             />
           </div>
           <SelectField
@@ -355,30 +330,33 @@ const TabEstudiante = ({ register, errors, setValue }) => {
             }}
           />
         </div>
-
         <div className="field-row">
-          <SelectField
-            label="Tipo de Documento:"
-            id="studentDocument"
-            register={register}
-            errors={errors}
-            required
-            options={documentOptions}
-          />
-          <InputField
-            label="Número de Documento:"
-            id="studentDocumentNumber"
-            type="text"
-            register={register}
-            errors={errors}
-            required
-            validation={{
-              pattern: {
-                value: /^\d{5,15}$/,
-                message: "Debe ser numérico (5-15 dígitos)",
-              },
-            }}
-          />
+          <div className="group">
+            <SelectField
+              label="Tipo de Documento:"
+              id="studentDocument"
+              register={register}
+              errors={errors}
+              required
+              options={documentOptions}
+            />
+          </div>
+          <div className="group">
+            <InputField
+              label="Número de Documento:"
+              id="studentDocumentNumber"
+              type="text"
+              register={register}
+              errors={errors}
+              required
+              validation={{
+                pattern: {
+                  value: /^\d{5,15}$/,
+                  message: "Debe ser numérico (5-15 dígitos)",
+                },
+              }}
+            />
+          </div>
           <InputField
             label="Teléfono:"
             id="studentphone"
@@ -409,35 +387,17 @@ const TabEstudiante = ({ register, errors, setValue }) => {
             }}
           />
         </div>
-        
         <div className="field-row">
-          <SelectField
-            label="Grupo Sanguíneo:"
-            id="studentBlood"
-            register={register}
-            errors={errors}
-            required
-            options={bloodOptions}
-          />
-          <InputField
-            label="EPS:"
-            id="studentEPS"
-            register={register}
-            errors={errors}
-            required
-            validation={{
-              minLength: { value: 3, message: "Mínimo 3 caracteres" },
-              maxLength: { value: 20 , message: "Máximo 20 caracteres" },
-            }}
-          />
-          <SelectField
-            label="Grado al que ingresa"
-            id="studentGrade"
-            register={register}
-            errors={errors}
-            required
-            options={gradeOptions}
-          />
+          <div className="group">
+            <SelectField
+              label="Grado al que ingresa"
+              id="studentGrade"
+              register={register}
+              errors={errors}
+              required
+              options={gradeOptions}
+            />
+          </div>
           <InputField
             label="Grupo:"
             id="studentGroup"
@@ -451,6 +411,24 @@ const TabEstudiante = ({ register, errors, setValue }) => {
               },
             }}
           />
+          <div className="group">
+            <SelectField
+              label="Jornada:"
+              id="studentShift"
+              register={register}
+              errors={errors}
+              required
+              options={gradeShift}
+            />
+          </div>
+           <SelectField
+              label="Tipo de Matrícula"
+              id="studentRegister"
+              register={register}
+              errors={errors}
+              required
+              options={gradeRegister}
+            />
         </div>
       </div>
     </div>

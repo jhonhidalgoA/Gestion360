@@ -45,24 +45,8 @@
     padding: 0 20px;
 }
 
-.group {
-  display: flex;
-  flex-direction: column;
-}
-
-.group label {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #333;
-  font-size: 14px;
-}
 
 
-
-.input-error {
-  border-color: #ef4444 !important;
-  background-color: #fef2f2;
-}
 
 .error-message {
   color: #ef4444;
