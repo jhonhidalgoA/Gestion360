@@ -1,0 +1,52 @@
+.modal-lista-estudiantes {
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.modal-lista-estudiantes input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.modal-lista-estudiantes .table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.modal-lista-estudiantes table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-lista-estudiantes th {
+  padding: 8px;
+  text-align: left;
+  background: #007bff;
+  color: white;
+}
+
+.modal-lista-estudiantes td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-lista-estudiantes button {
+  background: #ffc107;
+  color: #000;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}

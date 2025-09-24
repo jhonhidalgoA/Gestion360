@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import {getDefaultValues} from "../Matricula/config/defaultValues"
+import { validateTab, formatMatriculaData } from "../Matricula/utils/formHelpers";
+import {postMatricula} from "../Matricula/utils/apiHelpers"
+import ModalListaEstudiantes from "../Matricula/ModalListaEstudiante"
 import TabEstudiante from "./TabEstudiante";
-import TabAcademica from "./TabGeneral";
+import TabAcademica from "./TabAcademica"; 
 import TabFamiliar from "./TabFamiliar";
 import NavbarSection from "../../../components/layout/Navbar/NavbarSection";
 import Botones from "../../../components/ui/Botones";
@@ -11,309 +15,114 @@ import "./Matricula.css";
 const Matricula = () => {
   const [activeTab, setActiveTab] = useState("estudiante");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isStudentListModalOpen, setIsStudentListModalOpen] = useState(false);
 
-  const generateStudentCode = () => {
-    const year = new Date().getFullYear();
-    const random = Math.floor(10000 + Math.random() * 90000);
-    return `MAT-${year}-${random}`;
-  };
-
-  const todayDate = new Date().toISOString().split("T")[0];
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-    trigger,
-    setValue,
-    getValues,
-  } = useForm({
+  const { register, handleSubmit, formState: { errors, isValid }, trigger, setValue, getValues, reset } = useForm({
     mode: "onBlur",
-    defaultValues: {
-      // Datos Estudiante
-      registerDate: todayDate,
-      codigo: generateStudentCode(),
-      studentPhoto: null,
-      name: "",
-      lastname: "",
-      studentBirthDate: "",
-      studentAge: "",
-      studentGender: "",
-      studentBirthPlace: "",
-      studentDocument: "",
-      studentDocumentNumber: "",
-      studentphone: "",
-      studentEmail: "",     
-      studentGrade: "",
-      studentGroup: "",      
-      studentShift: "",
-      studentRegister: "",
-     
-
-      // Datos Generales
-      studentBlood: "",
-      studentEPS: "",
-      studentEthnic: "",
-      studentReference: "",
-      studentAddress: "",
-      studentNeiborhood: "",
-      studentLocality: "",
-      studentStatus: "",
-      studentZone: "",   
-     
-      // Datos Familiares - Madre
-      motherName: "",
-      motherLastname: "",
-      motherTypeDocument: "",
-      motherDocument: "",
-      motherPhone: "",
-      motherEmail: "",
-      motherProfesion: "",
-      motherOcupation: "",
-
-      // Datos Familiares - Padre
-      fatherName: "",
-      fatherLastname: "",
-      fatherTypeDocument: "",
-      fatherDocument: "",
-      fatherPhone: "",
-      fatherEmail: "",
-      fatherProfesion: "",
-      fatherOcupation: "",
-    },
+    defaultValues: getDefaultValues(),
   });
 
   const handleTabChange = async (tab) => {
-    let fieldsToValidate = [];
-    let hasErrors = false;
-
-    // Validación por pestaña
-    if (activeTab === "estudiante") {
-      fieldsToValidate = [
-        "name",
-        "lastname",
-        "studentBirthDate",
-        "studentGender",
-        "studentBirthPlace",
-        "studentDocument",
-        "studentDocumentNumber",
-        "studentphone",
-        "studentEmail",        
-        "studentGrade",
-        "studentGroup",
-        "studentBlood",
-        "studentShift",
-        "studentEthnic",
-        "studentReference",
-        "studentRegister"
-      ];
-
-      const formData = getValues();
-      if (!formData.studentPhoto) {
-        hasErrors = true;
-      }
-    } else if (activeTab === "academica") { 
-      fieldsToValidate = [
-        "studentBlood",
-        "studentEPS",
-        "studentEthnic",
-        "studentReference",
-        "studentAddress",
-        "studentNeiborhood", 
-        "studentLocality",
-        "studentStatus",
-        "studentZone"
-      ];
-    } else if (activeTab === "familia") {
-      fieldsToValidate = [
-        "motherName",
-        "motherLastname",
-        "motherTypeDocument",
-        "motherDocument",
-        "motherPhone",
-        "motherEmail",
-        "motherProfesion",
-        "motherOcupation",
-        "fatherName",
-        "fatherLastname",
-        "fatherTypeDocument",
-        "fatherDocument",
-        "fatherPhone",
-        "fatherEmail",
-        "fatherProfesion",
-        "fatherOcupation",
-      ];
-    }
-
-    if (fieldsToValidate.length > 0) {
-      const isValidTab = await trigger(fieldsToValidate);
-      if (!isValidTab || hasErrors) {
-        setIsModalOpen(true);
-        return;
-      }
-    }
-
-    setActiveTab(tab);
+    const isValidTab = await validateTab(activeTab, trigger, setIsModalOpen);
+    if (isValidTab) setActiveTab(tab);
   };
 
-  const handleConfirmModal = () => {
-    setIsModalOpen(false);
-
-    const firstErrorField = Object.keys(errors)[0];
-    if (firstErrorField) {
-      setTimeout(() => {
-        const element =
-          document.getElementById(firstErrorField) ||
-          document.querySelector(`[name="${firstErrorField}"]`) ||
-          document.querySelector(".photo-label");
-
-        if (element) {
-          element.focus();
-          element.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-      }, 100);
+  const onSubmit = async (data) => {
+    try {
+      const formattedData = formatMatriculaData(data);
+      await postMatricula(formattedData);
+      reset(getDefaultValues());
+      setActiveTab("estudiante");
+      setIsSuccessModalOpen(true);
+    } catch (error) {
+      console.error("❌ Error al enviar a la API:", error);
+      alert("No se pudo registrar la matrícula. Verifique el servidor.");
     }
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+ const loadStudentForEdit = (matricula) => {
+  const values = {
+    // Datos del estudiante (TabEstudiante)
+    name: matricula.student.name,
+    lastname: matricula.student.lastname,
+    studentBirthDate: matricula.student.birthDate,
+    studentAge: matricula.student.age,
+    studentGender: matricula.student.gender,
+    studentBirthPlace: matricula.student.birthPlace,
+    studentDocument: matricula.student.documentType,
+    studentDocumentNumber: matricula.student.documentNumber,
+    studentphone: matricula.student.phone,
+    studentEmail: matricula.student.email,
+    studentGrade: matricula.student.grade,
+    studentGroup: matricula.student.group,
+    studentShift: matricula.student.shift,
+    studentRegister: matricula.student.registerType || "",
+
+    // Datos de TabAcademica
+    studentBlood: matricula.student.bloodType,
+    studentEPS: matricula.student.eps,
+    studentEthnic: matricula.student.ethnicGroup,
+    studentReference: matricula.student.reference, 
+
+    // Dirección y ubicación
+    studentAddress: matricula.academic.address,
+    studentNeighborhood: matricula.academic.neighborhood,
+    studentLocality: matricula.academic.locality,
+    studentStatus: matricula.academic.status,
+    studentZone: matricula.academic.zone,
+
+    // Datos familiares
+    motherName: matricula.family.mother.name,
+    motherLastname: matricula.family.mother.lastname,
+    motherTypeDocument: matricula.family.mother.documentType,
+    motherDocument: matricula.family.mother.document,
+    motherPhone: matricula.family.mother.phone,
+    motherEmail: matricula.family.mother.email,
+    motherProfesion: matricula.family.mother.profession, 
+    motherOcupation: matricula.family.mother.occupation, 
+
+    fatherName: matricula.family.father.name,
+    fatherLastname: matricula.family.father.lastname,
+    fatherTypeDocument: matricula.family.father.documentType,
+    fatherDocument: matricula.family.father.document,
+    fatherPhone: matricula.family.father.phone,
+    fatherEmail: matricula.family.father.email,
+    fatherProfesion: matricula.family.father.profession,
+    fatherOcupation: matricula.family.father.occupation,
   };
 
-  const handleClosePhotoModal = () => {
-    setIsPhotoModalOpen(false);
-  };
-
-  const handleSuccessModalClose = () => {
-    setIsSuccessModalOpen(false);
-  };
-
-  const onSubmit = (data) => {
-    console.log("🚀 Formulario ENVIADO - Datos completos:", data);
-    console.table(data);
-
-    if (!data.studentPhoto) {
-      setIsPhotoModalOpen(true);
-      return;
-    }
-
-    // Aquí puedes preparar los datos para enviar a la base de datos
-    const formattedData = {
-      // Información básica
-      registerDate: data.registerDate,
-      codigo: data.codigo,
-      
-      // Datos del estudiante
-      student: {
-        photo: data.studentPhoto,
-        name: data.name,
-        lastname: data.lastname,
-        birthDate: data.studentBirthDate,
-        age: data.studentAge,
-        gender: data.studentGender,
-        birthPlace: data.studentBirthPlace,
-        documentType: data.studentDocument,
-        documentNumber: data.studentDocumentNumber,
-        phone: data.studentphone,
-        email: data.studentEmail,
-        eps: data.studentEPS,
-        grade: data.studentGrade,
-        group: data.studentGroup,
-        bloodType: data.studentBlood,
-        shift: data.studentShift,
-        ethnicGroup: data.studentEthnic,
-        reference: data.studentReference,
-      },
-
-      // Datos generales/académicos
-      academic: {
-        address: data.studentAddress,
-        neighborhood: data.studentNeiborhood,
-        locality: data.studentLocality,
-        status: data.studentStatus,
-        zone: data.studentZone,
-      },
-
-      // Datos familiares
-      family: {
-        mother: {
-          name: data.motherName,
-          lastname: data.motherLastname,
-          documentType: data.motherTypeDocument,
-          document: data.motherDocument,
-          phone: data.motherPhone,
-          email: data.motherEmail,
-          profession: data.motherProfesion,
-          occupation: data.motherOcupation,
-        },
-        father: {
-          name: data.fatherName,
-          lastname: data.fatherLastname,
-          documentType: data.fatherTypeDocument,
-          document: data.fatherDocument,
-          phone: data.fatherPhone,
-          email: data.fatherEmail,
-          profession: data.fatherProfesion,
-          occupation: data.fatherOcupation,
-        },
-      },
-    };
-
-    console.log("📤 Datos formateados para BD:", formattedData);
-    
-    // Aquí harías la llamada a tu API/base de datos
-    // await submitToDatabase(formattedData);
-    
-    setIsSuccessModalOpen(true);
-  };
+  reset(values);
+  setActiveTab("estudiante");
+};
 
   return (
     <div className="student-registration">
       <NavbarSection title="Registro Matrícula Estudiante" color="#2e86c1" />
 
       <div className="tabs">
-        <button
-          className={activeTab === "estudiante" ? "active" : ""}
-          onClick={() => handleTabChange("estudiante")}
-        >
-          Datos Estudiante
-        </button>
-        <button
-          className={activeTab === "academica" ? "active" : ""}
-          onClick={() => handleTabChange("academica")}
-        >
-          Información General
-        </button>
-        <button
-          className={activeTab === "familia" ? "active" : ""}
-          onClick={() => handleTabChange("familia")}
-        >
-          Datos Familiares
-        </button>
+        {["estudiante", "academica", "familia"].map((tab) => (
+          <button
+            key={tab}
+            className={activeTab === tab ? "active" : ""}
+            onClick={() => handleTabChange(tab)}
+            type="button"
+          >
+            {tab === "estudiante" ? "Datos Estudiante" :
+             tab === "academica" ? "Información General" : "Datos Familiares"}
+          </button>
+        ))}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="formStudent">
-        {activeTab === "estudiante" && (
-          <TabEstudiante
-            register={register}
-            errors={errors}
-            setValue={setValue}
-            getValues={getValues}
-            trigger={trigger}
-          />
-        )}
-        {activeTab === "academica" && (
-          <TabAcademica register={register} errors={errors} />
-        )}
-        {activeTab === "familia" && (
-          <TabFamiliar register={register} errors={errors} />
-        )}
+        {activeTab === "estudiante" && <TabEstudiante register={register} errors={errors} setValue={setValue} getValues={getValues} trigger={trigger} />}
+        {activeTab === "academica" && <TabAcademica register={register} errors={errors} />}
+        {activeTab === "familia" && <TabFamiliar register={register} errors={errors} />}
 
         <div className="form-actions">
           <Botones
             onSave={handleSubmit(onSubmit)}
-            onEdit={() => alert("Editar")}
+            onEdit={() => setIsStudentListModalOpen(true)}
             onDelete={() => alert("Eliminar")}
             onGeneratePDF={() => alert("Generar PDF")}
             disabled={!isValid}
@@ -323,57 +132,24 @@ const Matricula = () => {
 
       <Modal
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        title={
-          <>
-            Colegio <span className="modal-title-360"> STEAM 360</span>
-          </>
-        }
-        message="Por favor completar todos los campos requeridos antes de cambiar de pestaña."
-        buttons={[
-          {
-            text: "Entendido",
-            variant: "success",
-            onClick: handleConfirmModal,
-          },
-        ]}
-      />
-
-      <Modal
-        isOpen={isPhotoModalOpen}
-        onClose={handleClosePhotoModal}
-        title={
-          <>
-            Colegio <span className="modal-title-360"> STEAM 360</span>
-          </>
-        }
-        message="Por favor, suba una foto del estudiante."
-        buttons={[
-          {
-            text: "Entendido",
-            variant: "danger",
-            onClick: handleClosePhotoModal,
-          },
-        ]}
+        onClose={() => setIsModalOpen(false)}
+        title="Colegio STEAM 360"
+        message="Por favor complete todos los campos requeridos antes de cambiar de pestaña."
+        buttons={[{ text: "Entendido", variant: "success", onClick: () => setIsModalOpen(false) }]}
       />
 
       <Modal
         isOpen={isSuccessModalOpen}
-        onClose={handleSuccessModalClose}
-        title={
-          <>
-            Colegio <span className="modal-title-360"> STEAM 360</span>
-          </>
-        }
+        onClose={() => setIsSuccessModalOpen(false)}
+        title="Colegio STEAM 360"
         message="¡Matrícula registrada con éxito!"
-        buttons={[
-          {
-            text: "Aceptar",
-            variant: "success",
-            onClick: handleSuccessModalClose,
-          },
-        ]}
+        buttons={[{ text: "Aceptar", variant: "success", onClick: () => setIsSuccessModalOpen(false) }]}
       />
+      <ModalListaEstudiantes
+  isOpen={isStudentListModalOpen}
+  onClose={() => setIsStudentListModalOpen(false)}
+  onSelect={loadStudentForEdit}
+/>
     </div>
   );
 };

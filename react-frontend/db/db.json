@@ -1,0 +1,653 @@
+{
+  "matriculas": [
+    {
+      "id": "a875",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-39862",
+      "student": {
+        "photo": {},
+        "name": "Jhon F",
+        "lastname": "Hidalgo",
+        "birthDate": "2014-01-25",
+        "age": 11,
+        "gender": "masculino",
+        "birthPlace": "Manizales",
+        "documentType": "TI",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "jhonfredyha@gmail.com",
+        "eps": "Sanitas",
+        "grade": "septimo",
+        "group": "A",
+        "bloodType": "B+",
+        "shift": "manana",
+        "ethnicGroup": "indigena",
+        "reference": "desplazado"
+      },
+      "academic": {
+        "address": "wert",
+        "neighborhood": "",
+        "locality": "wert",
+        "status": "2",
+        "zone": "rural"
+      },
+      "family": {
+        "mother": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "jhonfredyha@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "2e12",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-46754",
+      "student": {
+        "photo": {},
+        "name": "Jhon F",
+        "lastname": "Hidalgo",
+        "birthDate": "2017-01-25",
+        "age": 8,
+        "gender": "femenino",
+        "birthPlace": "Manizales",
+        "documentType": "TI",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "jhonfredyha@gmail.com",
+        "eps": "Sanitas",
+        "grade": "undecimo",
+        "group": "A",
+        "bloodType": "B+",
+        "shift": "tarde",
+        "ethnicGroup": "afro",
+        "reference": "icbf"
+      },
+      "academic": {
+        "address": "wert1",
+        "neighborhood": "",
+        "locality": "wert1",
+        "status": "3",
+        "zone": "rural"
+      },
+      "family": {
+        "mother": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "jhonfredyha@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "2a59",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-73464",
+      "student": {
+        "photo": {},
+        "name": "Jhon F",
+        "lastname": "Hidalgo",
+        "birthDate": "1986-01-25",
+        "age": 39,
+        "gender": "femenino",
+        "birthPlace": "Manizales",
+        "documentType": "TI",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "jhonfredyha@gmail.com",
+        "eps": "Sanitas",
+        "grade": "octavo",
+        "group": "A",
+        "bloodType": "B-",
+        "shift": "manana",
+        "ethnicGroup": "afro",
+        "reference": "desplazado"
+      },
+      "academic": {
+        "address": "wert1",
+        "neighborhood": "",
+        "locality": "wert1",
+        "status": "3",
+        "zone": "rural"
+      },
+      "family": {
+        "mother": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "RC",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "jhonfredyha@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "87d7",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-85467",
+      "student": {
+        "photo": {},
+        "name": "Jhon F",
+        "lastname": "Hidalgo",
+        "birthDate": "2010-01-25",
+        "age": 15,
+        "gender": "masculino",
+        "birthPlace": "Manizales",
+        "documentType": "TI",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "jhonfredyha@gmail.com",
+        "eps": "Sanitas",
+        "grade": "noveno",
+        "group": "A",
+        "bloodType": "B+",
+        "shift": "manana",
+        "ethnicGroup": "afro",
+        "reference": "desplazado"
+      },
+      "academic": {
+        "address": "wert1",
+        "neighborhood": "",
+        "locality": "wert1",
+        "status": "3",
+        "zone": "rural"
+      },
+      "family": {
+        "mother": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "RC",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "jhonfredyha@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "6ec0",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-70654",
+      "student": {
+        "photo": {},
+        "name": "Jhon F",
+        "lastname": "Hidalgo",
+        "birthDate": "2010-01-25",
+        "age": 15,
+        "gender": "femenino",
+        "birthPlace": "Manizales",
+        "documentType": "CC",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "jhonfredyha@gmail.com",
+        "eps": "Sanitas",
+        "grade": "noveno",
+        "group": "A",
+        "bloodType": "B+",
+        "shift": "manana",
+        "ethnicGroup": "afro",
+        "reference": "desplazado"
+      },
+      "academic": {
+        "address": "wert1",
+        "neighborhood": "",
+        "locality": "wert1",
+        "status": "2",
+        "zone": "urbana"
+      },
+      "family": {
+        "mother": {
+          "name": "Rosa Maria",
+          "lastname": "Benjumea",
+          "documentType": "RC",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "rosab@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Rosa Maria",
+          "lastname": "Benjumea",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "rosab@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "483f",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-42303",
+      "student": {
+        "photo": {},
+        "name": "Jhon F",
+        "lastname": "Hidalgo",
+        "birthDate": "2010-01-25",
+        "age": 15,
+        "gender": "femenino",
+        "birthPlace": "Manizales",
+        "documentType": "TI",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "jhonfredyha@gmail.com",
+        "eps": "Sanitas",
+        "grade": "decimo",
+        "group": "A",
+        "bloodType": "B+",
+        "shift": "manana",
+        "ethnicGroup": "afro",
+        "reference": "desplazado"
+      },
+      "academic": {
+        "address": "wert1",
+        "neighborhood": "",
+        "locality": "wert1",
+        "status": "3",
+        "zone": "rural"
+      },
+      "family": {
+        "mother": {
+          "name": "Rosa Maria",
+          "lastname": "Benjumea",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "jhonfredyha@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Rosa Maria",
+          "lastname": "Benjumea",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "rosab@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "11dd",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-60755",
+      "student": {
+        "photo": {},
+        "name": "Jorge Armando",
+        "lastname": "Giraldo",
+        "birthDate": "2014-01-25",
+        "age": 11,
+        "gender": "masculino",
+        "birthPlace": "Cali",
+        "documentType": "CC",
+        "documentNumber": "75065705",
+        "phone": "3152038965",
+        "email": "jorge@gmail.com",
+        "eps": "Sanitas",
+        "grade": "octavo",
+        "group": "A",
+        "bloodType": "B+",
+        "shift": "manana",
+        "ethnicGroup": "afro",
+        "reference": "desplazado"
+      },
+      "academic": {
+        "address": "Calle 2A NO 10-50",
+        "neighborhood": "",
+        "locality": "Atardeceres",
+        "status": "3",
+        "zone": "urbana"
+      },
+      "family": {
+        "mother": {
+          "name": "Alejandra",
+          "lastname": "Marin",
+          "documentType": "TI",
+          "document": "30279184",
+          "phone": "32852369",
+          "email": "alejam@gmail.com",
+          "profession": "Ama",
+          "occupation": "Ama"
+        },
+        "father": {
+          "name": "Alejandro",
+          "lastname": "Maldonado",
+          "documentType": "RC",
+          "document": "7506587632",
+          "phone": "3214785236",
+          "email": "alejam@gmail.com",
+          "profession": "Ama",
+          "occupation": "Ama"
+        }
+      }
+    },
+    {
+      "id": "2c5d",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-75750",
+      "student": {
+        "photo": {},
+        "name": "Camila",
+        "lastname": "Arango",
+        "birthDate": "2014-01-25",
+        "age": 11,
+        "gender": "masculino",
+        "birthPlace": "Manizales",
+        "documentType": "TI",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "camiarango@gmail.com",
+        "eps": "Sanitas",
+        "grade": "octavo",
+        "group": "A",
+        "bloodType": "B+",
+        "shift": "manana",
+        "ethnicGroup": "afro",
+        "reference": "victima"
+      },
+      "academic": {
+        "address": "wert1",
+        "neighborhood": "",
+        "locality": "wert1",
+        "status": "2",
+        "zone": "urbana"
+      },
+      "family": {
+        "mother": {
+          "name": "Rosa Maria",
+          "lastname": "Benjumea",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "jhonfredyha@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Rosa Maria",
+          "lastname": "Benjumea",
+          "documentType": "RC",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "rosab@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "e050",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-17197",
+      "student": {
+        "photo": {},
+        "name": "Jhon F",
+        "lastname": "Hidalgo",
+        "birthDate": "1985-01-25",
+        "age": 40,
+        "gender": "femenino",
+        "birthPlace": "Manizales",
+        "documentType": "TI",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "jhonfredyha@gmail.com",
+        "eps": "Sanitas",
+        "grade": "undecimo",
+        "group": "A",
+        "bloodType": "B+",
+        "shift": "manana",
+        "ethnicGroup": "afro",
+        "reference": "victima"
+      },
+      "academic": {
+        "address": "wert1",
+        "neighborhood": "",
+        "locality": "wert1",
+        "status": "2",
+        "zone": "urbana"
+      },
+      "family": {
+        "mother": {
+          "name": "Rosa Maria",
+          "lastname": "Benjumea",
+          "documentType": "RC",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "jhonfredyha@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Rosa Maria",
+          "lastname": "Benjumea",
+          "documentType": "RC",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "rosab@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "7207",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-12661",
+      "student": {
+        "photo": {},
+        "name": "Ana Maria",
+        "lastname": "Lopez Quintero",
+        "birthDate": "2010-10-22",
+        "age": 14,
+        "gender": "femenino",
+        "birthPlace": "Manizales",
+        "documentType": "TI",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "anamaria@gmail.com",
+        "eps": "Sanitas",
+        "grade": "noveno",
+        "group": "A",
+        "bloodType": "B-",
+        "shift": "tarde",
+        "ethnicGroup": "afro",
+        "reference": "desplazado"
+      },
+      "academic": {
+        "address": "wert1",
+        "neighborhood": "",
+        "locality": "wert1",
+        "status": "2",
+        "zone": "rural"
+      },
+      "family": {
+        "mother": {
+          "name": "Rosa Maria",
+          "lastname": "Benjumea",
+          "documentType": "RC",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "jhonfredyha@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Rosa Maria",
+          "lastname": "Benjumea",
+          "documentType": "TI",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "rosab@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "bbe3",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-80723",
+      "student": {
+        "photo": {},
+        "name": "Jorge Armando",
+        "lastname": "Cardona",
+        "birthDate": "2014-01-25",
+        "age": 11,
+        "gender": "masculino",
+        "birthPlace": "Manizales",
+        "documentType": "TI",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "jhonfredyha@gmail.com",
+        "eps": "Compensar",
+        "grade": "decimo",
+        "group": "A",
+        "bloodType": "B+",
+        "shift": "unica",
+        "ethnicGroup": "indigena",
+        "reference": "desplazado"
+      },
+      "academic": {
+        "address": "werty",
+        "neighborhood": "",
+        "locality": "werty",
+        "status": "3",
+        "zone": "urbana"
+      },
+      "family": {
+        "mother": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "TI",
+          "document": "30452639",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "RC",
+          "document": "30258963",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "c1e3",
+      "registerDate": "2025-09-24",
+      "codigo": "MAT-2025-47190",
+      "student": {
+        "photo": {},
+        "name": "Sofia ",
+        "lastname": "Lopez",
+        "birthDate": "2014-01-25",
+        "age": 11,
+        "gender": "femenino",
+        "birthPlace": "Medellin",
+        "documentType": "TI",
+        "documentNumber": "10102020",
+        "phone": "312852369",
+        "email": "sofialopez@gmail.com",
+        "eps": "Nueva Eps",
+        "grade": "septimo",
+        "group": "A",
+        "bloodType": "O+",
+        "shift": "manana",
+        "ethnicGroup": "afro",
+        "reference": "victima",
+        "registerType": "nueva"
+      },
+      "academic": {
+        "address": "Calle 102 No 45-23",
+        "neighborhood": "La Enea",
+        "locality": "Tesorito",
+        "status": "2",
+        "zone": "urbana"
+      },
+      "family": {
+        "mother": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "RC",
+          "document": "30452639",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "RC",
+          "document": "30258963",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    }
+  ]
+}

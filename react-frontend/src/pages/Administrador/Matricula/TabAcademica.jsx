@@ -106,7 +106,7 @@ const TabAcademica = ({ register, errors }) => {
           <div className="group">
             <InputField
               label="Barrio:"
-              id="studentNeiborhood"
+              id="studentNeighborhood"
               register={register}
               errors={errors}
               required
