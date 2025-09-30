@@ -20,13 +20,13 @@
   background-color: #e0e0e0;
   color: #333;
   border: none;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  margin-right: 2px;
+  margin-right: 5px;
 }
 
 .tabs button:hover {

@@ -1,6 +1,5 @@
 import "./NavbarAdmin.css";
-import Modal from "../../ui/Modal";
-import { FaSignOutAlt } from "react-icons/fa"; 
+import Modal from "../../ui/Modal"; 
 import { FaCheck } from "react-icons/fa"; 
 import { FaTimes } from "react-icons/fa"; 
 import logo from "../../icons/espiral.svg";

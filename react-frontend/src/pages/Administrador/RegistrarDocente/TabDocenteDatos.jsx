@@ -1,9 +1,17 @@
-import { useState, useEffect } from "react";
-import "./TabEstudiante.css";
+import { useState,  } from "react";
+import "./TabDocenteDatos.css";
 import InputField from "../../../components/ui/InputField";
 import SelectField from "../../../components/ui/SelectField";
 
-const TabEstudiante = ({ register, errors, setValue, getValues }) => {
+const TabDocenteDatos = ({ register, errors, setValue }) => {
+
+  const genderOptions = [
+    { value: "", label: "Seleccionar" },
+    { value: "masculino", label: "Masculino" },
+    { value: "femenino", label: "Femenino" },
+    { value: "no-binario", label: "No Binario" },
+  ];
+
   const documentOptions = [
     { value: "", label: "Seleccionar" },
     { value: "RC", label: "Registro Civil (RC)" },
@@ -13,48 +21,44 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
     { value: "PEP", label: "Permiso Especial de Permanencia (PEP)" },
   ];
 
-  const genderOptions = [
+  const areaOptions = [
     { value: "", label: "Seleccionar" },
-    { value: "masculino", label: "Masculino" },
-    { value: "femenino", label: "Femenino" },
-    { value: "no-binario", label: "No Binario" },
+    { value: "algebra", label: "Álgebra" },
+    { value: "biologia", label: "Biología" },
+    { value: "calculo", label: "Cálculo" },
+    { value: "ciencias de la tierra", label: "Ciencias de la Tierra" },
+    { value: "constitucion politica", label: "Constitución Política" },
+    { value: "democracia y paz", label: "Democracia y Paz" },
+    { value: "educacion artistica", label: "Educación Artística" },
+    { value: "educacion fisica", label: "Educación Física" },
+    { value: "español", label: "Español (Gramática, Literatura)" },
+    { value: "estadistica", label: "Estadística" },
+    { value: "etica y valores humanos", label: "Ética y Valores Humanos" },
+    { value: "fisica", label: "Física" },
+    { value: "geografia", label: "Geografía" },
+    { value: "geometria", label: "Geometría" },
+    { value: "historia de colombia", label: "Historia de Colombia" },
+    { value: "ingles", label: "Inglés (como lengua extranjera)" },
+    { value: "quimica", label: "Química" },
+    { value: "tecnologia e informatica", label: "Tecnología e Informática" },
   ];
 
-  const gradeOptions = [
+  const scaleOptions = [
     { value: "", label: "Seleccionar" },
-    { value: "preescolar", label: "Preescolar" },
-    { value: "primero", label: "Primero" },
-    { value: "segundo", label: "Segundo" },
-    { value: "tercero", label: "Tercero" },
-    { value: "cuarto", label: "Cuarto" },
-    { value: "quinto", label: "Quinto" },
-    { value: "sexto", label: "Sexto" },
-    { value: "septimo", label: "Séptimo" },
-    { value: "octavo", label: "Octavo" },
-    { value: "noveno", label: "Noveno" },
-    { value: "decimo", label: "Décimo" },
-    { value: "undecimo", label: "Undécimo" },
+    { value: "1a", label: "1A" },
+    { value: "1b", label: "1B" },
+    { value: "1c", label: "1C" },
+    { value: "1d", label: "1D" },
+    { value: "2a", label: "2A" },
+    { value: "2b", label: "2B" },
+    { value: "2c", label: "2C" },
+    { value: "2d", label: "2D" },
+    { value: "3a", label: "3A" },
+    { value: "3b", label: "3B" },
+    { value: "3c", label: "3C" },
+    { value: "3d", label: "3D" },
   ];
 
-  const gradeShift = [
-    { value: "", label: "Seleccionar" },
-    { value: "unica", label: "Única" },
-    { value: "manana", label: "Mañana" },
-    { value: "tarde", label: "Tarde" },
-    { value: "nocturna", label: "Nocturna" },
-    { value: "sabatino", label: "Sabatino" },
-  ];
-
-  const gradeRegister = [
-    { value: "", label: "Seleccionar" },
-    { value: "nueva", label: "Nuevo" },
-    { value: "repite", label: "Repitente" },
-    { value: "promovido", label: "Promovido" },
-    { value: "reingreso", label: "Re-ingreso" },
-    { value: "validacion", label: "Validación" },
-  ];
-
-  const [preview, setPreview] = useState(null);
   const [age, setAge] = useState("");
 
   const calculateAge = (birthDateString) => {
@@ -80,127 +84,9 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
     setValue("studentAge", calculatedAge);
   };
 
-  useEffect(() => {
-    const currentPhoto = getValues("studentPhoto");
-    if (currentPhoto) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(currentPhoto);
-    }
-  }, [getValues]);
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-
-    if (!file) {
-      setPreview(null);
-
-      setValue("studentPhoto", null);
-      return;
-    }
-
-    // Verifica si es una imagen
-    if (!file.type.startsWith("image/")) {
-      alert("Solo se permiten archivos de imagen (JPG, PNG, GIF).");
-      e.target.value = "";
-      setPreview(null);
-
-      setValue("studentPhoto", null);
-      return;
-    }
-
-    // Verifica tamaño
-    if (file.size > 5 * 1024 * 1024) {
-      alert("La imagen debe pesar menos de 5MB.");
-      e.target.value = "";
-      setPreview(null);
-
-      setValue("studentPhoto", null);
-      return;
-    }
-
-    // Leer y mostrar la imagen
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result);
-
-      setValue("studentPhoto", file);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const clearPhoto = () => {
-    setPreview(null);
-
-    setValue("studentPhoto", null);
-    const fileInput = document.getElementById("student-photo");
-    if (fileInput) {
-      fileInput.value = "";
-    }
-  };
-
   return (
-    <div className="tab-content">
-      <div className="photo-container">
-        <label
-          htmlFor="student-photo"
-          className={`photo-label ${errors.studentPhoto ? "photo-error" : ""}`}
-        >
-          {!preview && <span>Foto del Estudiante</span>}
-          <input
-            type="file"
-            id="student-photo"
-            name="studentPhoto"
-            accept="image/*"
-            onChange={handlePhotoChange}
-            className="visually-hidden"
-          />
-          <div
-            className="photo-preview"
-            style={{
-              backgroundImage: preview ? `url(${preview})` : "none",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              border: preview
-                ? "2px solid #28a745"
-                : errors.studentPhoto
-                ? "2px dashed #dc3545"
-                : "2px dashed #adb5bd",
-              minHeight: "150px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              borderRadius: "8px",
-            }}
-          >
-            {!preview && (
-              <div
-                style={{
-                  textAlign: "center",
-                  color: errors.studentPhoto ? "#dc3545" : "#6c757d",
-                }}
-              />
-            )}
-          </div>
-        </label>
-
-        {preview && (
-          <button
-            type="button"
-            onClick={clearPhoto}
-            className="clear-photo-btn"
-          >
-            Quitar foto
-          </button>
-        )}
-
-        {errors.studentPhoto && (
-          <span className="error-message">{errors.studentPhoto.message}</span>
-        )}
-      </div>
+    <div className="tab-content-teacher">
+      <div className="photo-container"></div>
 
       <div className="register-fields">
         <div className="field-row">
@@ -229,7 +115,7 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
           <div className="group">
             <InputField
               label="Nombres:"
-              id="name"
+              id="teacherName"
               register={register}
               errors={errors}
               required
@@ -246,7 +132,7 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
           <div className="group">
             <InputField
               label="Apellidos:"
-              id="lastname"
+              id="teacherLastname"
               register={register}
               errors={errors}
               required
@@ -263,11 +149,10 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
         </div>
         <div className="field-row">
           <div className="group">
-            <label htmlFor="studentBirthDate">Fecha de Nacimiento</label>
+            <label htmlFor="teacherBirthDate">Fecha de Nacimiento</label>
             <input
               type="date"
-              id="studentBirthDate"
-              name="studentBirthDate"
+              id="teacherBirthDate"
               {...register("studentBirthDate", {
                 required: "La fecha de nacimiento es requerida",
                 validate: {
@@ -300,11 +185,10 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
             )}
           </div>
           <div className="group">
-            <label htmlFor="studentAge">Edad:</label>
+            <label htmlFor="teacherAge">Edad:</label>
             <input
               type="number"
-              id="studentAge"
-              name="studentAge"
+              id="teacherAge"
               value={age}
               readOnly
               className="input-line"
@@ -312,7 +196,7 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
           </div>
           <SelectField
             label="Género"
-            id="studentGender"
+            id="teacherGender"
             register={register}
             errors={errors}
             required
@@ -320,7 +204,7 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
           />
           <InputField
             label="Lugar de Nacimiento:"
-            id="studentBirthPlace"
+            id="teacherBirthPlace"
             register={register}
             errors={errors}
             required
@@ -334,32 +218,30 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
           <div className="group">
             <SelectField
               label="Tipo de Documento:"
-              id="studentDocument"
+              id="teacherDocument"
               register={register}
               errors={errors}
               required
               options={documentOptions}
             />
           </div>
-          <div className="group">
-            <InputField
-              label="Número de Documento:"
-              id="studentDocumentNumber"
-              type="text"
-              register={register}
-              errors={errors}
-              required
-              validation={{
-                pattern: {
-                  value: /^\d{5,15}$/,
-                  message: "Debe ser numérico (5-15 dígitos)",
-                },
-              }}
-            />
-          </div>
           <InputField
-            label="Teléfono:"
-            id="studentphone"
+            label="Número de Documento:"
+            id="teacherDocumentNumber"
+            type="text"
+            register={register}
+            errors={errors}
+            required
+            validation={{
+              pattern: {
+                value: /^\d{5,15}$/,
+                message: "Debe ser numérico (5-15 dígitos)",
+              },
+            }}
+          />
+          <InputField
+            label="Número de Teléfono:"
+            id="teacherPhone"
             type="text"
             register={register}
             errors={errors}
@@ -373,7 +255,7 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
           />
           <InputField
             label="Correo Electrónico:"
-            id="studentEmail"
+            id="teacherEmail"
             type="email"
             register={register}
             errors={errors}
@@ -388,46 +270,46 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
           />
         </div>
         <div className="field-row">
-          <div className="group">
-            <SelectField
-              label="Grado al que ingresa"
-              id="studentGrade"
-              register={register}
-              errors={errors}
-              required
-              options={gradeOptions}
-            />
-          </div>
           <InputField
-            label="Grupo:"
-            id="studentGroup"
+            label="Profesión:"
+            id="teacherProfession"
+            register={register}
+            errors={errors}
+            required
+            validation={{
+              minLength: { value: 3, message: "Mínimo 3 caracteres" },
+              maxLength: { value: 100, message: "Máximo 100 caracteres" },
+            }}
+          />
+          <SelectField
+            label="Área de Especialización"
+            id="teacherArea"
+            register={register}
+            errors={errors}
+            required
+            options={areaOptions}
+          />
+          <InputField
+            label="Número de Resolución:"
+            id="teacherResolutionNumber"
+            type="text"
             register={register}
             errors={errors}
             required
             validation={{
               pattern: {
-                value: /^[A-Z]{1}$/,
-                message: "Debe ser una letra mayúscula (A, B, C...)",
+                value: /^\d{4,8}$/,
+                message: "Resolución inválida (4-8 dígitos)",
               },
             }}
           />
-          <div className="group">
-            <SelectField
-              label="Jornada:"
-              id="studentShift"
-              register={register}
-              errors={errors}
-              required
-              options={gradeShift}
-            />
-          </div>
           <SelectField
-            label="Tipo de Matrícula"
-            id="studentRegister"
+            label="Escalafon Docente"
+            id="teacherStatus"
             register={register}
             errors={errors}
             required
-            options={gradeRegister}
+            options={scaleOptions}
           />
         </div>
       </div>
@@ -435,4 +317,4 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
   );
 };
 
-export default TabEstudiante;
+export default TabDocenteDatos;

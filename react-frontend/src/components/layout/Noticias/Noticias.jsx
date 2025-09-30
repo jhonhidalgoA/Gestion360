@@ -21,9 +21,11 @@ const Noticias = ({
             school={item.school}
             title={item.title}
             date={item.date}
+            comment={item.comment}
             buttonText={item.buttonText}
             buttonLink={item.buttonLink}
             showDetailsButton={showDetailsButton}
+            photos={item.photos} 
           />
         ))}
       </div>

@@ -101,6 +101,47 @@
     --spacing-lg: 2rem;
     --spacing-xl: 3rem;
 
+
+  --primary-purple: #6B46C1;
+  --primary-purple-dark: #5B3AA8;
+  --accent-orange: #FF8C42;
+  --accent-turquoise: #4ECDC4;
+  --link-purple: #7C3AED;
+  --link-purple-hover: #6B46C1;
+  --primary-purple: #6B46C1;
+  
+  /* Colores de texto */
+  --text-primary: #2D3748;
+  --text-secondary: #4A5568;
+  --text-tertiary: #718096;
+  
+  /* Fondos */
+  --bg-card: #eeeeee;
+  --bg-page: #F7FAFC;
+  --bg-hover: #F8F9FA;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.15);
+  
+  /* Bordes */
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  
+  /* Espaciado */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Transiciones */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.4s ease;
+
     
 }
 

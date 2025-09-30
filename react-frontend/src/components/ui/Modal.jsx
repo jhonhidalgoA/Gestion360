@@ -15,11 +15,9 @@ const Modal = ({ isOpen, onClose, title, message, buttons = [] }) => {
             <IoClose />
           </button>
         </div>
-
         <div className="modal-body">
           <p>{message}</p>
         </div>
-
         <div className="modal-footer">
           {buttons.map((btn, index) => (
             <button

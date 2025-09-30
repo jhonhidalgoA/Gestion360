@@ -10,6 +10,7 @@ import Circulares from "./pages/CircularesDetalles";
 import VerManual from "./pages/VerManual";
 import VerPEI from "./pages/VerPEI";
 import Matricula  from "./pages/Administrador/Matricula/Matricula"
+import RegistrarDocente from "./pages/Administrador/RegistrarDocente/RegistrarDocente";
 
 //prueba de navbarAdmin //
 import Administrador from "./pages/Administrador/Administrador";
@@ -62,6 +63,7 @@ function App() {
         <Route path="administrador" element={<Administrador />} />
         <Route path="docente" element={<Docente />} />
         <Route path="/matricula" element={<Matricula />} />
+        <Route path="/registro-docente" element={<RegistrarDocente />} />
 
       </Routes>
     </BrowserRouter>

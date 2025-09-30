@@ -2,7 +2,7 @@
     width:100%;
     min-height:100vh;
     background:100vh;
-    background:linear-gradient(rgba(8,0,58,0.3),rgba(8,0,25,0.3)),url('../assets/images/fondo_11.jpg');
+    background:url('../assets/images/2.jpg');
     background-size:cover;
     backgroud-position:center;
     background-repeat: no-repeat; 
@@ -19,13 +19,13 @@
 
 .header h1 {
   font-size: 2.5rem;
-  color: white;
-  margin-top: 40px;  
+  color:white;
+  margin-top: 60px;  
 }
 
 .header p {
   font-size: 1.5rem;
-  color: white;
+  color:white;
   
 }
 
