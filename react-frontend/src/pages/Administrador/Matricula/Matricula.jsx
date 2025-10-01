@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import {getDefaultValues} from "../Matricula/config/defaultValues"
-import { validateTab, formatMatriculaData } from "../Matricula/utils/formHelpers";
-import {postMatricula} from "../Matricula/utils/apiHelpers"
-import ModalListaEstudiantes from "../Matricula/ModalListaEstudiante"
+import { getDefaultValues } from "../Matricula/config/defaultValues";
+import {
+  validateTab,
+  formatMatriculaData,
+} from "../Matricula/utils/formHelpers";
+import { postMatricula } from "../Matricula/utils/apiHelpers";
+import ModalListaEstudiantes from "../Matricula/ModalListaEstudiante";
 import TabEstudiante from "./TabEstudiante";
-import TabAcademica from "./TabAcademica"; 
+import TabAcademica from "./TabAcademica";
 import TabFamiliar from "./TabFamiliar";
 import NavbarSection from "../../../components/layout/Navbar/NavbarSection";
 import Botones from "../../../components/ui/Botones";
@@ -18,7 +21,15 @@ const Matricula = () => {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isStudentListModalOpen, setIsStudentListModalOpen] = useState(false);
 
-  const { register, handleSubmit, formState: { errors, isValid }, trigger, setValue, getValues, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    trigger,
+    setValue,
+    getValues,
+    reset,
+  } = useForm({
     mode: "onBlur",
     defaultValues: getDefaultValues(),
   });
@@ -41,60 +52,65 @@ const Matricula = () => {
     }
   };
 
- const loadStudentForEdit = (matricula) => {
-  const values = {
-    // Datos del estudiante (TabEstudiante)
-    name: matricula.student.name,
-    lastname: matricula.student.lastname,
-    studentBirthDate: matricula.student.birthDate,
-    studentAge: matricula.student.age,
-    studentGender: matricula.student.gender,
-    studentBirthPlace: matricula.student.birthPlace,
-    studentDocument: matricula.student.documentType,
-    studentDocumentNumber: matricula.student.documentNumber,
-    studentphone: matricula.student.phone,
-    studentEmail: matricula.student.email,
-    studentGrade: matricula.student.grade,
-    studentGroup: matricula.student.group,
-    studentShift: matricula.student.shift,
-    studentRegister: matricula.student.registerType || "",
-
-    // Datos de TabAcademica
-    studentBlood: matricula.student.bloodType,
-    studentEPS: matricula.student.eps,
-    studentEthnic: matricula.student.ethnicGroup,
-    studentReference: matricula.student.reference, 
-
-    // Dirección y ubicación
-    studentAddress: matricula.academic.address,
-    studentNeighborhood: matricula.academic.neighborhood,
-    studentLocality: matricula.academic.locality,
-    studentStatus: matricula.academic.status,
-    studentZone: matricula.academic.zone,
-
-    // Datos familiares
-    motherName: matricula.family.mother.name,
-    motherLastname: matricula.family.mother.lastname,
-    motherTypeDocument: matricula.family.mother.documentType,
-    motherDocument: matricula.family.mother.document,
-    motherPhone: matricula.family.mother.phone,
-    motherEmail: matricula.family.mother.email,
-    motherProfesion: matricula.family.mother.profession, 
-    motherOcupation: matricula.family.mother.occupation, 
-
-    fatherName: matricula.family.father.name,
-    fatherLastname: matricula.family.father.lastname,
-    fatherTypeDocument: matricula.family.father.documentType,
-    fatherDocument: matricula.family.father.document,
-    fatherPhone: matricula.family.father.phone,
-    fatherEmail: matricula.family.father.email,
-    fatherProfesion: matricula.family.father.profession,
-    fatherOcupation: matricula.family.father.occupation,
+  const handleClear = () => {
+    reset(getDefaultValues());
+    setActiveTab("estudiante");
   };
 
-  reset(values);
-  setActiveTab("estudiante");
-};
+  const loadStudentForEdit = (matricula) => {
+    const values = {
+      // Datos del estudiante (TabEstudiante)
+      name: matricula.student.name,
+      lastname: matricula.student.lastname,
+      studentBirthDate: matricula.student.birthDate,
+      studentAge: matricula.student.age,
+      studentGender: matricula.student.gender,
+      studentBirthPlace: matricula.student.birthPlace,
+      studentDocument: matricula.student.documentType,
+      studentDocumentNumber: matricula.student.documentNumber,
+      studentphone: matricula.student.phone,
+      studentEmail: matricula.student.email,
+      studentGrade: matricula.student.grade,
+      studentGroup: matricula.student.group,
+      studentShift: matricula.student.shift,
+      studentRegister: matricula.student.registerType || "",
+
+      // Datos de TabAcademica
+      studentBlood: matricula.student.bloodType,
+      studentEPS: matricula.student.eps,
+      studentEthnic: matricula.student.ethnicGroup,
+      studentReference: matricula.student.reference,
+
+      // Dirección y ubicación
+      studentAddress: matricula.academic.address,
+      studentNeighborhood: matricula.academic.neighborhood,
+      studentLocality: matricula.academic.locality,
+      studentStatus: matricula.academic.status,
+      studentZone: matricula.academic.zone,
+
+      // Datos familiares
+      motherName: matricula.family.mother.name,
+      motherLastname: matricula.family.mother.lastname,
+      motherTypeDocument: matricula.family.mother.documentType,
+      motherDocument: matricula.family.mother.document,
+      motherPhone: matricula.family.mother.phone,
+      motherEmail: matricula.family.mother.email,
+      motherProfesion: matricula.family.mother.profession,
+      motherOcupation: matricula.family.mother.occupation,
+
+      fatherName: matricula.family.father.name,
+      fatherLastname: matricula.family.father.lastname,
+      fatherTypeDocument: matricula.family.father.documentType,
+      fatherDocument: matricula.family.father.document,
+      fatherPhone: matricula.family.father.phone,
+      fatherEmail: matricula.family.father.email,
+      fatherProfesion: matricula.family.father.profession,
+      fatherOcupation: matricula.family.father.occupation,
+    };
+
+    reset(values);
+    setActiveTab("estudiante");
+  };
 
   return (
     <div className="student-registration">
@@ -108,22 +124,37 @@ const Matricula = () => {
             onClick={() => handleTabChange(tab)}
             type="button"
           >
-            {tab === "estudiante" ? "Datos Estudiante" :
-             tab === "academica" ? "Información General" : "Datos Familiares"}
+            {tab === "estudiante"
+              ? "Datos Estudiante"
+              : tab === "academica"
+              ? "Información General"
+              : "Datos Familiares"}
           </button>
         ))}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="formStudent">
-        {activeTab === "estudiante" && <TabEstudiante register={register} errors={errors} setValue={setValue} getValues={getValues} trigger={trigger} />}
-        {activeTab === "academica" && <TabAcademica register={register} errors={errors} />}
-        {activeTab === "familia" && <TabFamiliar register={register} errors={errors} />}
+        {activeTab === "estudiante" && (
+          <TabEstudiante
+            register={register}
+            errors={errors}
+            setValue={setValue}
+            getValues={getValues}
+            trigger={trigger}
+          />
+        )}
+        {activeTab === "academica" && (
+          <TabAcademica register={register} errors={errors} />
+        )}
+        {activeTab === "familia" && (
+          <TabFamiliar register={register} errors={errors} />
+        )}
 
         <div className="form-actions">
           <Botones
             onSave={handleSubmit(onSubmit)}
             onEdit={() => setIsStudentListModalOpen(true)}
-            onDelete={() => alert("Eliminar")}
+            onDelete={handleClear}
             onGeneratePDF={() => alert("Generar PDF")}
             disabled={!isValid}
           />
@@ -134,8 +165,14 @@ const Matricula = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Colegio STEAM 360"
-        message="Por favor complete todos los campos requeridos antes de cambiar de pestaña."
-        buttons={[{ text: "Entendido", variant: "success", onClick: () => setIsModalOpen(false) }]}
+        message="Por favor complete todos los campos requeridos antes de cambiar de continuar."
+        buttons={[
+          {
+            text: "Entendido",
+            variant: "success",
+            onClick: () => setIsModalOpen(false),
+          },
+        ]}
       />
 
       <Modal
@@ -143,13 +180,19 @@ const Matricula = () => {
         onClose={() => setIsSuccessModalOpen(false)}
         title="Colegio STEAM 360"
         message="¡Matrícula registrada con éxito!"
-        buttons={[{ text: "Aceptar", variant: "success", onClick: () => setIsSuccessModalOpen(false) }]}
+        buttons={[
+          {
+            text: "Aceptar",
+            variant: "success",
+            onClick: () => setIsSuccessModalOpen(false),
+          },
+        ]}
       />
       <ModalListaEstudiantes
-  isOpen={isStudentListModalOpen}
-  onClose={() => setIsStudentListModalOpen(false)}
-  onSelect={loadStudentForEdit}
-/>
+        isOpen={isStudentListModalOpen}
+        onClose={() => setIsStudentListModalOpen(false)}
+        onSelect={loadStudentForEdit}
+      />
     </div>
   );
 };

@@ -2,58 +2,15 @@ import { useState, useEffect } from "react";
 import "./TabEstudiante.css";
 import InputField from "../../../components/ui/InputField";
 import SelectField from "../../../components/ui/SelectField";
+import {
+  documentOptions,
+  genderOptions,
+  gradeOptions,
+  gradeShift,
+  gradeRegister,
+} from "../../../constants/formOptions";
 
 const TabEstudiante = ({ register, errors, setValue, getValues }) => {
-  const documentOptions = [
-    { value: "", label: "Seleccionar" },
-    { value: "RC", label: "Registro Civil (RC)" },
-    { value: "TI", label: "Tarjeta de Identidad (TI)" },
-    { value: "CC", label: "Cédula de Ciudadanía (CC)" },
-    { value: "CE", label: "Cédula de Extranjería (CE)" },
-    { value: "PEP", label: "Permiso Especial de Permanencia (PEP)" },
-  ];
-
-  const genderOptions = [
-    { value: "", label: "Seleccionar" },
-    { value: "masculino", label: "Masculino" },
-    { value: "femenino", label: "Femenino" },
-    { value: "no-binario", label: "No Binario" },
-  ];
-
-  const gradeOptions = [
-    { value: "", label: "Seleccionar" },
-    { value: "preescolar", label: "Preescolar" },
-    { value: "primero", label: "Primero" },
-    { value: "segundo", label: "Segundo" },
-    { value: "tercero", label: "Tercero" },
-    { value: "cuarto", label: "Cuarto" },
-    { value: "quinto", label: "Quinto" },
-    { value: "sexto", label: "Sexto" },
-    { value: "septimo", label: "Séptimo" },
-    { value: "octavo", label: "Octavo" },
-    { value: "noveno", label: "Noveno" },
-    { value: "decimo", label: "Décimo" },
-    { value: "undecimo", label: "Undécimo" },
-  ];
-
-  const gradeShift = [
-    { value: "", label: "Seleccionar" },
-    { value: "unica", label: "Única" },
-    { value: "manana", label: "Mañana" },
-    { value: "tarde", label: "Tarde" },
-    { value: "nocturna", label: "Nocturna" },
-    { value: "sabatino", label: "Sabatino" },
-  ];
-
-  const gradeRegister = [
-    { value: "", label: "Seleccionar" },
-    { value: "nueva", label: "Nuevo" },
-    { value: "repite", label: "Repitente" },
-    { value: "promovido", label: "Promovido" },
-    { value: "reingreso", label: "Re-ingreso" },
-    { value: "validacion", label: "Validación" },
-  ];
-
   const [preview, setPreview] = useState(null);
   const [age, setAge] = useState("");
 
@@ -80,14 +37,38 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
     setValue("studentAge", calculatedAge);
   };
 
+  
   useEffect(() => {
+    const currentBirthDate = getValues("studentBirthDate");
+    const currentAge = getValues("studentAge");
     const currentPhoto = getValues("studentPhoto");
+
+    
+    if (currentBirthDate) {
+      const calculatedAge = calculateAge(currentBirthDate);
+      setAge(calculatedAge);
+    } else if (currentAge) {
+      setAge(currentAge);
+    } else {
+      setAge("");
+    }
+
+    
     if (currentPhoto) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(currentPhoto);
+      // Si es un File object
+      if (currentPhoto instanceof File) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreview(reader.result);
+        };
+        reader.readAsDataURL(currentPhoto);
+      } 
+     
+      else if (typeof currentPhoto === 'string') {
+        setPreview(currentPhoto);
+      }
+    } else {
+      setPreview(null);
     }
   }, [getValues]);
 
@@ -96,36 +77,32 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
 
     if (!file) {
       setPreview(null);
-
       setValue("studentPhoto", null);
       return;
     }
 
-    // Verifica si es una imagen
+    
     if (!file.type.startsWith("image/")) {
       alert("Solo se permiten archivos de imagen (JPG, PNG, GIF).");
       e.target.value = "";
       setPreview(null);
-
       setValue("studentPhoto", null);
       return;
     }
 
-    // Verifica tamaño
+    
     if (file.size > 5 * 1024 * 1024) {
       alert("La imagen debe pesar menos de 5MB.");
       e.target.value = "";
       setPreview(null);
-
       setValue("studentPhoto", null);
       return;
     }
 
-    // Leer y mostrar la imagen
+    
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result);
-
       setValue("studentPhoto", file);
     };
     reader.readAsDataURL(file);
@@ -133,7 +110,6 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
 
   const clearPhoto = () => {
     setPreview(null);
-
     setValue("studentPhoto", null);
     const fileInput = document.getElementById("student-photo");
     if (fileInput) {

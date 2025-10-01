@@ -1,4 +1,3 @@
-import React from "react";
 import { FaSave, FaEdit, FaTrash, FaFilePdf } from "react-icons/fa";
 import "./Botones.css";
 
