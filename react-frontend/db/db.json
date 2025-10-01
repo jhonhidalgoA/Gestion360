@@ -1,80 +1,25 @@
 {
   "matriculas": [
     {
-      "id": "2fba",
+      "id": "15a7",
       "registerDate": "2025-10-01",
-      "codigo": "MAT-2025-61082",
+      "codigo": "MAT-2025-35810",
       "student": {
         "photo": {},
-        "name": "Jhon F",
-        "lastname": "Hidalgo",
-        "birthDate": "1972-01-25",
-        "age": 53,
+        "name": "Jhon Fredy",
+        "lastname": "Hidalgo Arango",
+        "birthDate": "1980-01-25",
+        "age": 45,
         "gender": "masculino",
-        "birthPlace": "Medellin",
-        "documentType": "TI",
-        "documentNumber": "30401700",
+        "birthPlace": "Manizales",
+        "documentType": "CC",
+        "documentNumber": "75065705",
         "phone": "3128103686",
-        "email": "jhonfredyha@gmail.com",
-        "eps": "Compensar",
-        "grade": "septimo",
+        "email": "jhon@gmail.com",
+        "eps": "Sanitas",
+        "grade": "decimo",
         "group": "A",
-        "bloodType": "B+",
-        "shift": "manana",
-        "ethnicGroup": "afro",
-        "reference": "desplazado",
-        "registerType": "nueva"
-      },
-      "academic": {
-        "address": "werty",
-        "neighborhood": "werty",
-        "locality": "werty",
-        "status": "3",
-        "zone": "rural"
-      },
-      "family": {
-        "mother": {
-          "name": "Camila",
-          "lastname": "Arango",
-          "documentType": "TI",
-          "document": "30401700",
-          "phone": "3128103686",
-          "email": "jhonfredyha@gmail.com",
-          "profession": "wert",
-          "occupation": "wert"
-        },
-        "father": {
-          "name": "Camila",
-          "lastname": "Arango",
-          "documentType": "TI",
-          "document": "30258963",
-          "phone": "3128103686",
-          "email": "camiarango@gmail.com",
-          "profession": "wert",
-          "occupation": "wert"
-        }
-      }
-    },
-    {
-      "id": "96a2",
-      "registerDate": "2025-10-01",
-      "codigo": "MAT-2025-30164",
-      "student": {
-        "photo": {},
-        "name": "Marisol",
-        "lastname": "Correa",
-        "birthDate": "2013-10-25",
-        "age": 11,
-        "gender": "femenino",
-        "birthPlace": "Cartagena de Indias",
-        "documentType": "TI",
-        "documentNumber": "1052369852",
-        "phone": "32147852369",
-        "email": "marisol@gmail.com",
-        "eps": "Compensar",
-        "grade": "sexto",
-        "group": "C",
-        "bloodType": "O+",
+        "bloodType": "A+",
         "shift": "unica",
         "ethnicGroup": "ninguna",
         "reference": "ninguno",
@@ -91,172 +36,7 @@
         "mother": {
           "name": "Camila",
           "lastname": "Arango",
-          "documentType": "RC",
-          "document": "30401700",
-          "phone": "3128103686",
-          "email": "camiarango@gmail.com",
-          "profession": "Licenciada",
-          "occupation": "Docente"
-        },
-        "father": {
-          "name": "Camila",
-          "lastname": "Arango",
           "documentType": "CC",
-          "document": "30401700",
-          "phone": "3128103686",
-          "email": "camiarango@gmail.com",
-          "profession": "Ingeniero",
-          "occupation": "Empleado"
-        }
-      }
-    },
-    {
-      "id": "f0b6",
-      "registerDate": "2025-10-01",
-      "codigo": "MAT-2025-82944",
-      "student": {
-        "photo": null,
-        "name": "Jhon F",
-        "lastname": "Hidalgo",
-        "birthDate": "1985-01-25",
-        "age": 40,
-        "gender": "masculino",
-        "birthPlace": "Medellin",
-        "documentType": "TI",
-        "documentNumber": "30401700",
-        "phone": "3128103686",
-        "email": "jhonfredyha@gmail.com",
-        "eps": "",
-        "grade": "decimo",
-        "group": "A",
-        "bloodType": "",
-        "shift": "manana",
-        "ethnicGroup": "",
-        "reference": "",
-        "registerType": "repite"
-      },
-      "academic": {
-        "address": "",
-        "neighborhood": "",
-        "locality": "",
-        "status": "",
-        "zone": ""
-      },
-      "family": {
-        "mother": {
-          "name": "",
-          "lastname": "",
-          "documentType": "",
-          "document": "",
-          "phone": "",
-          "email": "",
-          "profession": "",
-          "occupation": ""
-        },
-        "father": {
-          "name": "",
-          "lastname": "",
-          "documentType": "",
-          "document": "",
-          "phone": "",
-          "email": "",
-          "profession": "",
-          "occupation": ""
-        }
-      }
-    },
-    {
-      "id": "6343",
-      "registerDate": "2025-10-01",
-      "codigo": "MAT-2025-28398",
-      "student": {
-        "photo": {},
-        "name": "Adalberto",
-        "lastname": "Mondragon",
-        "birthDate": "1985-01-25",
-        "age": 40,
-        "gender": "masculino",
-        "birthPlace": "Medellin",
-        "documentType": "TI",
-        "documentNumber": "30401700",
-        "phone": "3128103686",
-        "email": "ada@gmail.com",
-        "eps": "",
-        "grade": "septimo",
-        "group": "A",
-        "bloodType": "",
-        "shift": "manana",
-        "ethnicGroup": "",
-        "reference": "",
-        "registerType": "repite"
-      },
-      "academic": {
-        "address": "",
-        "neighborhood": "",
-        "locality": "",
-        "status": "",
-        "zone": ""
-      },
-      "family": {
-        "mother": {
-          "name": "",
-          "lastname": "",
-          "documentType": "",
-          "document": "",
-          "phone": "",
-          "email": "",
-          "profession": "",
-          "occupation": ""
-        },
-        "father": {
-          "name": "",
-          "lastname": "",
-          "documentType": "",
-          "document": "",
-          "phone": "",
-          "email": "",
-          "profession": "",
-          "occupation": ""
-        }
-      }
-    },
-    {
-      "id": "e653",
-      "registerDate": "2025-10-01",
-      "codigo": "MAT-2025-82017",
-      "student": {
-        "photo": {},
-        "name": "Jhon Fredy",
-        "lastname": "Hidalgo",
-        "birthDate": "1973-01-25",
-        "age": 52,
-        "gender": "masculino",
-        "birthPlace": "Medellin",
-        "documentType": "CC",
-        "documentNumber": "30401700",
-        "phone": "3128103686",
-        "email": "jhonfredyha@gmail.com",
-        "eps": "Compensar",
-        "grade": "decimo",
-        "group": "A",
-        "bloodType": "B-",
-        "shift": "unica",
-        "ethnicGroup": "afro",
-        "reference": "desplazado",
-        "registerType": "repite"
-      },
-      "academic": {
-        "address": "werty",
-        "neighborhood": "werty",
-        "locality": "werty",
-        "status": "2",
-        "zone": "urbana"
-      },
-      "family": {
-        "mother": {
-          "name": "Camila",
-          "lastname": "Arango",
-          "documentType": "TI",
           "document": "30401700",
           "phone": "3128103686",
           "email": "camiarango@gmail.com",
@@ -266,7 +46,7 @@
         "father": {
           "name": "Camila",
           "lastname": "Arango",
-          "documentType": "TI",
+          "documentType": "CC",
           "document": "30258963",
           "phone": "3128103686",
           "email": "camiarango@gmail.com",

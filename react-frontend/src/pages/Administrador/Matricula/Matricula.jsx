@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { getDefaultValues } from "../Matricula/config/defaultValues";
-import {
-  validateTab,
-  formatMatriculaData,
-} from "../Matricula/utils/formHelpers";
-import { postMatricula } from "../Matricula/utils/apiHelpers";
-import ModalListaEstudiantes from "../Matricula/ModalListaEstudiante";
+import {getDefaultValues} from "../Matricula/config/defaultValues"
+import { validateTab, formatMatriculaData } from "../Matricula/utils/formHelpers";
+import {postMatricula} from "../Matricula/utils/apiHelpers"
+import ModalListaEstudiantes from "../Matricula/ModalListaEstudiante"
 import TabEstudiante from "./TabEstudiante";
-import TabAcademica from "./TabAcademica";
+import TabAcademica from "./TabAcademica"; 
 import TabFamiliar from "./TabFamiliar";
 import NavbarSection from "../../../components/layout/Navbar/NavbarSection";
 import Botones from "../../../components/ui/Botones";
@@ -21,15 +18,7 @@ const Matricula = () => {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isStudentListModalOpen, setIsStudentListModalOpen] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-    trigger,
-    setValue,
-    getValues,
-    reset,
-  } = useForm({
+  const { register, handleSubmit, formState: { errors, isValid }, trigger, setValue, reset, watch } = useForm({
     mode: "onBlur",
     defaultValues: getDefaultValues(),
   });
@@ -52,6 +41,7 @@ const Matricula = () => {
     }
   };
 
+  // Función para limpiar el formulario
   const handleClear = () => {
     reset(getDefaultValues());
     setActiveTab("estudiante");
@@ -79,7 +69,7 @@ const Matricula = () => {
       studentBlood: matricula.student.bloodType,
       studentEPS: matricula.student.eps,
       studentEthnic: matricula.student.ethnicGroup,
-      studentReference: matricula.student.reference,
+      studentReference: matricula.student.reference, 
 
       // Dirección y ubicación
       studentAddress: matricula.academic.address,
@@ -95,8 +85,8 @@ const Matricula = () => {
       motherDocument: matricula.family.mother.document,
       motherPhone: matricula.family.mother.phone,
       motherEmail: matricula.family.mother.email,
-      motherProfesion: matricula.family.mother.profession,
-      motherOcupation: matricula.family.mother.occupation,
+      motherProfesion: matricula.family.mother.profession, 
+      motherOcupation: matricula.family.mother.occupation, 
 
       fatherName: matricula.family.father.name,
       fatherLastname: matricula.family.father.lastname,
@@ -124,31 +114,16 @@ const Matricula = () => {
             onClick={() => handleTabChange(tab)}
             type="button"
           >
-            {tab === "estudiante"
-              ? "Datos Estudiante"
-              : tab === "academica"
-              ? "Información General"
-              : "Datos Familiares"}
+            {tab === "estudiante" ? "Datos Estudiante" :
+             tab === "academica" ? "Información General" : "Datos Familiares"}
           </button>
         ))}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="formStudent">
-        {activeTab === "estudiante" && (
-          <TabEstudiante
-            register={register}
-            errors={errors}
-            setValue={setValue}
-            getValues={getValues}
-            trigger={trigger}
-          />
-        )}
-        {activeTab === "academica" && (
-          <TabAcademica register={register} errors={errors} />
-        )}
-        {activeTab === "familia" && (
-          <TabFamiliar register={register} errors={errors} />
-        )}
+        {activeTab === "estudiante" && <TabEstudiante register={register} errors={errors} setValue={setValue} watch={watch} />}
+        {activeTab === "academica" && <TabAcademica register={register} errors={errors} />}
+        {activeTab === "familia" && <TabFamiliar register={register} errors={errors} />}
 
         <div className="form-actions">
           <Botones
@@ -166,13 +141,7 @@ const Matricula = () => {
         onClose={() => setIsModalOpen(false)}
         title="Colegio STEAM 360"
         message="Por favor complete todos los campos requeridos antes de cambiar de continuar."
-        buttons={[
-          {
-            text: "Entendido",
-            variant: "success",
-            onClick: () => setIsModalOpen(false),
-          },
-        ]}
+        buttons={[{ text: "Entendido", variant: "success", onClick: () => setIsModalOpen(false) }]}
       />
 
       <Modal
@@ -180,14 +149,9 @@ const Matricula = () => {
         onClose={() => setIsSuccessModalOpen(false)}
         title="Colegio STEAM 360"
         message="¡Matrícula registrada con éxito!"
-        buttons={[
-          {
-            text: "Aceptar",
-            variant: "success",
-            onClick: () => setIsSuccessModalOpen(false),
-          },
-        ]}
+        buttons={[{ text: "Aceptar", variant: "success", onClick: () => setIsSuccessModalOpen(false) }]}
       />
+      
       <ModalListaEstudiantes
         isOpen={isStudentListModalOpen}
         onClose={() => setIsStudentListModalOpen(false)}

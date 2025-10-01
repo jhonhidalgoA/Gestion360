@@ -10,9 +10,13 @@ import {
   gradeRegister,
 } from "../../../constants/formOptions";
 
-const TabEstudiante = ({ register, errors, setValue, getValues }) => {
+const TabEstudiante = ({ register, errors, setValue, watch }) => {
   const [preview, setPreview] = useState(null);
   const [age, setAge] = useState("");
+
+  // Observar cambios en los campos importantes
+  const watchedPhoto = watch("studentPhoto");
+  const watchedBirthDate = watch("studentBirthDate");
 
   const calculateAge = (birthDateString) => {
     if (!birthDateString) return "";
@@ -37,40 +41,40 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
     setValue("studentAge", calculatedAge);
   };
 
-  
+  // Efecto para sincronizar la edad
   useEffect(() => {
-    const currentBirthDate = getValues("studentBirthDate");
-    const currentAge = getValues("studentAge");
-    const currentPhoto = getValues("studentPhoto");
-
-    
-    if (currentBirthDate) {
-      const calculatedAge = calculateAge(currentBirthDate);
+    if (watchedBirthDate) {
+      const calculatedAge = calculateAge(watchedBirthDate);
       setAge(calculatedAge);
-    } else if (currentAge) {
-      setAge(currentAge);
     } else {
       setAge("");
     }
+  }, [watchedBirthDate]);
 
-    
-    if (currentPhoto) {
+  // Efecto para sincronizar la foto
+  useEffect(() => {
+    if (watchedPhoto) {
       // Si es un File object
-      if (currentPhoto instanceof File) {
+      if (watchedPhoto instanceof File) {
         const reader = new FileReader();
         reader.onloadend = () => {
           setPreview(reader.result);
         };
-        reader.readAsDataURL(currentPhoto);
+        reader.readAsDataURL(watchedPhoto);
       } 
-     
-      else if (typeof currentPhoto === 'string') {
-        setPreview(currentPhoto);
+      // Si es una URL (cuando se carga un estudiante para editar)
+      else if (typeof watchedPhoto === 'string') {
+        setPreview(watchedPhoto);
       }
     } else {
+      // Si no hay foto, limpiar preview
       setPreview(null);
+      const fileInput = document.getElementById("student-photo");
+      if (fileInput) {
+        fileInput.value = "";
+      }
     }
-  }, [getValues]);
+  }, [watchedPhoto]);
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -81,7 +85,7 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
       return;
     }
 
-    
+    // Verifica si es una imagen
     if (!file.type.startsWith("image/")) {
       alert("Solo se permiten archivos de imagen (JPG, PNG, GIF).");
       e.target.value = "";
@@ -90,7 +94,7 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
       return;
     }
 
-    
+    // Verifica tamaño
     if (file.size > 5 * 1024 * 1024) {
       alert("La imagen debe pesar menos de 5MB.");
       e.target.value = "";
@@ -99,7 +103,7 @@ const TabEstudiante = ({ register, errors, setValue, getValues }) => {
       return;
     }
 
-    
+    // Leer y mostrar la imagen
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result);
