@@ -1,16 +1,20 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import {getDefaultValues} from "../Matricula/config/defaultValues"
-import { validateTab, formatMatriculaData } from "../Matricula/utils/formHelpers";
-import {postMatricula} from "../Matricula/utils/apiHelpers"
-import ModalListaEstudiantes from "../Matricula/ModalListaEstudiante"
+import { getDefaultValues } from "../Matricula/config/defaultValues";
+import {
+  validateTab,
+  formatMatriculaData,
+} from "../Matricula/utils/formHelpers";
+import { postMatricula } from "../Matricula/utils/apiHelpers";
+import ModalListaEstudiantes from "../Matricula/ModalListaEstudiante";
 import TabEstudiante from "./TabEstudiante";
-import TabAcademica from "./TabAcademica"; 
+import TabAcademica from "./TabAcademica";
 import TabFamiliar from "./TabFamiliar";
 import NavbarSection from "../../../components/layout/Navbar/NavbarSection";
 import Botones from "../../../components/ui/Botones";
 import Modal from "../../../components/ui/Modal";
 import "./Matricula.css";
+import { FaExclamation } from "react-icons/fa";
 
 const Matricula = () => {
   const [activeTab, setActiveTab] = useState("estudiante");
@@ -18,7 +22,15 @@ const Matricula = () => {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isStudentListModalOpen, setIsStudentListModalOpen] = useState(false);
 
-  const { register, handleSubmit, formState: { errors, isValid }, trigger, setValue, reset, watch } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    trigger,
+    setValue,
+    reset,
+    watch,
+  } = useForm({
     mode: "onBlur",
     defaultValues: getDefaultValues(),
   });
@@ -69,7 +81,7 @@ const Matricula = () => {
       studentBlood: matricula.student.bloodType,
       studentEPS: matricula.student.eps,
       studentEthnic: matricula.student.ethnicGroup,
-      studentReference: matricula.student.reference, 
+      studentReference: matricula.student.reference,
 
       // Dirección y ubicación
       studentAddress: matricula.academic.address,
@@ -85,8 +97,8 @@ const Matricula = () => {
       motherDocument: matricula.family.mother.document,
       motherPhone: matricula.family.mother.phone,
       motherEmail: matricula.family.mother.email,
-      motherProfesion: matricula.family.mother.profession, 
-      motherOcupation: matricula.family.mother.occupation, 
+      motherProfesion: matricula.family.mother.profession,
+      motherOcupation: matricula.family.mother.occupation,
 
       fatherName: matricula.family.father.name,
       fatherLastname: matricula.family.father.lastname,
@@ -104,7 +116,7 @@ const Matricula = () => {
 
   return (
     <div className="student-registration">
-      <NavbarSection title="Registro Matrícula Estudiante" color="#2e86c1" />
+      <NavbarSection title="Registro Matrícula Estudiante" color="#F57C00" />
 
       <div className="tabs">
         {["estudiante", "academica", "familia"].map((tab) => (
@@ -114,16 +126,30 @@ const Matricula = () => {
             onClick={() => handleTabChange(tab)}
             type="button"
           >
-            {tab === "estudiante" ? "Datos Estudiante" :
-             tab === "academica" ? "Información General" : "Datos Familiares"}
+            {tab === "estudiante"
+              ? "Datos Estudiante"
+              : tab === "academica"
+              ? "Información General"
+              : "Datos Familiares"}
           </button>
         ))}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="formStudent">
-        {activeTab === "estudiante" && <TabEstudiante register={register} errors={errors} setValue={setValue} watch={watch} />}
-        {activeTab === "academica" && <TabAcademica register={register} errors={errors} />}
-        {activeTab === "familia" && <TabFamiliar register={register} errors={errors} />}
+        {activeTab === "estudiante" && (
+          <TabEstudiante
+            register={register}
+            errors={errors}
+            setValue={setValue}
+            watch={watch}
+          />
+        )}
+        {activeTab === "academica" && (
+          <TabAcademica register={register} errors={errors} />
+        )}
+        {activeTab === "familia" && (
+          <TabFamiliar register={register} errors={errors} />
+        )}
 
         <div className="form-actions">
           <Botones
@@ -139,19 +165,40 @@ const Matricula = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Colegio STEAM 360"
-        message="Por favor complete todos los campos requeridos antes de cambiar de continuar."
-        buttons={[{ text: "Entendido", variant: "success", onClick: () => setIsModalOpen(false) }]}
+        title={
+          <>
+            Colegio <span className="modal-title-360">STEM 360</span>
+          </>
+        }
+        message="Por favor completar todos los campos obligatorios antes de continuar."
+        buttons={[
+          {
+            text: "Entendido",
+            variant: "success",
+             icon: <FaExclamation />,
+            onClick: () => setIsModalOpen(false),
+          },
+        ]}
       />
 
       <Modal
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
-        title="Colegio STEAM 360"
+        title={
+          <>
+            Colegio <span className="modal-title-360">STEM 360</span>
+          </>
+        }
         message="¡Matrícula registrada con éxito!"
-        buttons={[{ text: "Aceptar", variant: "success", onClick: () => setIsSuccessModalOpen(false) }]}
+        buttons={[
+          {
+            text: "Aceptar",
+            variant: "success",
+            onClick: () => setIsSuccessModalOpen(false),
+          },
+        ]}
       />
-      
+
       <ModalListaEstudiantes
         isOpen={isStudentListModalOpen}
         onClose={() => setIsStudentListModalOpen(false)}

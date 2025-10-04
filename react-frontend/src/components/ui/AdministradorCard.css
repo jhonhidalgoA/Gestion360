@@ -1,5 +1,5 @@
 .card-item {
-  width: 400px; 
+  width: 450px; 
   height:220px;  
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -15,7 +15,7 @@
 
 .icons-admin{
     font-size:90px;
-    color: var(--color-primary);
+    color: white;
 }
 
 .card-content h2{

@@ -11,10 +11,11 @@ import VerManual from "./pages/VerManual";
 import VerPEI from "./pages/VerPEI";
 import Matricula  from "./pages/Administrador/Matricula/Matricula"
 import RegistrarDocente from "./pages/Administrador/RegistrarDocente/RegistrarDocente";
+import Calendario from "./components/calendar/Calendar"
 
 //prueba de navbarAdmin //
 import Administrador from "./pages/Administrador/Administrador";
-import Docente from "./pages/Docente";
+import Docente from "./pages/Docente/Docente";
 
 const ScrollToSection = () => {
   const location = useLocation();
@@ -64,7 +65,7 @@ function App() {
         <Route path="docente" element={<Docente />} />
         <Route path="/matricula" element={<Matricula />} />
         <Route path="/registro-docente" element={<RegistrarDocente />} />
-
+        <Route path="/calendario" element={<Calendario />} />
       </Routes>
     </BrowserRouter>
   );

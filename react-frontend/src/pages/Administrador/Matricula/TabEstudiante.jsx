@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./TabEstudiante.css";
 import InputField from "../../../components/ui/InputField";
 import SelectField from "../../../components/ui/SelectField";
+import PhotoUpload from "../../../components/ui/PhotoUpload"; 
 import {
   documentOptions,
   genderOptions,
@@ -11,10 +12,9 @@ import {
 } from "../../../constants/formOptions";
 
 const TabEstudiante = ({ register, errors, setValue, watch }) => {
-  const [preview, setPreview] = useState(null);
   const [age, setAge] = useState("");
 
-  // Observar cambios en los campos importantes
+  
   const watchedPhoto = watch("studentPhoto");
   const watchedBirthDate = watch("studentBirthDate");
 
@@ -41,7 +41,7 @@ const TabEstudiante = ({ register, errors, setValue, watch }) => {
     setValue("studentAge", calculatedAge);
   };
 
-  // Efecto para sincronizar la edad
+  
   useEffect(() => {
     if (watchedBirthDate) {
       const calculatedAge = calculateAge(watchedBirthDate);
@@ -51,136 +51,22 @@ const TabEstudiante = ({ register, errors, setValue, watch }) => {
     }
   }, [watchedBirthDate]);
 
-  // Efecto para sincronizar la foto
-  useEffect(() => {
-    if (watchedPhoto) {
-      // Si es un File object
-      if (watchedPhoto instanceof File) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreview(reader.result);
-        };
-        reader.readAsDataURL(watchedPhoto);
-      } 
-      // Si es una URL (cuando se carga un estudiante para editar)
-      else if (typeof watchedPhoto === 'string') {
-        setPreview(watchedPhoto);
-      }
-    } else {
-      // Si no hay foto, limpiar preview
-      setPreview(null);
-      const fileInput = document.getElementById("student-photo");
-      if (fileInput) {
-        fileInput.value = "";
-      }
-    }
-  }, [watchedPhoto]);
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-
-    if (!file) {
-      setPreview(null);
-      setValue("studentPhoto", null);
-      return;
-    }
-
-    // Verifica si es una imagen
-    if (!file.type.startsWith("image/")) {
-      alert("Solo se permiten archivos de imagen (JPG, PNG, GIF).");
-      e.target.value = "";
-      setPreview(null);
-      setValue("studentPhoto", null);
-      return;
-    }
-
-    // Verifica tamaño
-    if (file.size > 5 * 1024 * 1024) {
-      alert("La imagen debe pesar menos de 5MB.");
-      e.target.value = "";
-      setPreview(null);
-      setValue("studentPhoto", null);
-      return;
-    }
-
-    // Leer y mostrar la imagen
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result);
-      setValue("studentPhoto", file);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const clearPhoto = () => {
-    setPreview(null);
-    setValue("studentPhoto", null);
-    const fileInput = document.getElementById("student-photo");
-    if (fileInput) {
-      fileInput.value = "";
-    }
+  
+  const handlePhotoChange = (file) => {
+    setValue("studentPhoto", file);
   };
 
   return (
-    <div className="tab-content">
-      <div className="photo-container">
-        <label
-          htmlFor="student-photo"
-          className={`photo-label ${errors.studentPhoto ? "photo-error" : ""}`}
-        >
-          {!preview && <span>Foto del Estudiante</span>}
-          <input
-            type="file"
-            id="student-photo"
-            name="studentPhoto"
-            accept="image/*"
-            onChange={handlePhotoChange}
-            className="visually-hidden"
-          />
-          <div
-            className="photo-preview"
-            style={{
-              backgroundImage: preview ? `url(${preview})` : "none",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              border: preview
-                ? "2px solid #28a745"
-                : errors.studentPhoto
-                ? "2px dashed #dc3545"
-                : "2px dashed #adb5bd",
-              minHeight: "150px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              borderRadius: "8px",
-            }}
-          >
-            {!preview && (
-              <div
-                style={{
-                  textAlign: "center",
-                  color: errors.studentPhoto ? "#dc3545" : "#6c757d",
-                }}
-              />
-            )}
-          </div>
-        </label>
-
-        {preview && (
-          <button
-            type="button"
-            onClick={clearPhoto}
-            className="clear-photo-btn"
-          >
-            Quitar foto
-          </button>
-        )}
-
-        {errors.studentPhoto && (
-          <span className="error-message">{errors.studentPhoto.message}</span>
-        )}
-      </div>
+    <div className="tab-content">    
+      <PhotoUpload
+        id="student-photo"
+        label="Foto del Estudiante"
+        value={watchedPhoto}
+        onChange={handlePhotoChange}
+        error={errors.studentPhoto}
+        maxSizeMB={5}
+        allowedTypes={["image/jpeg", "image/png", "image/webp"]}
+      />
 
       <div className="register-fields">
         <div className="field-row">

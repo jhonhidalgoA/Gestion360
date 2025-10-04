@@ -34,7 +34,7 @@
 }
 
 .tabs button.active {
-  background-color: #2e86c1; 
+  background-color: #F57C00; 
   color: white;
   transform: scale(1.02);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -44,8 +44,6 @@
     margin-top:20px;
     padding: 0 20px;
 }
-
-
 
 
 .error-message {
@@ -71,37 +69,3 @@
   padding: 0 20px;
 }
 
-.btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-primary {
-  background-color: #27ae60;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #f39c12;
-  color: white;
-}
-
-.btn-danger {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.btn-info {
-  background-color: #9b59b6;
-  color: white;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}

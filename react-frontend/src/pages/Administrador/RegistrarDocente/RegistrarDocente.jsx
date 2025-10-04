@@ -18,21 +18,51 @@ const RegistrarDocente = () => {
     formState: { errors, isValid },
     trigger,
     reset,
-    setValue
+    setValue,
+    watch 
   } = useForm({
     mode: "onBlur",
     defaultValues: {
-      nombre: "",
-      apellidos: "",
-      edad: "",
-      genero: "",
-      lugarNacimiento: "",
-      telefono: "",
-      email: "",
-      tipoSangre: "",
+      // Datos básicos
+      registerDate: "",
+      codigo: "",
+      teacherPhoto: null, 
+      teacherName: "",
+      teacherLastname: "",
+      teacherBirthDate: "",
+      teacherAge: "",
+      teacherGender: "",
+      teacherBirthPlace: "",
+      
+      // Documento
+      teacherDocument: "",
+      teacherDocumentNumber: "",
+      teacherPhone: "",
+      teacherEmail: "",
+      
+      // Profesional
+      teacherProfession: "",
+      teacherArea: "",
+      teacherResolutionNumber: "",
+      teacherScale: "",
     },
   });
 
+  
+  useEffect(() => {
+    const today = new Date();
+    const isoDate = today.toISOString().split("T")[0];
+    setValue("registerDate", isoDate, { shouldValidate: false });
+
+   
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const code = `DOC-${today.getFullYear()}${String(
+      today.getMonth() + 1
+    ).padStart(2, "0")}${String(today.getDate()).padStart(2, "0")}-${randomSuffix}`;
+    setValue("codigo", code, { shouldValidate: false });
+  }, [setValue]);
+
+  
   const validateTab = async () => {
     const valid = await trigger();
     if (!valid) setIsModalOpen(true);
@@ -40,14 +70,35 @@ const RegistrarDocente = () => {
   };
 
   const handleTabChange = async (tab) => {
-    const isValidTab = await validateTab(activeTab);
+    const isValidTab = await validateTab();
     if (isValidTab) setActiveTab(tab);
   };
 
   const onSubmit = async (data) => {
     try {
       console.log("📌 Datos enviados del docente:", data);
-      // aquí iría la llamada a la API
+      
+      // ✅ Si necesitas enviar como FormData (para la foto)
+      const formData = new FormData();
+      
+      // Agregar foto si existe
+      if (data.teacherPhoto) {
+        formData.append("photo", data.teacherPhoto);
+      }
+      
+      // Agregar resto de campos
+      Object.keys(data).forEach((key) => {
+        if (key !== "teacherPhoto" && data[key] !== null) {
+          formData.append(key, data[key]);
+        }
+      });
+
+      // TODO: Llamada a la API
+      // await fetch("/api/docentes", {
+      //   method: "POST",
+      //   body: formData
+      // });
+
       reset();
       setActiveTab("docente");
       setIsSuccessModalOpen(true);
@@ -57,16 +108,19 @@ const RegistrarDocente = () => {
     }
   };
 
-   useEffect(() => {
+  
+  const handleClear = () => {
+    reset();
+    setActiveTab("docente");
+    
+  
     const today = new Date();
-    const isoDate = today.toISOString().split("T")[0];
-    setValue("registerDate", isoDate, { shouldValidate: false });
-
-    // Generar código único (ej: DOC-YYYYMMDD-XXXX)
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const code = `DOC-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}-${randomSuffix}`;
+    const code = `DOC-${today.getFullYear()}${String(
+      today.getMonth() + 1
+    ).padStart(2, "0")}${String(today.getDate()).padStart(2, "0")}-${randomSuffix}`;
     setValue("codigo", code, { shouldValidate: false });
-  }, [setValue]);
+  };
 
   return (
     <div className="teacher-register">
@@ -91,6 +145,7 @@ const RegistrarDocente = () => {
             register={register}
             errors={errors}
             setValue={setValue}
+            watch={watch} 
           />
         )}
         {activeTab === "profesional" && (
@@ -104,13 +159,14 @@ const RegistrarDocente = () => {
         <div className="form-actions">
           <Botones
             onSave={handleSubmit(onSubmit)}
-            onEdit={() => alert("Editar")}
-            onDelete={() => alert("Eliminar")}
+            onEdit={() => alert("Editar (próximamente)")}
+            onDelete={handleClear} 
             onGeneratePDF={() => alert("Generar PDF")}
             disabled={!isValid}
           />
         </div>
       </form>
+
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -124,6 +180,7 @@ const RegistrarDocente = () => {
           },
         ]}
       />
+
       <Modal
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}

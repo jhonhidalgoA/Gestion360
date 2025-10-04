@@ -4,14 +4,14 @@ export const docenteData = [
     icon: "assignment",
     title: "Ver Calificaciones",
     path: "calificaciones",
-    gradient: "linear-gradient(135deg, #4a90e2, #357abd)"
+    gradient: "linear-gradient(135deg, #4169E1)"
   },
   {
     id: 2,
     icon: "note_alt",
     title: "Ver Asistencia",
     path: "asistencia",
-    gradient: "linear-gradient(135deg, #66bb6a, #43a047)"
+    gradient: "linear-gradient(135deg, #32cd32)"
   },
   {
     id: 3,
@@ -32,7 +32,7 @@ export const docenteData = [
     icon: "analytics",
     title: "Reportes Académicos",
     path: "tareas",
-    gradient: "linear-gradient(135deg, #5c6bc0, #3949ab)" 
+    gradient: "linear-gradient(135deg, #40E0D0)" 
   },
   {
     id: 6,
@@ -46,7 +46,7 @@ export const docenteData = [
     icon: "calendar_month",
     title: "Calendario",
     path: "calendario",
-    gradient: "linear-gradient(135deg, #00acc1, #0097a7)"
+    gradient: "linear-gradient(135deg, #6B8E23)"
   },
   {
     id: 8,
@@ -54,5 +54,12 @@ export const docenteData = [
     title: "Observador",
     path: "observador",
     gradient: "linear-gradient(135deg, #7f8c8d, #636e72)" 
+  },
+  {
+    id: 9,
+    icon: "family_restroom",
+    title: "Atencion a Padres",
+    path: "observador",
+    gradient: "linear-gradient(135deg, #7B68EE)" 
   }
 ];

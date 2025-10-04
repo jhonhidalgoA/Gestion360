@@ -1,6 +1,6 @@
-import NavbarAdmin from "../components/layout/Navbar/NavbarAdmin";
-import {docenteData} from "../data/DocenteData";
-import AdminCard from "../components/ui/AdministradorCard";
+import NavbarAdmin from "../../components/layout/Navbar/NavbarAdmin";
+import {docenteData} from "../../data/DocenteData";
+import AdminCard from "../../components/ui/AdministradorCard";
 import "./Docente.css";
 
 const Docente = () => {

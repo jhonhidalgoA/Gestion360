@@ -1,9 +1,13 @@
-import { useState,  } from "react";
+import { useState, useEffect } from "react";
 import "./TabDocenteDatos.css";
 import InputField from "../../../components/ui/InputField";
 import SelectField from "../../../components/ui/SelectField";
+import PhotoUpload from "../../../components/ui/PhotoUpload"; 
 
-const TabDocenteDatos = ({ register, errors, setValue }) => {
+const TabDocenteDatos = ({ register, errors, setValue, watch }) => {
+  const [age, setAge] = useState("");
+  const watchedPhoto = watch("teacherPhoto");
+  const watchedBirthDate = watch("teacherBirthDate");
 
   const genderOptions = [
     { value: "", label: "Seleccionar" },
@@ -59,9 +63,7 @@ const TabDocenteDatos = ({ register, errors, setValue }) => {
     { value: "3d", label: "3D" },
   ];
 
-  const [age, setAge] = useState("");
-
-  const calculateAge = (birthDateString) => {
+   const calculateAge = (birthDateString) => {
     if (!birthDateString) return "";
     const birthDate = new Date(birthDateString);
     const today = new Date();
@@ -81,12 +83,35 @@ const TabDocenteDatos = ({ register, errors, setValue }) => {
     const value = e.target.value;
     const calculatedAge = calculateAge(value);
     setAge(calculatedAge);
-    setValue("studentAge", calculatedAge);
+    setValue("teacherAge", calculatedAge);
+  };
+
+  useEffect(() => {
+    if (watchedBirthDate) {
+      const calculatedAge = calculateAge(watchedBirthDate);
+      setAge(calculatedAge);
+    } else {
+      setAge("");
+    }
+  }, [watchedBirthDate]);
+
+  const handlePhotoChange = (file) => {
+    setValue("teacherPhoto", file);
   };
 
   return (
     <div className="tab-content-teacher">
-      <div className="photo-container"></div>
+      <div className="photo-container">
+        <PhotoUpload
+        id="teacher-photo"
+        label="Foto del Docente"
+        value={watchedPhoto}
+        onChange={handlePhotoChange}
+        error={errors.teacherPhoto}
+        maxSizeMB={5}
+        allowedTypes={["image/jpeg", "image/png", "image/webp"]}
+      />
+      </div>
 
       <div className="register-fields">
         <div className="field-row">

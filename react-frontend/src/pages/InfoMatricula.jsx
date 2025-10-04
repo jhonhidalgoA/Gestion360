@@ -14,10 +14,9 @@ const InfoMatricula = () => {
       <Navbar />
       <div className="section-admissions">
         <div className="title-admissions">
-          <h1>Proceso de Admisiones 2026</h1>
+          <h1>¡Bienvenido al Proceso de Admisiones 2026!</h1>
           <p>
-            Información detallada sobre el proceso de admisión para el año
-            lectivo 2026.
+            Toda la información necesaria para aplicar al proceso de admision.
           </p>
         </div>
         <div className="admissions">
