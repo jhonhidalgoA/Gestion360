@@ -3,10 +3,10 @@
   justify-content: space-between; 
   align-items: center;
   background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  margin: 20px auto;
+  margin: 30px auto;
   width: 100%;
   max-width: 900px;
   text-align: center;
@@ -45,13 +45,15 @@
   padding: 0 20px;
 }
 
-.btn-download {
+.btn-circular {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;  
-  
+  gap: 20px;
+  font-size: 16px;  
+   
 }
+
 
 
 .material-symbols-outlined {

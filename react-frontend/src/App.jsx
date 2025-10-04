@@ -12,6 +12,8 @@ import VerPEI from "./pages/VerPEI";
 import Matricula  from "./pages/Administrador/Matricula/Matricula"
 import RegistrarDocente from "./pages/Administrador/RegistrarDocente/RegistrarDocente";
 import Calendario from "./components/calendar/Calendar"
+import HorarioGrados from "./pages/Administrador/HorarioGrados/HorarioGrados"
+import AtencionPadres from "./pages/AtencionPadres"
 
 //prueba de navbarAdmin //
 import Administrador from "./pages/Administrador/Administrador";
@@ -66,6 +68,8 @@ function App() {
         <Route path="/matricula" element={<Matricula />} />
         <Route path="/registro-docente" element={<RegistrarDocente />} />
         <Route path="/calendario" element={<Calendario />} />
+        <Route path="/atencion-padres" element={<AtencionPadres />} />
+        <Route path="/horario-grados" element={<HorarioGrados/>} />
       </Routes>
     </BrowserRouter>
   );

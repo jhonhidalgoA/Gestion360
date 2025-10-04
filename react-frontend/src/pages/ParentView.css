@@ -1,0 +1,365 @@
+.parent-view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Info Banner */
+.info-banner {
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.info-banner-blue {
+  background-color: #dbeafe;
+  border: 1px solid #bfdbfe;
+}
+
+.info-banner-content {
+  display: flex;
+  align-items: flex-start;
+}
+
+
+
+.info-banner-blue .info-banner-icon {
+  color: #2563eb;
+  width: 50px;
+  height: 50px;
+}
+
+.info-banner-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 1.3rem;
+  color: #1e40af;
+}
+
+.info-banner-blue .info-banner-text {
+  color: #1e40af;
+  font-size:1.1rem;
+  margin-top: 4px;
+}
+
+/* Section Titles */
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Teachers Grid */
+.teachers-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .teachers-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.teacher-card {
+  background: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.teacher-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
+  border-color: #2563EB;
+}
+
+.teacher-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.teacher-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #2563EB, #1E40AF);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.teacher-name {
+  font-weight: 600;
+}
+
+.teacher-subject {
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+}
+
+.icon-small {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+/* Back Button */
+.back-button {
+  color: #2563eb;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.back-button:hover {
+  color: #1e40af;
+}
+
+/* Selected Teacher Card */
+.selected-teacher-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  background-color: #f9fafb;
+}
+
+/* Dates Grid */
+.dates-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .dates-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.date-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.date-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.date-icon {
+  width: 24px;
+  height: 24px;
+  margin: 0 auto 8px;
+  color: #2563eb;
+}
+
+.date-text {
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* Selected Date */
+.selected-date {
+  margin-bottom: 24px;
+  padding: 12px;
+  background-color: #dbeafe;
+  border-radius: 8px;
+}
+
+.selected-date-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* Times Grid */
+.times-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .times-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.time-button {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.time-button:hover {
+  border-color: #3b82f6;
+  background-color: #dbeafe;
+}
+
+.time-icon {
+  width: 20px;
+  height: 20px;
+  margin: 0 auto 4px;
+  color: #2563eb;
+}
+
+.time-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Confirmation Card */
+.confirmation-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 24px;
+  background-color: white;
+}
+
+.appointment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+/* Reason Section */
+.reason-section {
+  margin-bottom: 24px;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.reason-textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.reason-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Confirm Button */
+.confirm-button {
+  background-color: #2563EB;
+  color: white;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.confirm-button:hover:not(:disabled) {
+  background-color: #1E40AF;
+  transform: scale(1.02);
+}
+
+.confirm-button:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.confirmation-modal {
+  background-color: white;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 28rem;
+  width: 100%;
+}
+
+.confirmation-content {
+  text-align: center;
+}
+
+.success-icon {
+  width: 64px;
+  height: 64px;
+  background-color: #dcfce7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.check-icon {
+  width: 32px;
+  height: 32px;
+  color: #16a34a;
+}
+
+.confirmation-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.confirmation-text {
+  color: #6b7280;
+}
+
+/* Utility Classes */
+.capitalize {
+  text-transform: capitalize;
+}

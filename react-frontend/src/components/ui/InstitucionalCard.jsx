@@ -2,7 +2,7 @@ import "./InstitucionalCard.css";
 
 const ScheduleCard = ({ icon, title, subtitle, linkText = "",}) => {
   return (
-    <div className="schedule-card">
+    <div className="schedules-card">
       <div className="schedule-icon">
         <span className="material-symbols-outlined icon ">{icon}</span>
       </div>

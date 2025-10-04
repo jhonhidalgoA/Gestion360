@@ -11,6 +11,10 @@ const CircularesDetalles = () => {
   return (
     <div className="circulares-container">
       <Navbar />
+      <div className="header">
+        <h1>Circulares</h1>
+        <p>Últimas actualizaciones académicas y administrativas.</p>
+      </div>
       <div className="circular-grid">
        {circularesData.map((circular, index) => (
           <CircularCard

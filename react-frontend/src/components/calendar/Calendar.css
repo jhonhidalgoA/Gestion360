@@ -1,86 +1,14 @@
-
-:root {
-  /* Paleta de colores moderna y profesional */
-  --color-primary: #2563eb;
-  --color-primary-dark: #1e40af;
-  --color-primary-light: #3b82f6;
-  
-  --color-secondary: #7c3aed;
-  --color-secondary-dark: #6d28d9;
-  
-  --color-accent: #06b6d4;
-  --color-accent-dark: #0891b2;
-  
-  /* Colores de eventos */
-  --event-red: #ef4444;
-  --event-blue: #3b82f6;
-  --event-green: #10b981;
-  --event-purple: #a855f7;
-  --event-orange: #f97316;
-  --event-teal: #14b8a6;
-  --event-indigo: #6366f1;
-  --event-pink: #ec4899;
-  
-  /* Escala de grises */
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
-  
-  /* Espaciado consistente */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  
-  /* Bordes redondeados */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
-  --radius-full: 9999px;
-  
-  /* Sombras modernas */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  
-  /* Transiciones suaves */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-  
-  /* Tipografía */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-}
-
-
 .calendar-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-  padding: var(--spacing-xl) var(--spacing-md);
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
 }
 
-/* Patrón de fondo sutil y moderno */
+
 .calendar-container::before {
   content: '';
   position: absolute;
@@ -94,43 +22,41 @@
   pointer-events: none;
 }
 
-
 .container-header {
   width: 99%; 
-  margin: 40px auto var(--spacing-xl);
+  margin: 40px auto 2rem;
   background: white;
   border-radius: 0 0 10px 10px;
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   position: relative;
   z-index: 1;
 }
 
 .header__calendar {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
   color: white;
-  padding: var(--spacing-xl) var(--spacing-2xl);
+  padding: 2rem 3rem;
   text-align: center;
 }
 
 .header__calendar h1 {
   font-size: clamp(1.5rem, 4vw, 2.5rem);
-  font-weight: var(--font-weight-bold);
-  margin-bottom: var(--spacing-md);
+  font-weight: 700;
+  margin-bottom: 1rem;
   letter-spacing: -0.02em;
 }
-
 
 .calendar-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: var(--spacing-lg);
+  margin-top: 1.5rem;
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-radius: var(--radius-full);
-  gap: var(--spacing-md);
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  gap: 1rem;
 }
 
 .calendar-btn {
@@ -138,12 +64,12 @@
   backdrop-filter: blur(5px);
   border: 2px solid rgba(255, 255, 255, 0.3);
   color: white;
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-radius: var(--radius-full);
+  padding: 1rem 2rem;
+  border-radius: 9999px;
   cursor: pointer;
   font-size: 1rem;
-  font-weight: var(--font-weight-semibold);
-  transition: all var(--transition-base);
+  font-weight: 600;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
 
@@ -159,18 +85,19 @@
 
 .current-month {
   font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   letter-spacing: -0.01em;
 }
+
 
 
 .calendar-section {
   width: 100%;
   max-width: 1400px;
   background: white;
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-2xl);
-  box-shadow: var(--shadow-xl);
+  border-radius: 1rem;
+  padding: 3rem;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
   position: relative;
   z-index: 1;
 }
@@ -179,17 +106,17 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 1px;
-  background: var(--gray-200);
-  border-radius: var(--radius-lg);
+  background: #e5e7eb;
+  border-radius: 0.75rem;
   overflow: hidden;
 }
 
 .day-header {
-  background: var(--color-primary);
+  background: #2563eb;
   color: white;
-  padding: var(--spacing-lg);
+  padding: 1.5rem;
   text-align: center;
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -198,25 +125,25 @@
 .day-cell {
   background: white;
   min-height: 120px;
-  padding: var(--spacing-md);
+  padding: 1rem;
   position: relative;
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   border: 2px solid transparent;
 }
 
 .day-cell:hover {
-  background: var(--gray-50);
-  border-color: var(--color-primary-light);
+  background: #f9fafb;
+  border-color: #3b82f6;
   transform: scale(1.02);
   z-index: 10;
 }
 
 .day-cell.other-month {
-  background: var(--gray-100);
-  color: var(--gray-400);
+  background: #f3f4f6;
+  color: #9ca3af;
 }
 
 .day-cell.other-month .day-number {
@@ -224,10 +151,10 @@
 }
 
 .day-cell.today {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
   color: white;
-  font-weight: var(--font-weight-bold);
-  box-shadow: var(--shadow-lg);
+  font-weight: 700;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
 }
 
 .day-cell.today .day-number {
@@ -235,49 +162,49 @@
 }
 
 .day-number {
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   font-size: 1rem;
-  margin-bottom: var(--spacing-sm);
-  color: var(--gray-900);
+  margin-bottom: 0.5rem;
+  color: #111827;
 }
 
 
 .event-bar {
   color: white;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  margin: var(--spacing-xs) 0;
-  border-radius: var(--radius-md);
+  padding: 0.25rem 0.5rem;
+  margin: 0.25rem 0;
+  border-radius: 0.5rem;
   font-size: 0.75rem;
-  font-weight: var(--font-weight-medium);
+  font-weight: 500;
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .event-bar:hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
   filter: brightness(1.1);
 }
 
 /* Colores de eventos con mejor contraste */
-.event-bar.color-red { background: var(--event-red); }
-.event-bar.color-blue { background: var(--event-blue); }
-.event-bar.color-green { background: var(--event-green); }
-.event-bar.color-purple { background: var(--event-purple); }
-.event-bar.color-orange { background: var(--event-orange); }
-.event-bar.color-teal { background: var(--event-teal); }
-.event-bar.color-indigo { background: var(--event-indigo); }
-.event-bar.color-pink { background: var(--event-pink); }
+.event-bar.color-red { background: #ef4444; }
+.event-bar.color-blue { background: #3b82f6; }
+.event-bar.color-green { background: #10b981; }
+.event-bar.color-purple { background: #a855f7; }
+.event-bar.color-orange { background: #f97316; }
+.event-bar.color-teal { background: #14b8a6; }
+.event-bar.color-indigo { background: #6366f1; }
+.event-bar.color-pink { background: #ec4899; }
 
 /* Estilos para eventos multi-día */
-.event-bar.single { border-radius: var(--radius-md); }
-.event-bar.start { border-radius: var(--radius-md) 0 0 var(--radius-md); }
-.event-bar.end { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+.event-bar.single { border-radius: 0.5rem; }
+.event-bar.start { border-radius: 0.5rem 0 0 0.5rem; }
+.event-bar.end { border-radius: 0 0.5rem 0.5rem 0; }
 .event-bar.middle { border-radius: 0; }
 
 
@@ -293,7 +220,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn var(--transition-base);
+  animation: fadeIn 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes fadeIn {
@@ -303,12 +230,12 @@
 
 .modals-content {
   background: white;
-  border-radius: var(--radius-2xl);
+  border-radius: 1.5rem;
   width: 90%;
   max-width: 600px;
-  box-shadow: var(--shadow-2xl);
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
   overflow: hidden;
-  animation: modalSlideIn var(--transition-slow);
+  animation: modalSlideIn 350ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes modalSlideIn {
@@ -323,35 +250,35 @@
 }
 
 .modals-header {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
   color: white;
-  padding: var(--spacing-xl);
+  padding: 2rem;
   position: relative;
 }
 
 .modals-header h3 {
   font-size: 1.5rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   margin: 0;
   letter-spacing: -0.01em;
 }
 
 .close {
   position: absolute;
-  right: var(--spacing-lg);
-  top: var(--spacing-lg);
+  right: 1.5rem;
+  top: 1.5rem;
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-md);
+  border-radius: 0.5rem;
   font-size: 1.5rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   cursor: pointer;
   color: white;
-  transition: all var(--transition-base);
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
 }
 
@@ -362,18 +289,18 @@
 
 
 .modals-body {
-  padding: var(--spacing-xl);
+  padding: 2rem;
 }
 
 .form-group {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: var(--spacing-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #374151;
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -382,25 +309,25 @@
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: var(--spacing-md);
-  border: 2px solid var(--gray-200);
-  border-radius: var(--radius-md);
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
   font-size: 1rem;
-  transition: all var(--transition-base);
-  font-family: var(--font-sans);
-  color: var(--gray-900);
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: #111827;
   background: white;
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: var(--color-primary);
+  border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .form-group input::placeholder {
-  color: var(--gray-400);
+  color: #9ca3af;
 }
 
 /* ============================================
@@ -409,27 +336,27 @@
 .color-selector {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-sm);
+  gap: 1rem;
+  margin-top: 0.5rem;
 }
 
 .color-option {
   width: 100%;
   height: 48px;
   border: 3px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: 0.5rem;
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
 .color-option:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
 }
 
 .color-option.selected {
-  border-color: var(--gray-900);
+  border-color: #111827;
   transform: scale(1.05);
   box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
 }
@@ -441,10 +368,10 @@
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   font-size: 1.25rem;
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -453,31 +380,31 @@
 }
 
 /* Colores para el selector */
-.color-red { background: var(--event-red); }
-.color-blue { background: var(--event-blue); }
-.color-green { background: var(--event-green); }
-.color-purple { background: var(--event-purple); }
-.color-orange { background: var(--event-orange); }
-.color-teal { background: var(--event-teal); }
-.color-indigo { background: var(--event-indigo); }
-.color-pink { background: var(--event-pink); }
+.color-red { background: #ef4444; }
+.color-blue { background: #3b82f6; }
+.color-green { background: #10b981; }
+.color-purple { background: #a855f7; }
+.color-orange { background: #f97316; }
+.color-teal { background: #14b8a6; }
+.color-indigo { background: #6366f1; }
+.color-pink { background: #ec4899; }
 
 
 .modals-footer {
-  padding: 0 var(--spacing-xl) var(--spacing-xl);
+  padding: 0 2rem 2rem;
   display: flex;
-  gap: var(--spacing-md);
+  gap: 1rem;
 }
 
 .btn-calendar {
   flex: 1;
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: 1rem 2rem;
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: 9999px;
   font-size: 1rem;
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   display: flex;
   justify-content: center;
@@ -496,7 +423,7 @@
 }
 
 .btn-calendar-primary {
-  background:var(--color-primary) ;
+  background:#2563eb ;
   color: white;
 }
 
@@ -512,29 +439,33 @@
    DISPLAY DE EVENTOS
    ============================================ */
 .events-display {
-  margin-top: var(--spacing-xl);
-  padding: var(--spacing-xl);
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
-  border-radius: var(--radius-xl);
+  margin-top: 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  border-radius: 1rem;
   color: white;
 }
 
+events_display_placeholder /* intentional placeholder to avoid accidental syntax issues */
+
+
+
 .events-display h3 {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 1.5rem;
   font-size: 1.5rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
 }
 
 .event-item {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-  border-radius: var(--radius-lg);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.75rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all var(--transition-base);
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -552,8 +483,8 @@
 }
 
 .event-title {
-  font-weight: var(--font-weight-semibold);
-  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
   font-size: 1rem;
 }
 
@@ -564,7 +495,7 @@
 
 .event-actions {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 0.5rem;
 }
 
 .edit-btn,
@@ -573,12 +504,12 @@
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   font-size: 0.875rem;
-  font-weight: var(--font-weight-medium);
-  transition: all var(--transition-base);
+  font-weight: 500;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .edit-btn:hover,
@@ -588,11 +519,11 @@
 }
 
 /* ============================================
-   RESPONSIVE DESIGN
+   RESPONSIVE DESIGN (continuación)
    ============================================ */
 @media (max-width: 1024px) {
   .calendar-section {
-    padding: var(--spacing-xl);
+    padding: 2rem;
   }
   
   .day-cell {
@@ -601,22 +532,22 @@
 }
 
 @media (max-width: 768px) {
-  :root {
-    --spacing-xl: 1.5rem;
-    --spacing-2xl: 2rem;
-  }
+  /* En la versión original :root cambiaba spacing-xl/2xl.
+     Aquí aplicamos los valores equivalentes dentro del media query. */
+  /* --spacing-xl: 1.5rem; */
+  /* --spacing-2xl: 2rem; */
   
   .calendar-container {
-    padding: var(--spacing-md);
+    padding: 1rem;
   }
   
   .header__calendar {
-    padding: var(--spacing-lg);
+    padding: 1.5rem;
   }
   
   .calendar-nav {
     flex-direction: column;
-    padding: var(--spacing-md);
+    padding: 1rem;
   }
   
   .calendar-btn {
@@ -629,7 +560,7 @@
   
   .day-cell {
     min-height: 80px;
-    padding: var(--spacing-sm);
+    padding: 0.5rem;
   }
   
   .day-number {
@@ -638,11 +569,11 @@
   
   .event-bar {
     font-size: 0.7rem;
-    padding: 2px var(--spacing-xs);
+    padding: 2px 0.25rem;
   }
   
   .calendar-section {
-    padding: var(--spacing-md);
+    padding: 1rem;
   }
   
   .modals-content {
@@ -650,7 +581,7 @@
   }
   
   .modals-body {
-    padding: var(--spacing-lg);
+    padding: 1.5rem;
   }
   
   .modals-footer {
@@ -659,7 +590,7 @@
   
   .color-selector {
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-sm);
+    gap: 0.5rem;
   }
   
   .color-option {
@@ -669,7 +600,7 @@
 
 @media (max-width: 480px) {
   .day-header {
-    padding: var(--spacing-sm);
+    padding: 0.5rem;
     font-size: 0.75rem;
   }
   
@@ -683,27 +614,27 @@
 }
 
 /* ============================================
-   MODO OSCURO (opcional)
-   ============================================ */
+   MODO OSCURO (opcional) - variables aplicadas manualmente
+   (originalmente estas eran overrides en :root dentro del media query)
+   Aquí se presentan como comentarios y guía; descomenta si quieres activar. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --gray-50: #1f2937;
-    --gray-100: #374151;
-  }
+  /* Valores alternos para modo oscuro */
+  /* --gray-50: #1f2937; */
+  /* --gray-100: #374151; */
   
   /* Puedes descomentar esto para habilitar modo oscuro
   .calendar-section {
-    background: var(--gray-800);
+    background: #1f2937;
     color: white;
   }
   
   .day-cell {
-    background: var(--gray-700);
+    background: #374151;
     color: white;
   }
   
   .day-cell:hover {
-    background: var(--gray-600);
+    background: #4b5563;
   }
   */
 }
@@ -716,17 +647,17 @@
   justify-content: center;
   align-items: center;
   min-height: 200px;
-  color: var(--gray-500);
+  color: #6b7280;
 }
 
 .empty-state {
   text-align: center;
-  padding: var(--spacing-2xl);
-  color: var(--gray-500);
+  padding: 3rem;
+  color: #6b7280;
 }
 
 .empty-state p {
-  margin-top: var(--spacing-md);
+  margin-top: 1rem;
   font-size: 1.125rem;
 }
 
@@ -743,10 +674,10 @@
 }
 
 .skeleton {
-  background: linear-gradient(90deg, var(--gray-200) 0%, var(--gray-300) 50%, var(--gray-200) 100%);
+  background: linear-gradient(90deg, #e5e7eb 0%, #d1d5db 50%, #e5e7eb 100%);
   background-size: 1000px 100%;
   animation: shimmer 2s infinite;
-  border-radius: var(--radius-md);
+  border-radius: 0.5rem;
 }
 
 /* ============================================
@@ -766,7 +697,7 @@
 
 /* Focus visible para navegación por teclado */
 *:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
 

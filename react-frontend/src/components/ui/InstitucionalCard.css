@@ -1,22 +1,22 @@
 .schedule-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     justify-content: center; 
-    gap: 30px;
-    padding: 0 20px;
+    gap: 30px;    
     margin: 20px auto 0;
+    width: 100%;
     max-width:1200px;
 }
 
-.schedule-card {
+.schedules-card {
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background-color:#f0f0f0;
-    width: 100%;
-    max-width: 350px; 
-    height: 250px;
+    background: #f0f0f0;
+    width: 100%; 
+    max-width: 450px; 
+    height: 300px;
     padding: 40px;
     margin: 0 auto;
     border-radius: 10px;
@@ -27,13 +27,13 @@
     z-index: 1;
 }
 
-.schedule-card:hover {
+.schedules-card:hover {
     background-color: #e2a926;
     transform: scale(1.05);
     
 }
 
-.schedule-card .icon {
+.schedules-card .icon {
     position: relative;
     font-size: 70px;
     color: var(--color-primary);
@@ -41,7 +41,7 @@
 }
 
 .schedule-title{
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     margin-top: 20px;
     font-weight: 600;
     text-align: center;  
@@ -49,20 +49,25 @@
 }
 
 .schedule-subtitle{
-    font-size: 0.9rem;
+    font-size: 1.0rem;
     margin-top: 5px;
     font-weight: 600;
-    color: blue; 
+    color: var(--color-primary-dark); 
 }
 
+
 .schedule-link {
-    font-size: 0.9rem;    
+    font-size:1.0rem;    
     text-align: center; 
     font-weight: 600;
     text-decoration: none;
-    color: #DBD0BE;
+    color: #e2a926;
     align-self: center; 
     margin-top: 30px;    
+}
+
+.schedules-card:hover .schedule-link{   
+    color: white
 }
 
 

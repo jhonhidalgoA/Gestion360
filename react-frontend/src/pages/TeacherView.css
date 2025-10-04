@@ -1,0 +1,264 @@
+.teacher-view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Info Banner */
+.info-banner {
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.info-banner-green {
+  background-color: #dcfce7;
+  border: 1px solid #bbf7d0;
+}
+
+.info-banner-content {
+  display: flex;
+  align-items: flex-start;
+}
+
+.info-banner-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.info-banner-green .info-banner-icon {
+  color: #16a34a;
+}
+
+.info-banner-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.info-banner-green .info-banner-title {
+  color: #15803d;
+}
+
+.info-banner-text {
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+.info-banner-green .info-banner-text {
+  color: #15803d;
+}
+
+/* Section Titles */
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat-card {
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.stat-blue {
+  background-color: #dbeafe;
+}
+
+.stat-green {
+  background-color: #dcfce7;
+}
+
+.stat-purple {
+  background-color: #f3e8ff;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.stat-value {
+  font-size: 1.875rem;
+  font-weight: bold;
+}
+
+.stat-blue .stat-value {
+  color: #2563eb;
+}
+
+.stat-green .stat-value {
+  color: #16a34a;
+}
+
+.stat-purple .stat-value {
+  color: #7c3aed;
+}
+
+/* Appointments List */
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.appointment-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: white;
+  transition: box-shadow 0.2s;
+}
+
+.appointment-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.appointment-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.appointment-avatar {
+  width: 32px;
+  height: 32px;
+  background-color: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.appointment-info {
+  min-width: 0;
+}
+
+.appointment-parent {
+  font-weight: 600;
+}
+
+.appointment-reason {
+  font-size: 0.875rem;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.appointment-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+.appointment-detail {
+  display: flex;
+  align-items: center;
+}
+
+.detail-icon-small {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  background-color: #dcfce7;
+  color: #166534;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* Schedule Card */
+.schedule-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 24px;
+  background-color: white;
+}
+
+.schedule-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.day-schedule {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.day-schedule:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.day-name {
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+}
+
+.time-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.time-slot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+}
+
+.time-slot-icon {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+/* Utility Classes */
+.capitalize {
+  text-transform: capitalize;
+}
