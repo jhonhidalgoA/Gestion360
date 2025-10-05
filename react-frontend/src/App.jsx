@@ -13,6 +13,7 @@ import Matricula  from "./pages/Administrador/Matricula/Matricula"
 import RegistrarDocente from "./pages/Administrador/RegistrarDocente/RegistrarDocente";
 import Calendario from "./components/calendar/Calendar"
 import HorarioGrados from "./pages/Administrador/HorarioGrados/HorarioGrados"
+import EditarMenu from "./pages/Administrador/EditarMenu/EditarMenu";
 import AtencionPadres from "./pages/AtencionPadres"
 
 //prueba de navbarAdmin //
@@ -70,6 +71,7 @@ function App() {
         <Route path="/calendario" element={<Calendario />} />
         <Route path="/atencion-padres" element={<AtencionPadres />} />
         <Route path="/horario-grados" element={<HorarioGrados/>} />
+        <Route path="/menu-escolar" element={<EditarMenu/>} />
       </Routes>
     </BrowserRouter>
   );

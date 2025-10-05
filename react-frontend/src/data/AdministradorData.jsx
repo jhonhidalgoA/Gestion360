@@ -37,21 +37,21 @@ export const adminData = [
   {
     id: 6,
     icon: "restaurant",
-    title: "Restaurante",
-    path: "/restaurante",
+    title: "Editar Menú Escolar",
+    path: "/menu-escolar",
     gradient: "linear-gradient(135deg, #7B1FA2)"
   },
   {
     id: 7,
     icon: "article",
-    title: "Noticias",
+    title: "Editar Noticias",
     path: "/noticias",
     gradient: "linear-gradient(135deg, #0097A7, #006064)"
   },
   {
     id: 8,
     icon: "description",
-    title: "Circulares",
+    title: "Agregar Circulares",
     path: "/circulares",
     gradient: "linear-gradient(135deg, #B8860B)"
   },

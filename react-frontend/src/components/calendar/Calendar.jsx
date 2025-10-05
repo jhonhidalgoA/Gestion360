@@ -4,7 +4,7 @@ import CalendarHeader from './CalendarHeader';
 import CalendarGrid from './CalendarGrid';
 import EventsList from './EventsList';
 import EventModal from './EventModal';
-import NavbarSection from "../../components/layout/Navbar/NavbarSection";
+import NavbarSection from "../layout/Navbar/NavbarSection";
 import './Calendar.css';
 
 const Calendar = () => {

@@ -1,6 +1,6 @@
 .grid-layout {  
   min-height: 100vh;
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  background: #E5E7EB;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -163,28 +163,32 @@
   transition: all 0.2s;
 }
 
+.grades-btn:hover{
+  transform:scale(1.05);
+}
+
 .horario-grados-btn-add {
-  background: #4ecdc4;
+  background: #FF8C00;
   color: white;
 }
 
 .horario-grados-btn-save {
-  background: #48bb78;
+  background: #27ae60;
   color: white;
 }
 
 .horario-grados-btn-edit {
-  background: #ed8936;
+  background: #ffc107;
   color: white;
 }
 
 .horario-grados-btn-delete {
-  background: #f56565;
+  background:  #dc3545;
   color: white;
 }
 
 .horario-grados-btn-view {
-  background: #667eea;
+  background: #0a34f0ff;
   color: white;
 }
 
