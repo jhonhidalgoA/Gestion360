@@ -1,11 +1,12 @@
-.navbar-section {
+.navbars-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;  
+  padding: 20px;  
   margin: 0 auto;
-  width:97%;
-  height: 60px;
+  width:95%;
+  max-width: 1800px; 
+  height: auto;
   position: fixed;
   top: 5px;
   border-radius: 10px 10px 0 0;
@@ -15,29 +16,46 @@
   transition: all 0.4s ease-in-out;
  }
 
+.navbars-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+  color: white;
+}
 
-.navbar-section-title {
+.navbars-title {
   display: flex;
   align-items: center;
-  gap: 20px;
-  cursor: pointer;
+  justify-content: center;
+  gap: 20px; 
+  margin-bottom: 6px;
 }
 
-.navbar-section-title .logo {
-  height: 24px;         
-  margin-right: 10px;  
-  filter: invert(100%) brightness(200%);
+.navbars-icon {
+  font-size: 50px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top:5px;
+}
+
+.navbars-content h2 {
+  font-size: 1.8rem;  
+  margin: 0;
+  line-height: 1;
+}
+
+.navbars-content p {
+  font-size: 1.2rem;
+  margin-top: 10px;
+  line-height: 1.2;  
 }
 
 
-.navbar-title {
-  font-size: 1.3rem;
-  font-weight: bold;
-  text-align: center; 
-}
-
-
-.nav-btn {
+.navs-btn {
   background: transparent;
   border: none;
   color: white;  
@@ -52,18 +70,18 @@
 }
 
 
-.nav-btn .icons-section {
+.navs-btn .icons-section {
   font-size: 2rem;
   transition: transform 0.3s ease, color 0.3s ease;
 }
 
 
-.nav-btn:hover {
+.navs-btn:hover {
   animation: pulse-border 1s infinite;
   transform: scale(1.1);
 }
 
-.nav-btn .icons-section:hover {
+.navs-btn .icons-section:hover {
   transform: scale(1.2);
 }
 

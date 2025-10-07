@@ -1,4 +1,6 @@
 
+import "./SelectField.css"; // Asegúrate de tener este archivo
+
 const SelectField = ({
   label,
   id,
@@ -20,7 +22,7 @@ const SelectField = ({
           required: required ? "Este campo es obligatorio" : false,
           ...validation,
         })}
-        className={errorMsg ? "input-error" : ""}
+        className={`input-line ${errorMsg ? "input-error" : ""}`}
         {...props}
       >
         {options.map((option) => (
@@ -29,7 +31,7 @@ const SelectField = ({
           </option>
         ))}
       </select>
-      {errorMsg && <span className="error-message">{errorMsg.message || errorMsg}</span>}
+      {errorMsg && <span className="error-message">{errorMsg}</span>}
     </div>
   );
 };

@@ -1,46 +1,133 @@
-import { FaSave, FaEdit, FaTrash, FaFilePdf } from "react-icons/fa";
+
 import "./Botones.css";
 
-const ActionButtons = ({ 
-  onSave, 
-  onEdit, 
-  onDelete, 
-  onGeneratePDF,
+const ActionButtons = ({
+ 
+  onLoad,
+  loadLabel = "Cargar",
+  loadLoading = false,
+  loadDisabled = false,
+
+ 
+  onSave,
   saveLabel = "Guardar",
+  saveLoading = false,
+  saveDisabled = false,
+
+  // Editar
+  onEdit,
   editLabel = "Editar",
+  editLoading = false,
+  editDisabled = false,
+
+  // Borrar / Limpiar
+  onDelete,
   deleteLabel = "Borrar",
-  generatePDFLabel = "Generar PDF"
+  deleteLoading = false,
+  deleteDisabled = false,
+
+  // Ver
+  onView,
+  viewLabel = "Ver",
+  viewLoading = false,
+  viewDisabled = false,
+
+  // Generar PDF
+  onLoadPDF,
+  pdfLabel = "Generar PDF",
+  pdfLoading = false,
+  pdfDisabled = false,
 }) => {
+  
+  const getButtonText = (isLoading, label, loadingText) => {
+    return isLoading ? loadingText : label;
+  };
+
   return (
     <div className="action-buttons">
-      <button
-        type="button"
-        className="btn btn-primary"
-        onClick={onSave}
-      >
-        <FaSave /> {saveLabel}
-      </button>
-      <button
-        type="button"
-        className="btn btn-secondary"
-        onClick={onEdit}
-      >
-        <FaEdit /> {editLabel}
-      </button>
-      <button
-        type="button"
-        className="btn btn-danger"
-        onClick={onDelete}
-      >
-        <FaTrash /> {deleteLabel}
-      </button>
-      <button
-        type="button"
-        className="btn btn-info"
-        onClick={onGeneratePDF}
-      >
-        <FaFilePdf /> {generatePDFLabel}
-      </button>
+      {onLoad && (
+        <button
+          type="button"
+          className="btn btn-load"
+          onClick={onLoad}
+          disabled={loadLoading || loadDisabled}
+        >
+          <span className="material-symbols-outlined icon-btn">
+            {loadLoading ? "hourglass_empty" : "add"}
+          </span>
+          {getButtonText(loadLoading, loadLabel, "Cargando...")}
+        </button>
+      )}
+
+      {onSave && (
+        <button
+          type="button"
+          className="btn btn-save"
+          onClick={onSave}
+          disabled={saveLoading || saveDisabled}
+        >
+          <span className="material-symbols-outlined icon-btn">
+            {saveLoading ? "hourglass_empty" : "save"}
+          </span>
+          {getButtonText(saveLoading, saveLabel, "Guardando...")}
+        </button>
+      )}
+
+      {onEdit && (
+        <button
+          type="button"
+          className="btn btn-edit"
+          onClick={onEdit}
+          disabled={editLoading || editDisabled}
+        >
+          <span className="material-symbols-outlined icon-btn">
+            {editLoading ? "hourglass_empty" : "edit"}
+          </span>
+          {getButtonText(editLoading, editLabel, "Editando...")}
+        </button>
+      )}
+
+      {onDelete && (
+        <button
+          type="button"
+          className="btn btn-delet"
+          onClick={onDelete}
+          disabled={deleteLoading || deleteDisabled}
+        >
+          <span className="material-symbols-outlined icon-btn">
+            {deleteLoading ? "hourglass_empty" : "delete"}
+          </span>
+          {getButtonText(deleteLoading, deleteLabel, "Borrando...")}
+        </button>
+      )}
+
+      {onView && (
+        <button
+          type="button"
+          className="btn btn-view"
+          onClick={onView}
+          disabled={viewLoading || viewDisabled}
+        >
+          <span className="material-symbols-outlined icon-btn">
+            {viewLoading ? "hourglass_empty" : "visibility"}
+          </span>
+          {getButtonText(viewLoading, viewLabel, "Cargando...")}
+        </button>
+      )}
+
+      {onLoadPDF && (
+        <button
+          type="button"
+          className="btn btn-pdf"
+          onClick={onLoadPDF}
+          disabled={pdfLoading || pdfDisabled}
+        >
+          <span className="material-symbols-outlined icon-btn">
+            {pdfLoading ? "hourglass_empty" : "picture_as_pdf"}
+          </span>
+          {getButtonText(pdfLoading, pdfLabel, "Generando PDF...")}
+        </button>
+      )}
     </div>
   );
 };

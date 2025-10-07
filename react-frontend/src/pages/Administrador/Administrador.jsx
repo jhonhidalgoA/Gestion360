@@ -1,4 +1,4 @@
-import NavbarAdmin from "../../components/layout/Navbar/NavbarAdmin";
+import NavbarAdmin from "../../components/layout/Navbar/NavbarModulo";
 import { adminData } from "../../data/AdministradorData";
 import AdministradorCard from "../../components/ui/AdministradorCard";
 import "./Administrador.css";

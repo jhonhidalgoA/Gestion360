@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+
+// Páginas principales //
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import Reset from "./pages/Reset";
@@ -9,12 +11,18 @@ import EventosDetalles from "./pages/EventosDetalles";
 import Circulares from "./pages/CircularesDetalles";
 import VerManual from "./pages/VerManual";
 import VerPEI from "./pages/VerPEI";
+import AtencionPadres from "./pages/AtencionPadres"
+
+// Páginas del módulo administrador //
 import Matricula  from "./pages/Administrador/Matricula/Matricula"
 import RegistrarDocente from "./pages/Administrador/RegistrarDocente/RegistrarDocente";
 import Calendario from "./components/calendar/Calendar"
 import HorarioGrados from "./pages/Administrador/HorarioGrados/HorarioGrados"
 import EditarMenu from "./pages/Administrador/EditarMenu/EditarMenu";
-import AtencionPadres from "./pages/AtencionPadres"
+
+// Páginas del módulo docente //
+import Calificaciones from "./pages/Docente/Calificaciones/Calificaciones"
+import Asistencia from "./pages/Docente/Asistencia/Asistencia"
 
 //prueba de navbarAdmin //
 import Administrador from "./pages/Administrador/Administrador";
@@ -72,6 +80,9 @@ function App() {
         <Route path="/atencion-padres" element={<AtencionPadres />} />
         <Route path="/horario-grados" element={<HorarioGrados/>} />
         <Route path="/menu-escolar" element={<EditarMenu/>} />
+        <Route path="/calificaciones" element={<Calificaciones/>} />
+        <Route path="/asistencia" element={<Asistencia/>} />
+
       </Routes>
     </BrowserRouter>
   );

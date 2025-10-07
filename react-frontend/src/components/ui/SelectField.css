@@ -1,0 +1,27 @@
+
+.input-line {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9fafb;
+  font-size: 16px;
+}
+
+.input-line:focus {
+  outline: none;
+  border-color: #2e83c5;
+  box-shadow: 0 0 0 2px rgba(46, 131, 197, 0.2);
+}
+
+.input-error {
+  border: 2px solid #dc3545 !important;
+  background-color: #f8d7da !important;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+  display: block;
+}
