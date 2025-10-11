@@ -1,24 +1,33 @@
-.qualification {
+.asistence {
   min-height: 100vh;
-  background: #D0E7FF;
+  background: #DFFFE2;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
 }
 
-.qualification-content {
+.main-content {
   width: 95%;
   max-width: 1800px;
   margin: 90px auto 40px;  
   border-radius: 0 0 10px 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  padding: 25px 35px;
+  padding: 60px 35px;
   background:#ffff;
 }
 
-
-.table-header{
-  background: #2e83c5;
+.input-line {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9fafb;
+  font-size: 16px;
 }
 
+
+
+.table-color{
+  background: #32cd32;
+}

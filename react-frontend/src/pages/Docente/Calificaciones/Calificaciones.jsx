@@ -1,6 +1,6 @@
 import NavbarDocente from "../../../components/layout/Navbar/NavbarDocente";
 import SelectField from "../../../components/ui/SelectField";
-import ActionButtons from "../../../components/ui/Botones"; // Tu componente mejorado
+import ActionButtons from "../../../components/ui/Botones";
 import "./Calificaciones.css";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
@@ -40,7 +40,11 @@ const periodoOptions = [
 // };
 
 const Calificaciones = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     defaultValues: { grupo: "", asignatura: "", periodo: "" },
     mode: "onBlur",
   });
@@ -56,21 +60,20 @@ const Calificaciones = () => {
   // 🚀 Manejador de acciones
   const manejarAccion = async (data, action) => {
     setMensaje({ tipo: "", texto: "" });
-    setLoading(prev => ({ ...prev, [action]: true }));
+    setLoading((prev) => ({ ...prev, [action]: true }));
 
     try {
       // 🔜 Aquí irá la llamada real al backend
       // await enviarACalificacionesAPI(data, action);
 
       // ✅ Simulación
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 800));
       console.log("✅ Datos enviados:", { ...data, action });
 
       setMensaje({
         tipo: "exito",
         texto: `Acción "${action}" procesada correctamente.`,
       });
-
     } catch (error) {
       console.error("❌ Error:", error);
       setMensaje({
@@ -78,7 +81,7 @@ const Calificaciones = () => {
         texto: "Error al procesar la solicitud. Inténtalo más tarde.",
       });
     } finally {
-      setLoading(prev => ({ ...prev, [action]: false }));
+      setLoading((prev) => ({ ...prev, [action]: false }));
     }
   };
 
@@ -86,10 +89,9 @@ const Calificaciones = () => {
   const handleCargar = handleSubmit((data) => manejarAccion(data, "cargar"));
   const handleGuardar = handleSubmit((data) => manejarAccion(data, "guardar"));
   const handleVer = handleSubmit((data) => manejarAccion(data, "ver"));
-  
 
   return (
-    <div className="ratings">
+    <div className="qualification">
       <NavbarDocente
         title="Calificaciones"
         color="#2e83c5"
@@ -99,10 +101,9 @@ const Calificaciones = () => {
           </span>
         }
       />
-
-      <main className="ratings-container">
-        <form className="ratings-form" onSubmit={(e) => e.preventDefault()}>
-          <div className="field-row">
+      <div className="main-content">
+        <form className="form-wrapper" onSubmit={(e) => e.preventDefault()}>
+          <div className="form-row">
             <SelectField
               label="Grupo:"
               id="grupo"
@@ -129,21 +130,18 @@ const Calificaciones = () => {
             />
           </div>
 
-          {/* ✅ Usa tu ActionButtons mejorado */}
           <ActionButtons
             onLoad={handleCargar}
             loadLoading={loading.cargar}
-            loadLabel="Cargar Notas"
-
+            loadLabel="Cargar"
             onSave={handleGuardar}
             saveLoading={loading.guardar}
             saveLabel="Guardar"
-
             onView={handleVer}
             viewLoading={loading.ver}
-            viewLabel="Ver"            
+            viewLabel="Ver"
           />
-          
+
           {mensaje.texto && (
             <div className={`mensaje-feedback mensaje-${mensaje.tipo}`}>
               {mensaje.texto}
@@ -161,7 +159,7 @@ const Calificaciones = () => {
           <div>NOTA 5</div>
           <div>NOTA FINAL</div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
