@@ -2,14 +2,14 @@ export const docenteData = [
   {
     id: 1,
     icon: "edit_note",
-    title: "Ver Calificaciones",
+    title: "Calificaciones",
     path: "/calificaciones",
     gradient: "linear-gradient(135deg, #4169E1)"
   },
   {
     id: 2,
     icon: "app_registration",
-    title: "Ver Asistencia",
+    title: "Asistencia",
     path: "/asistencia",
     gradient: "linear-gradient(135deg, #32cd32)"
   },
@@ -23,16 +23,16 @@ export const docenteData = [
   {
     id: 4,
     icon: "format_list_numbered",
-    title: "Tareas",
-    path: "/reportes",
+    title: "Asignar Tareas",
+    path: "/tareas",
     gradient: "linear-gradient(135deg, #ff9800, #f57c00)"
   },
   {
     id: 5,
     icon: "table_view",
     title: "Reportes Académicos",
-    path: "/tareas",
-    gradient: "linear-gradient(135deg, #40E0D0)" 
+    path: "/reportes",
+    gradient: "linear-gradient(135deg, #000080)" 
   },
   {
     id: 6,
@@ -44,7 +44,7 @@ export const docenteData = [
   {
     id: 7,
     icon: "calendar_month",
-    title: "Calendario",
+    title: "Ver Calendario",
     path: "/calendario",
     gradient: "linear-gradient(135deg, #6B8E23)"
   },

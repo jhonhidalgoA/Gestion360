@@ -28,7 +28,7 @@ const NavbarSection = ({ title, icon, color }) => {
         </div>
         <div className="navbars-content">
           <div className="navbars-title">
-            {icon && <span className="navbars-icon">{icon}</span>}
+            {icon && <span className="navbar-icon2">{icon}</span>}
             <h2>{title}</h2>
           </div>
           <p> Sistema de Gestión Administrativa y Procesos Académicos </p>

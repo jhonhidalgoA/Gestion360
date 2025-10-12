@@ -7,20 +7,23 @@ const ActionButtons = ({
   loadLabel = "Cargar",
   loadLoading = false,
   loadDisabled = false,
-
  
   onSave,
   saveLabel = "Guardar",
   saveLoading = false,
   saveDisabled = false,
 
-  // Editar
   onEdit,
   editLabel = "Editar",
   editLoading = false,
   editDisabled = false,
 
-  // Borrar / Limpiar
+  onSend,
+  sendLabel = "Enviar",
+  sendLoading = false,
+  sendDisabled = false,
+
+
   onDelete,
   deleteLabel = "Borrar",
   deleteLoading = false,
@@ -37,6 +40,11 @@ const ActionButtons = ({
   pdfLabel = "Generar PDF",
   pdfLoading = false,
   pdfDisabled = false,
+
+
+ 
+
+
 }) => {
   
   const getButtonText = (isLoading, label, loadingText) => {
@@ -87,6 +95,20 @@ const ActionButtons = ({
         </button>
       )}
 
+       {onSend && (
+        <button
+          type="button"
+          className="btn btn-send"
+          onClick={onSend}
+          disabled={sendLoading || sendDisabled}
+        >
+          <span className="material-symbols-outlined icon-btn">
+            {sendLoading ? "hourglass_empty" : "attach_email"}
+          </span>
+          {getButtonText(sendLoading, sendLabel, "Enviando...")}
+        </button>
+      )}
+
       {onDelete && (
         <button
           type="button"
@@ -128,6 +150,8 @@ const ActionButtons = ({
           {getButtonText(pdfLoading, pdfLabel, "Generando PDF...")}
         </button>
       )}
+
+      
     </div>
   );
 };

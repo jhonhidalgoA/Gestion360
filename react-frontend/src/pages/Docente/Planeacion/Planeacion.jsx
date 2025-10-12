@@ -1,5 +1,3 @@
-// Planeacion.jsx
-
 import NavbarDocente from "../../../components/layout/Navbar/NavbarDocente";
 import SelectField from "../../../components/ui/SelectField";
 import ActionButtons from "../../../components/ui/Botones";
@@ -116,6 +114,7 @@ const Planeacion = () => {
   const handleCargar = handleSubmit((data) => manejarAccion(data, "cargar"));
   const handleGuardar = handleSubmit((data) => manejarAccion(data, "guardar"));
   const handleVer = handleSubmit((data) => manejarAccion(data, "ver"));
+  const handleDelete =  handleSubmit((data) => manejarAccion(data, "borrar"));
 
   return (
     <div className="planning">
@@ -255,6 +254,8 @@ const Planeacion = () => {
             onSave={handleGuardar}
             saveLoading={loading.guardar}
             saveLabel="Guardar"
+            onDelete={handleDelete}
+            deleteLoading = {loading.delete}
             onView={handleVer}
             viewLoading={loading.ver}
             viewLabel="Ver"

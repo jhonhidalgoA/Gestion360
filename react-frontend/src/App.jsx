@@ -24,6 +24,9 @@ import EditarMenu from "./pages/Administrador/EditarMenu/EditarMenu";
 import Calificaciones from "./pages/Docente/Calificaciones/Calificaciones";
 import Asistencia from "./pages/Docente/Asistencia/Asistencia";
 import Planeacion from "./pages/Docente/Planeacion/Planeacion";
+import Reportes from "./pages/Docente/Reportes/Reportes"
+import Tareas from "./pages/Docente/Tareas/Tareas"
+import Comunicacion from "./pages/Docente/Comunicacion/Comunicacion"
 
 //prueba de navbarAdmin //
 import Administrador from "./pages/Administrador/Administrador";
@@ -84,6 +87,10 @@ function App() {
         <Route path="/calificaciones" element={<Calificaciones />} />
         <Route path="/asistencia" element={<Asistencia />} />
         <Route path="/planeacion" element={<Planeacion />} />
+        <Route path="/reportes" element={<Reportes />} />
+        <Route path="/tareas" element={<Tareas />} />
+        <Route path="/comunicacion" element={<Comunicacion />} />
+
       </Routes>
     </BrowserRouter>
   );
