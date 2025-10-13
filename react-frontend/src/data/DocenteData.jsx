@@ -1,7 +1,7 @@
 export const docenteData = [
   {
     id: 1,
-    icon: "edit_note",
+    icon: "diamond_shine",
     title: "Calificaciones",
     path: "/calificaciones",
     gradient: "linear-gradient(135deg, #4169E1)"

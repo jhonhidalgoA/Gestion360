@@ -28,7 +28,7 @@ const periodoOptions = [
 ];
 
 const Reportes = () => {
-    const {
+  const {
     register,
     handleSubmit,
     formState: { errors },
@@ -77,11 +77,11 @@ const Reportes = () => {
   const handleCargar = handleSubmit((data) => manejarAccion(data, "cargar"));
   const handleGuardar = handleSubmit((data) => manejarAccion(data, "guardar"));
   const handleVer = handleSubmit((data) => manejarAccion(data, "ver"));
-   const handleDelete =  handleSubmit((data) => manejarAccion(data, "borrar"));
+  const handleDelete = handleSubmit((data) => manejarAccion(data, "borrar"));
 
   return (
     <div className="report">
-        <NavbarDocente
+      <NavbarDocente
         title="Reportes Académicos"
         color="#000080"
         icon={
@@ -127,7 +127,7 @@ const Reportes = () => {
             saveLoading={loading.guardar}
             saveLabel="Guardar"
             onDelete={handleDelete}
-            deleteLoading = {loading.delete}
+            deleteLoading={loading.delete}
             onView={handleVer}
             viewLoading={loading.ver}
             viewLabel="Ver"
@@ -140,9 +140,8 @@ const Reportes = () => {
           )}
         </form>
       </div>
-      
     </div>
-  )
-}
+  );
+};
 
-export default Reportes
+export default Reportes;

@@ -31,6 +31,7 @@ import Comunicacion from "./pages/Docente/Comunicacion/Comunicacion"
 //prueba de navbarAdmin //
 import Administrador from "./pages/Administrador/Administrador";
 import Docente from "./pages/Docente/Docente";
+import PadreFamilia from "./pages/PadreFamilia/PadreFamilia";
 
 const ScrollToSection = () => {
   const location = useLocation();
@@ -90,6 +91,7 @@ function App() {
         <Route path="/reportes" element={<Reportes />} />
         <Route path="/tareas" element={<Tareas />} />
         <Route path="/comunicacion" element={<Comunicacion />} />
+        <Route path="padrefamilia" element={<PadreFamilia />} />
 
       </Routes>
     </BrowserRouter>
