@@ -17,6 +17,7 @@ const PadreFamilia = () => {
               title={item.title}
               path={item.path}
               gradient={item.gradient}
+              role="padre"
             />
           ))}
         </ul>

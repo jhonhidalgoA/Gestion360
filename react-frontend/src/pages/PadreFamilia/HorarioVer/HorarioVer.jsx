@@ -1,21 +1,34 @@
 // src/pages/padre/HorarioVer.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavbarModulo from "../../../components/layout/Navbar/NavbarModulo";
 import "./HorarioVer.css";
 
-// Datos del horario (puedes reemplazar esto más tarde con una llamada a API)
+// Mapeo de colores por materia
+const subjectColors = {
+  'Matemáticas': { bg: 'rgba(59, 130, 246, 0.9)'},
+  'Español': { bg: 'rgba(34, 197, 94, 0.9)' },
+  'Ciencias': { bg: 'rgba(168, 85, 247, 0.9)' },
+  'Inglés': { bg: 'rgba(236, 72, 153, 0.9)' },
+  'Historia': { bg: 'rgba(234, 179, 8, 0.9)' },
+  'Educación Física': { bg: 'rgba(239, 68, 68, 0.9)' },
+  'Arte': { bg: 'rgba(251, 146, 60, 0.9)' },
+  'Música': { bg: 'rgba(14, 165, 233, 0.9)' },
+  'Computación': { bg: 'rgba(100, 116, 139, 0.9)' },
+  'Recreo': { bg: 'rgba(245, 158, 11, 0.9)' }
+};
+
 const schedules = [
   { day: 'Lunes', classes: [
-    { time: '7:00-8:00', subject: 'Matemáticas', teacher: 'Prof. Rodríguez' },
-    { time: '8:00-9:00', subject: 'Español', teacher: 'Prof. Martínez' },
-    { time: '9:00-10:00', subject: 'Ciencias', teacher: 'Prof. López' },
-    { time: '10:00-10:30', subject: 'Recreo', teacher: '-' },
+    { time: '7:00-8:00', subject: 'Matemáticas', teacher: 'Docente. Jhon F. Hidalgo' },
+    { time: '8:00-9:00', subject: 'Español', teacher: 'Docente. Alejandra Martínez' },
+    { time: '9:00-10:00', subject: 'Ciencias Naturales', teacher: 'Prof. López' },
+    { time: '10:00-10:30', subject: 'Descanso', teacher: '-' },
     { time: '10:30-11:30', subject: 'Inglés', teacher: 'Prof. Smith' },
     { time: '11:30-12:30', subject: 'Educación Física', teacher: 'Prof. García' }
   ]},
   { day: 'Martes', classes: [
-    { time: '7:00-8:00', subject: 'Ciencias', teacher: 'Prof. López' },
+    { time: '7:00-8:00', subject: 'Ciencias Naturales', teacher: 'Prof. López' },
     { time: '8:00-9:00', subject: 'Matemáticas', teacher: 'Prof. Rodríguez' },
     { time: '9:00-10:00', subject: 'Arte', teacher: 'Prof. Herrera' },
     { time: '10:00-10:30', subject: 'Recreo', teacher: '-' },
@@ -50,9 +63,46 @@ const schedules = [
 
 const HorarioVer = () => {
   const navigate = useNavigate();
+  const [currentDay, setCurrentDay] = useState('');
+  const [currentTime, setCurrentTime] = useState('');
+
+  useEffect(() => {
+    const updateCurrentTime = () => {
+      const now = new Date();
+      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      setCurrentDay(days[now.getDay()]);
+      
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      setCurrentTime(`${hours}:${minutes}`);
+    };
+
+    updateCurrentTime();
+    const interval = setInterval(updateCurrentTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleBack = () => {    
     navigate('/padrefamilia');
+  };
+
+  const isCurrentClass = (day, timeRange) => {
+    if (day !== currentDay) return false;
+    
+    const [start] = timeRange.split('-');
+    const [startHour, startMinute] = start.split(':').map(Number);
+    const [currentHour, currentMinute] = currentTime.split(':').map(Number);
+    
+    const currentMinutes = currentHour * 60 + currentMinute;
+    const startMinutes = startHour * 60 + startMinute;
+    
+    return currentMinutes >= startMinutes && currentMinutes < startMinutes + 60;
+  };
+
+  const getSubjectStyle = (subject) => {
+    return subjectColors[subject] || { 
+      bg: 'rgba(148, 163, 184, 0.4)'
+    };
   };
 
   return (
@@ -60,35 +110,63 @@ const HorarioVer = () => {
       <NavbarModulo />
       <div className="page-container">
         <div className="page-content">
-          <button onClick={handleBack} className="back-button">
-            ← Volver al inicio
-          </button>
+          <div className="header-section">
+            <button onClick={handleBack} className="back-button">
+              <span className="back-icon">←</span>
+              Volver al inicio
+            </button>
 
-          <h1 className="page-title">Horario Semanal</h1>
-
+            <div className="current-info">
+              <div className="current-day">
+                <span className="label">Hoy es:</span>
+                <span className="value">{currentDay}</span>
+              </div>
+              <div className="current-time">
+                <span className="time-value">{currentTime}</span>
+              </div>
+            </div>
+          </div>
+          <h1 className="page-title">
+            Horario Semanal
+          </h1>
           <div className="schedule-grid">
             {schedules.map((day, idx) => (
-              <div key={idx} className="schedule-day">
+              <div 
+                key={idx} 
+                className={`schedule-day ${day.day === currentDay ? 'is-today' : ''}`}
+              >
                 <div className="schedule-header">
-                  <h3 className="schedule-day-title">{day.day}</h3>
+                  <h3 className="schedule-day-title">
+                    {day.day}
+                    {day.day === currentDay && (
+                      <span className="today-badge">HOY</span>
+                    )}
+                  </h3>
                 </div>
                 <div className="schedule-classes">
-                  {day.classes.map((cls, cidx) => (
-                    <div
-                      key={cidx}
-                      className={`schedule-class ${
-                        cls.subject === 'Recreo' ? 'recess' : ''
-                      }`}
-                    >
-                      <p className="class-time">{cls.time}</p>
-                      <p className="class-subject">{cls.subject}</p>
-                      <p className="class-teacher">{cls.teacher}</p>
-                    </div>
-                  ))}
+                  {day.classes.map((cls, cidx) => {
+                    const style = getSubjectStyle(cls.subject);
+                    const isCurrent = isCurrentClass(day.day, cls.time);
+                    
+                    return (
+                      <div
+                        key={cidx}
+                        className={`schedule-class ${isCurrent ? 'is-current' : ''}`}
+                        style={{
+                          background: style.bg
+                        }}
+                      >
+                        <span className="class-time">{cls.time}</span>
+                        <p className="class-subject">{cls.subject}</p>
+                        <p className="class-teacher">{cls.teacher}</p>
+                        {isCurrent && <span className="live-badge">EN VIVO</span>}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
-          </div>
+          </div>        
         </div>
       </div>
     </div>

@@ -1,10 +1,18 @@
-.father-containers{
-    width:100%;  
-    background:blue;    
-    padding-top: 60px; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;  
- }     
+.father-containers {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0934f3ff 0%, #0a1e78 100%); 
+  padding: 20px;
+}
 
+
+
+.card-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  padding: 0;
+  margin:100px auto;  
+  width: 100%;
+  max-width: 1800px;
+}
  

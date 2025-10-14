@@ -136,6 +136,7 @@ const menuConfig = {
       title: "Calificaciones",
       path: "/calificaciones",
       gradient: "linear-gradient(135deg, #4169E1)",
+      background: "rgba(255, 255, 255, 0.15"
     },
     {
       id: 2,
@@ -147,7 +148,7 @@ const menuConfig = {
     {
       id: 3,
       icon: "schedule",
-      title: "Horario",
+      title: "Ver Horario",
       path: "/horario-ver",
       gradient: "linear-gradient(135deg, #9c27b0, #7b1fa2)",
     },
@@ -155,7 +156,7 @@ const menuConfig = {
       id: 4,
       icon: "format_list_numbered",
       title: "Tareas",
-      path: "/tareas",
+      path: "/tarea-ver",
       gradient: "linear-gradient(135deg, #ff9800, #f57c00)",
     },
     {

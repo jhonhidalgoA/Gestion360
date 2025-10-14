@@ -30,6 +30,7 @@ import Comunicacion from "./pages/Docente/Comunicacion/Comunicacion"
 
 // Páginas del módulo padre de Familia //
 import HorarioVer from "./pages/PadreFamilia/HorarioVer/HorarioVer"
+import TareaVer from "./pages/PadreFamilia/TareaVer/TareaVer"
 
 
 //prueba de navbarAdmin //
@@ -97,6 +98,7 @@ function App() {
         <Route path="/comunicacion" element={<Comunicacion />} />
         <Route path="padrefamilia" element={<PadreFamilia />} />
         <Route path="horario-ver" element={<HorarioVer />} />
+        <Route path="tarea-ver" element={<TareaVer />} />
 
       </Routes>
     </BrowserRouter>
