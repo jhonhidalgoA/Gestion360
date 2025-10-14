@@ -148,7 +148,7 @@ const menuConfig = {
       id: 3,
       icon: "schedule",
       title: "Horario",
-      path: "/planeacion",
+      path: "/horario-ver",
       gradient: "linear-gradient(135deg, #9c27b0, #7b1fa2)",
     },
     {

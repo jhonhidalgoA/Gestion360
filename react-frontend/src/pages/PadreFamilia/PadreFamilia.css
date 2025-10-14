@@ -1,13 +1,10 @@
 .father-containers{
-    width:100%;   
-    background:100vh;
-    background:blue;
-    background-size:cover;
-    background-position:center;
-    background-repeat: no-repeat; 
-    background-attachment: fixed; 
+    width:100%;  
+    background:blue;    
     padding-top: 60px; 
     display: flex;
     flex-direction: column;
-    align-items: center;      
-}
+    align-items: center;  
+ }     
+
+ 

@@ -1,27 +1,14 @@
-import NavbarPadre from "../../components/layout/Navbar/NavbarModulo"; 
+import NavbarModulo from "../../components/layout/Navbar/NavbarModulo"; 
 import { getMenuData } from "../../data/menuData";
 import AdministradorCard from "../../components/ui/AdministradorCard"; 
 import "./PadreFamilia.css"; 
 
-const PadreFamilia = () => {
-  const fechaActual = new Date().toLocaleDateString("es-ES", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  
+const PadreFamilia = () => {  
   const padreData = getMenuData("padre");
-
   return (
     <div className="father-containers"> 
-      <NavbarPadre />
-      <div className="card-containers">
-        <div className="home-title">
-          <h1>Bienvenido, Padre de Familia</h1>
-          <span className="date">{fechaActual}</span>
-        </div>
+      <NavbarModulo />
+      <div className="card-containers">        
         <ul className="card-group">
           {padreData.map((item) => (
             <AdministradorCard

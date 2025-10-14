@@ -28,6 +28,10 @@ import Reportes from "./pages/Docente/Reportes/Reportes"
 import Tareas from "./pages/Docente/Tareas/Tareas"
 import Comunicacion from "./pages/Docente/Comunicacion/Comunicacion"
 
+// Páginas del módulo padre de Familia //
+import HorarioVer from "./pages/PadreFamilia/HorarioVer/HorarioVer"
+
+
 //prueba de navbarAdmin //
 import Administrador from "./pages/Administrador/Administrador";
 import Docente from "./pages/Docente/Docente";
@@ -92,6 +96,7 @@ function App() {
         <Route path="/tareas" element={<Tareas />} />
         <Route path="/comunicacion" element={<Comunicacion />} />
         <Route path="padrefamilia" element={<PadreFamilia />} />
+        <Route path="horario-ver" element={<HorarioVer />} />
 
       </Routes>
     </BrowserRouter>
