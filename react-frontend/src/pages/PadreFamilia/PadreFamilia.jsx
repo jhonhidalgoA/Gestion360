@@ -1,27 +1,13 @@
-import NavbarModulo from "../../components/layout/Navbar/NavbarModulo"; 
-import { getMenuData } from "../../data/menuData";
-import AdministradorCard from "../../components/ui/AdministradorCard"; 
-import "./PadreFamilia.css"; 
+import NavbarAdmin from "../../components/layout/Navbar/NavbarModulo";
+import RoleDashboard from "../../components/ui/Dashboard"
+import "./PadreFamilia.css"
 
-const PadreFamilia = () => {  
-  const padreData = getMenuData("padre");
+
+const PadreFamilia = () => {
   return (
-    <div className="father-containers"> 
-      <NavbarModulo />
-      <div className="card-containers">        
-        <ul className="card-group">
-          {padreData.map((item) => (
-            <AdministradorCard
-              key={item.id}
-              icon={item.icon}
-              title={item.title}
-              path={item.path}
-              gradient={item.gradient}
-              role="padre"
-            />
-          ))}
-        </ul>
-      </div>
+    <div className="padre-container">
+      <NavbarAdmin />
+      <RoleDashboard role="padre" />
     </div>
   );
 };

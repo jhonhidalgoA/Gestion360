@@ -181,7 +181,7 @@ const TareaVer = () => {
           </div>
         </div>
 
-        {/* Tasks Grid */}
+       
         <div className="tasks-grid">
           {tasks.map((task) => (
             <div
@@ -189,7 +189,7 @@ const TareaVer = () => {
               className="task-card"
               onClick={() => setSelectedTask(task)}
             >
-              <div className="card-content glass-card">
+              <div className="card-content ">
                 <div className="card-header">
                   <span className={`subject-badge ${task.subjectColor}`}>
                     {task.subject}
@@ -240,11 +240,11 @@ const TareaVer = () => {
                     </div>
                   </div>
                 )}
-
                 <button className="details-button">
-                  <FiFileText />
-                  Ver Detalles Completos
-                </button>
+                  <span> <FiFileText  /></span>  
+                  <p>Ver Detalles... </p>               
+                  
+                </button> 
               </div>
             </div>
           ))}

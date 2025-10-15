@@ -1,34 +1,13 @@
 import NavbarAdmin from "../../components/layout/Navbar/NavbarModulo";
-import { docenteData } from "../../data/DocenteData";
-import AdminCard from "../../components/ui/AdministradorCard";
-import "./Docente.css";
+import RoleDashboard from "../../components/ui/Dashboard"
+import "./Docente.css"
+
 
 const Docente = () => {
-  const fechaActual = new Date().toLocaleDateString("es-ES", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
   return (
-    <div className="teacher-container">
+    <div className="docente-container">
       <NavbarAdmin />
-      <div className="home-title">
-        <h1>Bienvenido Docente</h1>
-        <span className="date">{fechaActual}</span>
-      </div>
-      <ul className="teacher-group">
-        {docenteData.map((item) => (
-          <AdminCard
-            key={item.id}
-            icon={item.icon}
-            title={item.title}
-            path={item.path}
-            gradient={item.gradient}
-          />
-        ))}
-      </ul>
+      <RoleDashboard role="docente" />
     </div>
   );
 };

@@ -1,18 +1,7 @@
-.father-containers {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0934f3ff 0%, #0a1e78 100%); 
-  padding: 20px;
+.padre-container{
+  background:linear-gradient(rgba(8,0,58,0.3),rgba(8,0,25,0.3)),url('../../assets/images/fondo_10.jpg');
+  background-size:cover;
+  background-position:center;
+  background-repeat: no-repeat; 
+  background-attachment: fixed;  
 }
-
-
-
-.card-group {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 20px;
-  padding: 0;
-  margin:100px auto;  
-  width: 100%;
-  max-width: 1800px;
-}
- 

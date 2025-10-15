@@ -31,7 +31,8 @@
   display: flex;
   align-items: flex-start;
   justify-content:center;
-  gap: 16px; 
+  gap: 16px;
+  max-width:1800px;
   width: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -67,10 +68,10 @@
   margin-top: 30px;
 }
 
-.task-card {  
-  border-radius: 10px;
+.task-card {    
+  border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f3f4f6;
+  border: 1px solid #0b58f3ff;
   cursor: pointer;
   transition: all 0.3s ease;
   overflow: hidden;
@@ -79,12 +80,10 @@
   height: 100%; 
 }
 
-.task-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
 
-.card-content {    
+
+.card-content {  
+  background:transparent;
   display: flex;
   flex-direction: column;
   flex-grow: 1;  
@@ -144,15 +143,17 @@
 }
 
 .task-title {
-  font-size: 1.25rem;  
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  text-align:center;
   margin-bottom: 16px;
   line-height: 1.4;
-  text-align:center;
 }
 
 /* Due Date Styles */
 .due-date-container {
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
   border: 2px solid transparent;
@@ -190,7 +191,7 @@
 .grade-display {
   background: #f0fdf4;
   border: 2px solid #bbf7d0;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
 }
@@ -236,22 +237,32 @@
   color: white;
   border: none;
   padding: 14px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 14px;
+  border-radius: 10px; 
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-top: auto; /* ¡ESTO ES CLAVE! Empuja el botón hacia abajo */
+  gap: 10px;
+  margin-top: auto; 
 }
 
 .details-button:hover {
   background: #4338ca;
-  transform: translateY(-2px);
+  transform: scale(1.05);
 }
+
+.details-button p{
+  font-size:14px;
+  font-weight: 600;
+}
+
+.details-button span{
+  font-size:24px;
+  margin-top:5px;
+}
+
+
 
 /* Modal Styles */
 .modal-overlay {
@@ -270,7 +281,7 @@
 
 .modal-content {
   background: white;
-  border-radius: 10px;
+  border-radius: 24px;
   max-width: 800px;
   width: 100%;
   max-height: 90vh;
@@ -387,7 +398,7 @@
 .submission-status {
   background: #dbeafe;
   border: 1px solid #93c5fd;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 16px;
   margin-bottom: 20px;
 }
@@ -447,7 +458,7 @@
 
 .grade-display-modal {
   background: white;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
 }
@@ -490,7 +501,7 @@
 /* Feedback Section */
 .feedback-section {
   background: white;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 20px;
 }
 
@@ -524,7 +535,7 @@
 .resources-section,
 .criteria-section {
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: 16px;
   padding: 20px;
   margin-bottom: 20px;
 }
@@ -558,7 +569,7 @@
   justify-content: space-between;
   padding: 16px;
   background: #f8fafc;
-  border-radius: 10px;
+  border-radius: 12px;
   transition: all 0.2s ease;
 }
 
@@ -631,7 +642,7 @@
   padding: 16px;
   background: #eef2ff;
   border: 2px solid #c7d2fe;
-  border-radius: 10px;
+  border-radius: 12px;
   margin-top: 8px;
 }
 
@@ -704,7 +715,6 @@
 
   .card-content {
     padding: 20px;
-    
   }
 
   .modal-content {

@@ -115,7 +115,6 @@ const HorarioVer = () => {
               <span className="back-icon">←</span>
               Volver al inicio
             </button>
-
             <div className="current-info">
               <div className="current-day">
                 <span className="label">Hoy es:</span>
