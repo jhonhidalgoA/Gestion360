@@ -2,7 +2,7 @@
   width: 100%;
   left: 0;
   right:0;
-  margin: 80px auto; 
+  margin: 100px auto; 
   border-radius: 12px;  
   overflow: hidden;
 }
@@ -44,6 +44,7 @@
     margin-top:20px;
     padding: 0 20px;
 }
+
 
 
 .error-message {

@@ -1,3 +1,11 @@
+import evaluationsImg from '../assets/student-img/evaluaciones.png';
+import scheduleImg from '../assets/student-img/calendario.png';
+import tasksImg from '../assets/student-img/algoritmo.png';
+import activitatesImg from '../assets/student-img/actividades.png';
+import chatImg from '../assets/student-img/chat.png';
+import teamImg from '../assets/student-img/brainstorm.png';
+
+
 const menuConfig = {
   admin: [
     {
@@ -31,7 +39,7 @@ const menuConfig = {
     {
       id: 5,
       icon: "calendar_month",
-      title: "Calendario",
+      title: "Editar Calendario",
       path: "/calendario",
       gradient: "linear-gradient(135deg, #0D47A1)",
     },
@@ -136,7 +144,7 @@ const menuConfig = {
       icon: "diamond_shine",
       title: "Calificaciones",
       path: "/calificaciones",
-      gradient: "linear-gradient(135deg, #2563eb, #1d4ed8)",      
+      gradient: "linear-gradient(135deg, #5B8FF9, #3A6DD8)",      
       iconSize: 100,
     },
     {
@@ -144,7 +152,7 @@ const menuConfig = {
       icon: "app_registration",
       title: "Asistencia",
       path: "/asistencia",
-      gradient: "linear-gradient(135deg, #2563eb, #1d4ed8)",     
+      gradient: "linear-gradient(135deg, #5B8FF9, #3A6DD8)",      
       iconSize: 100,
     },
     {
@@ -152,21 +160,21 @@ const menuConfig = {
       icon: "schedule",
       title: "Ver Horario",
       path: "/horario-ver",
-      gradient: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+       gradient: "linear-gradient(135deg, #5B8FF9, #3A6DD8)", 
     },
     {
       id: 4,
       icon: "format_list_numbered",
-      title: "Tareas",
+      title: "Ver Tareas",
       path: "/tarea-ver",
-      gradient: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+      gradient: "linear-gradient(135deg, #5B8FF9, #3A6DD8)", 
     },
     {
       id: 5,
       icon: "table_view",
       title: "Reportes Académicos",
       path: "/reportes-ver",
-      gradient: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+      gradient: "linear-gradient(135deg, #5B8FF9, #3A6DD8)",
     },
     {
       id: 6,
@@ -175,6 +183,61 @@ const menuConfig = {
       path: "/comunicacion",
       gradient: "linear-gradient(135deg, #2563eb, #1d4ed8)",
     },
+    
+  ],
+  estudiante: [
+    {
+      id: 1,      
+      title: "Mi Horario",
+      path: "/horario-ver",
+      iconUrl:scheduleImg,
+      gradient: "linear-gradient(135deg, #90d40aff)"
+    },
+    {
+      id: 2,     
+      title: " Mis Calificaciones",
+      path: "/calificaciones",    
+      iconUrl: evaluationsImg,  
+      gradient: "linear-gradient(135deg, #F59E0B, #D97706)"   
+      
+    },
+    {
+      id: 3,
+      icon: "format_list_numbered",
+      title: "Mis Tareas",
+      path: "/tarea-ver",
+      iconUrl: activitatesImg,
+      gradient: "linear-gradient(135deg, #5B8FF9, #3A6DD8)", 
+    },
+        
+    {
+      id:4,
+      icon: "table_view",
+      title: "Compañeros",
+      path: "/compañeros",
+      iconUrl: teamImg,
+      gradient: "linear-gradient(135deg, #F7971E, #FFD200)",
+    },
+
+    {
+      id:5,
+      icon: "app_registration",
+      title: "Recursos",
+      path: "/recursos",
+      iconUrl:tasksImg,
+      gradient: "linear-gradient(135deg, #6C63FF, #836FFF)"      
+      
+    }, 
+    
+     {
+      id:6,
+      icon: "forum",
+      title: "Mensajes",
+      path: "/comunicacion",
+      iconUrl:chatImg,
+      gradient: "linear-gradient(135deg, #ec407a, #d81b60)",
+    },
+   
     
   ],
 };

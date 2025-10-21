@@ -152,7 +152,7 @@ const Matricula = () => {
         )}
 
         <div className="form-actions">
-          <Botones
+          <Botones          
             onSave={handleSubmit(onSubmit)}
             onEdit={() => setIsStudentListModalOpen(true)}
             onDelete={handleClear}

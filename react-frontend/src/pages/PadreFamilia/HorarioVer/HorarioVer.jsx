@@ -6,10 +6,10 @@ import "./HorarioVer.css";
 
 // Mapeo de colores por materia
 const subjectColors = {
-  'Matemáticas': { bg: 'rgba(59, 130, 246, 0.9)'},
+  'Matemáticas': { bg: 'rgba(230, 59, 246, 0.9)'},
   'Español': { bg: 'rgba(34, 197, 94, 0.9)' },
-  'Ciencias': { bg: 'rgba(168, 85, 247, 0.9)' },
-  'Inglés': { bg: 'rgba(236, 72, 153, 0.9)' },
+  'Ciencias': { bg: 'rgba(132, 8, 247, 0.9)' },
+  'Inglés': { bg: 'rgba(193, 15, 104, 0.9)' },
   'Historia': { bg: 'rgba(234, 179, 8, 0.9)' },
   'Educación Física': { bg: 'rgba(239, 68, 68, 0.9)' },
   'Arte': { bg: 'rgba(251, 146, 60, 0.9)' },
@@ -20,32 +20,32 @@ const subjectColors = {
 
 const schedules = [
   { day: 'Lunes', classes: [
-    { time: '7:00-8:00', subject: 'Matemáticas', teacher: 'Docente. Jhon F. Hidalgo' },
-    { time: '8:00-9:00', subject: 'Español', teacher: 'Docente. Alejandra Martínez' },
-    { time: '9:00-10:00', subject: 'Ciencias Naturales', teacher: 'Prof. López' },
+    { time: '7:00-8:00', subject: 'Matemáticas', teacher: 'Docente: Jhon F. Hidalgo' },
+    { time: '8:00-9:00', subject: 'Español', teacher: 'Docente: Alejandra Martínez' },
+    { time: '9:00-10:00', subject: 'Ciencias Naturales', teacher: 'Prof. Marino López' },
     { time: '10:00-10:30', subject: 'Descanso', teacher: '-' },
-    { time: '10:30-11:30', subject: 'Inglés', teacher: 'Prof. Smith' },
-    { time: '11:30-12:30', subject: 'Educación Física', teacher: 'Prof. García' }
+    { time: '10:30-11:30', subject: 'Inglés', teacher: 'Prof. Luis A. Montoya' },
+    { time: '11:30-12:30', subject: 'Educación Física', teacher: 'Prof. Carlos M. García' }
   ]},
   { day: 'Martes', classes: [
-    { time: '7:00-8:00', subject: 'Ciencias Naturales', teacher: 'Prof. López' },
+    { time: '7:00-8:00', subject: 'Ciencias Naturales', teacher: 'Prof. Marino López' },
     { time: '8:00-9:00', subject: 'Matemáticas', teacher: 'Prof. Rodríguez' },
-    { time: '9:00-10:00', subject: 'Arte', teacher: 'Prof. Herrera' },
+    { time: '9:00-10:00', subject: 'Arte', teacher: 'Prof. Domingo Herrera' },
     { time: '10:00-10:30', subject: 'Recreo', teacher: '-' },
     { time: '10:30-11:30', subject: 'Historia', teacher: 'Prof. Díaz' },
     { time: '11:30-12:30', subject: 'Inglés', teacher: 'Prof. Smith' }
   ]},
   { day: 'Miércoles', classes: [
-    { time: '7:00-8:00', subject: 'Español', teacher: 'Prof. Martínez' },
+    { time: '7:00-8:00', subject: 'Español', teacher: 'Docente: Alejandra Martínez' },
     { time: '8:00-9:00', subject: 'Matemáticas', teacher: 'Prof. Rodríguez' },
     { time: '9:00-10:00', subject: 'Música', teacher: 'Prof. Torres' },
     { time: '10:00-10:30', subject: 'Recreo', teacher: '-' },
     { time: '10:30-11:30', subject: 'Ciencias', teacher: 'Prof. López' },
-    { time: '11:30-12:30', subject: 'Computación', teacher: 'Prof. Ruiz' }
+    { time: '11:30-12:30', subject: 'Tecnología', teacher: 'Prof. Ruiz' }
   ]},
   { day: 'Jueves', classes: [
-    { time: '7:00-8:00', subject: 'Matemáticas', teacher: 'Prof. Rodríguez' },
-    { time: '8:00-9:00', subject: 'Inglés', teacher: 'Prof. Smith' },
+    { time: '7:00-8:00', subject: 'Matemáticas', teacher: 'Docente: Jhon F. Hidalgo' },
+    { time: '8:00-9:00', subject: 'Inglés', teacher: 'Docente: Aida Rodríguez' },
     { time: '9:00-10:00', subject: 'Español', teacher: 'Prof. Martínez' },
     { time: '10:00-10:30', subject: 'Recreo', teacher: '-' },
     { time: '10:30-11:30', subject: 'Educación Física', teacher: 'Prof. García' },
@@ -106,7 +106,7 @@ const HorarioVer = () => {
   };
 
   return (
-    <div className="horario-ver-container">
+    <div className="schedules-container">
       <NavbarModulo />
       <div className="page-container">
         <div className="page-content">

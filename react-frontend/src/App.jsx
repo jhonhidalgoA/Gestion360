@@ -34,10 +34,16 @@ import TareaVer from "./pages/PadreFamilia/TareaVer/TareaVer"
 import ReportesVer from "./pages/PadreFamilia/ReportesVer/ReportesVer"
 
 
+// Páginas del módulo estudiante //
+
+
+
 //prueba de navbarAdmin //
 import Administrador from "./pages/Administrador/Administrador";
 import Docente from "./pages/Docente/Docente";
 import PadreFamilia from "./pages/PadreFamilia/PadreFamilia";
+import Estudiante from "./pages/Estudiante/Estudiante"
+
 
 const ScrollToSection = () => {
   const location = useLocation();
@@ -101,6 +107,7 @@ function App() {
         <Route path="horario-ver" element={<HorarioVer />} />
         <Route path="tarea-ver" element={<TareaVer />} />
         <Route path="reportes-ver" element={<ReportesVer />} />
+        <Route path="estudiante" element={<Estudiante />} />
 
       </Routes>
     </BrowserRouter>

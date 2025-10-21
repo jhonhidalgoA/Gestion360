@@ -5,7 +5,7 @@
   padding: 12px 20px;  
   margin: 0 auto;
   width:97%;
-  height: 60px;
+  height: auto;
   position: fixed;
   top: 5px;
   border-radius: 10px 10px 0 0;
@@ -31,9 +31,15 @@
 
 
 .navbar-title {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: bold;
   text-align: center; 
+}
+
+.navbar-content p{
+  font-size: 1.2rem;
+  margin-top: 10px;
+  line-height: 1.2; 
 }
 
 

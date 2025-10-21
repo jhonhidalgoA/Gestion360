@@ -25,7 +25,11 @@ const NavbarSection = ({ title, color = "#1976d2" }) => {
               arrow_back
             </span>
           </button>
+          
+        </div>
+        <div className="navbar-content">
           <h2 className="navbar-title">{title}</h2>
+          <p>Sistema de Gestión Administrativa y Procesos Académicos</p>
         </div>
         <button className="nav-btn logout-btn" onClick={() => setIsModalOpen(true)}>
           <span className="material-symbols-outlined icons-section">

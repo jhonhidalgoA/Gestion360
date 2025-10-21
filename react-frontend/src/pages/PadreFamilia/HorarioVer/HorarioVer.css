@@ -1,18 +1,13 @@
-.horario-ver-container {
+.schedules-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0934f3ff 0%, #0a1e78 100%);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
-  padding-top: 60px;
-}
-
-.page-container {
-  min-height: calc(100vh - 60px);
-  padding: 2rem 1.5rem;
+  padding-top:40px;
 }
 
 .page-content {
-  max-width: 1800px;
-  margin: 0 auto;
+  max-width: 1400px;
+  margin: 20px auto; 
 }
 
 .header-section {
@@ -57,7 +52,7 @@
 
 .current-info {
   display: flex;
-  gap: 2rem;
+  gap:1rem;
   align-items: center;
   background: rgba(255, 255, 255, 0.1);
   padding: 0.8rem 1.5rem;
@@ -165,25 +160,12 @@
   position: relative;
   overflow: hidden;
   text-align: center;
+  height:120px;
 }
 
-.schedule-class.is-current {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.4), rgba(16, 185, 129, 0.4)) !important;  
-  animation: pulse 2s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-}
-
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
-  }
-}
 
 .class-time {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #e2e8f0;
   margin-bottom: 0.6rem;
@@ -214,7 +196,7 @@
 .class-subject {
   font-size: 1.1rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
   color: white;
   line-height: 1.3;
 }
@@ -222,6 +204,7 @@
 .class-teacher {
   font-size: 0.875rem;
   color: #cbd5e1;
+  margin-top: 0.5rem;
   font-weight: 500;
 }
 

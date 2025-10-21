@@ -1,7 +1,7 @@
 import {Link} from "react-router-dom"
 import { institutionalData } from "../../../data/InstitucionalData"
 import ScheduleCard from "../../ui/InstitucionalCard"
-import "./Institucional.css"
+
 
 const Institucional = () => {
   return (
