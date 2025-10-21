@@ -1,0 +1,6 @@
+.schedules-containers{
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: white;
+  padding: 50px 20px;
+}

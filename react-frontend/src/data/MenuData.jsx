@@ -196,7 +196,7 @@ const menuConfig = {
     {
       id: 2,     
       title: " Mis Calificaciones",
-      path: "/calificaciones",    
+      path: "/calificaciones-estudiante",    
       iconUrl: evaluationsImg,  
       gradient: "linear-gradient(135deg, #F59E0B, #D97706)"   
       
@@ -205,7 +205,7 @@ const menuConfig = {
       id: 3,
       icon: "format_list_numbered",
       title: "Mis Tareas",
-      path: "/tarea-ver",
+      path: "/tareas-hacer",
       iconUrl: activitatesImg,
       gradient: "linear-gradient(135deg, #5B8FF9, #3A6DD8)", 
     },

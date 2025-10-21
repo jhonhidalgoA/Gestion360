@@ -1,6 +1,6 @@
 .section-admissions{    
-    min-height: 100vh;
-    background-image: url("../assets/images/7.jpg"); 
+    min-height: 100vh;    
+    background:linear-gradient(rgba(8,0,58,0.4),rgba(8,0,25,0.1)),url("../assets/images/7.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;  
