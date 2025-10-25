@@ -6,16 +6,16 @@ import "./HorarioVer.css";
 
 // Mapeo de colores por materia
 const subjectColors = {
-  'Matemáticas': { bg: 'rgba(230, 59, 246, 0.9)'},
-  'Español': { bg: 'rgba(34, 197, 94, 0.9)' },
-  'Ciencias': { bg: 'rgba(132, 8, 247, 0.9)' },
-  'Inglés': { bg: 'rgba(193, 15, 104, 0.9)' },
-  'Historia': { bg: 'rgba(234, 179, 8, 0.9)' },
+  'Matemáticas': { bg: '#FF6347'},
+  'Español': { bg: '#8A2BE2' },
+  'Ciencias': { bg: '#1E90FF' },
+  'Inglés': { bg: '#32CD32' },
+  'Historia': { bg: '#FFD700' },
   'Educación Física': { bg: 'rgba(239, 68, 68, 0.9)' },
   'Arte': { bg: 'rgba(251, 146, 60, 0.9)' },
   'Música': { bg: 'rgba(14, 165, 233, 0.9)' },
   'Computación': { bg: 'rgba(100, 116, 139, 0.9)' },
-  'Recreo': { bg: 'rgba(245, 158, 11, 0.9)' }
+  'Recreo': { bg: 'rgba(237, 234, 228, 0.9)' }
 };
 
 const schedules = [

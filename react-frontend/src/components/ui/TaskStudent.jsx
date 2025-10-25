@@ -2,10 +2,13 @@ import React from "react";
 import { Calendar } from "lucide-react";
 import "./TaskStudent.css";
 
-const TaskCard = ({ task, onViewDetails, variant = "default" }) => {
-  const { subject, title, description, dueDate, status, icon } = task;
-
-  
+const TaskCard = ({
+  task,
+  onViewDetails,
+  variant = "default"
+ 
+}) => {
+  const { subject, title, description, dueDate, status, icon, color } = task;
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -30,7 +33,12 @@ const TaskCard = ({ task, onViewDetails, variant = "default" }) => {
 
   if (variant === "compact") {
     return (
-      <div className="task-card compact">
+      <div
+        className="task-card compact"
+        style={{
+          background: color
+        }}
+      >
         <div className="task-header">
           <div className="task-meta">
             <span className="task-icon">{icon}</span>
@@ -54,13 +62,17 @@ const TaskCard = ({ task, onViewDetails, variant = "default" }) => {
   }
 
   return (
-    <div className="task-card-student">
+    <div
+      className="schedule-card-student"
+      style={{
+        background: color
+      }}
+    >
       <div className="task-header">
         <div className="task-meta">
           <span className="task-icon">{icon}</span>
           <div>
             <span className="subject-tag">{subject}</span>
-            
           </div>
         </div>
         <span className={`status-tag ${getStatusClass(status)}`}>{status}</span>

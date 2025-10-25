@@ -37,6 +37,7 @@ import ReportesVer from "./pages/PadreFamilia/ReportesVer/ReportesVer"
 // Páginas del módulo estudiante //
 import TareasHacer from "./pages/Estudiante/TareasHacer/Tareashacer"
 import CalificacionesEstudiante from "./pages/Estudiante/MisCalificaciones/MisCalificaciones"
+import Recursos from "./pages/Estudiante/Recursos/Recursos"
 
 
 
@@ -112,6 +113,7 @@ function App() {
         <Route path="estudiante" element={<Estudiante />} />
         <Route path="/tareas-hacer" element={<TareasHacer />} />
         <Route path="/calificaciones-estudiante" element={<CalificacionesEstudiante />} />
+        <Route path="/recursos" element={<Recursos />} />
 
       </Routes>
     </BrowserRouter>

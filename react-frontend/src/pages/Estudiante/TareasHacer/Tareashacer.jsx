@@ -26,6 +26,7 @@ const Tareashacer = () => {
       status: "Pendiente",
       priority: "Alta",
       icon: "📐",
+      color: "#FF6347",
       instructions: "Resuelve todos los ejercicios mostrando el procedimiento completo. Recuerda verificar tus respuestas y escribir de forma legible.",
       materials: [
         { name: "guia_algebra.pdf", type: "Archivo del profesor" },
@@ -34,13 +35,14 @@ const Tareashacer = () => {
     },
     {
       id: 2,
-      subject: "Español",
+      subject: "Español y Literatura",
       title: "Lectura y resumen",
       description: "Leer capítulo 3 y hacer resumen de 1 página",
       dueDate: "2024-10-16",
       status: "En proceso",
       priority: "Media",
       icon: "📚",
+      color: "#8A2BE2",
       instructions: "El resumen debe incluir ideas principales y conclusiones personales.",
       materials: [
         { name: "capitulo_3.pdf", type: "Archivo del profesor" },
@@ -55,6 +57,7 @@ const Tareashacer = () => {
       status: "Pendiente",
       priority: "Media",
       icon: "🔬",
+      color: "#1E90FF",
       instructions: "Incluir mínimo 5 planetas, sus características y una imagen por planeta.",
       materials: [
         { name: "sistema_solar_guia.pdf", type: "Archivo del profesor" },
@@ -69,8 +72,9 @@ const Tareashacer = () => {
       status: "Completado",
       priority: "Baja",
       icon: "🌍",
+      color: "#32CD32",
       instructions: "Escribe las palabras en contexto y define cada una.",
-      materials: [], // ← Asegurado como array vacío
+      materials: [], 
     },
   ];
 
@@ -132,6 +136,7 @@ const Tareashacer = () => {
             task={task}
             onViewDetails={handleViewTaskDetails}
             variant="default"
+            gradientStart={`${task.color} -30)}`}
           />
         ))}
       </div>

@@ -1,5 +1,4 @@
-
-import "./SelectField.css"; // Asegúrate de tener este archivo
+import "./SelectField.css"; 
 
 const SelectField = ({
   label,
