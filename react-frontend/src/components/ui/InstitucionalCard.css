@@ -16,7 +16,7 @@
     background: #f0f0f0;
     width: 100%; 
     max-width: 450px; 
-    height: 300px;
+    height: 280px;
     padding: 40px;
     margin: 0 auto;
     border-radius: 10px;
@@ -42,7 +42,7 @@
 
 .schedule-title{
     font-size: 1.3rem;
-    margin-top: 20px;
+    margin-top: 5px;
     font-weight: 600;
     text-align: center;  
     color: var(--color-primary-dark); 
@@ -63,7 +63,7 @@
     text-decoration: none;
     color: #e2a926;
     align-self: center; 
-    margin-top: 30px;    
+    margin-bottom:-10px;    
 }
 
 .schedules-card:hover .schedule-link{   

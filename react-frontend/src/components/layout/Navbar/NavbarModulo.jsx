@@ -20,6 +20,7 @@ const NavbarAdmin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
   const handleLogout = () => {
     window.location.href = "/";
@@ -59,6 +60,58 @@ const NavbarAdmin = () => {
     };
   }, []);
 
+  // Cerrar dropdown de notificaciones al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        !event.target.closest(".nav-icon-btn") &&
+        !event.target.closest(".notification-dropdown")
+      ) {
+        setIsNotificationModalOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const notifications = [
+    {
+      id: 1,
+      avatar: "https://i.pravatar.cc/40?img=1",
+      name: "Terry Franci",
+      message: "requests permission to change Project - Nganter App",
+      time: "5 min ago",
+      status: "online",
+    },
+    {
+      id: 2,
+      avatar: "https://i.pravatar.cc/40?img=2",
+      name: "Terry Franci",
+      message: "requests permission to change Project - Nganter App",
+      time: "5 min ago",
+      status: "offline",
+    },
+    {
+      id: 3,
+      avatar: "https://i.pravatar.cc/40?img=3",
+      name: "Terry Franci",
+      message: "requests permission to change Project - Nganter App",
+      time: "5 min ago",
+      status: "online",
+    },
+    {
+      id: 4,
+      avatar: "https://i.pravatar.cc/40?img=4",
+      name: "Terry Franci",
+      message: "requests permission to change Project - Nganter App",
+      time: "5 min ago",
+      status: "online",
+    },
+  ];
+
   return (
     <nav className="navbar-admin">
       <div className="nav-logo">
@@ -69,15 +122,55 @@ const NavbarAdmin = () => {
         </div>
       </div>
       <ul>
-        <li className="nav-item">
-          <button className="nav-icon-btn" aria-label="Notificaciones">
+        <li className="nav-item notification-container">
+          <button
+            className="nav-icon-btn"
+            aria-label="Notificaciones"
+            onClick={() => setIsNotificationModalOpen(!isNotificationModalOpen)}
+          >
             <span className="material-symbols-outlined" aria-hidden="true">
               notifications
             </span>
             <p className="notification-badge">3</p>
           </button>
+          {/* Dropdown de Notificaciones */}
+          {isNotificationModalOpen && (
+            <div className="notification-dropdown modal-alert">
+              <div className="notification-header">
+                <h4>Mensajes</h4>
+                <button
+                  className="close-btn"
+                  onClick={() => setIsNotificationModalOpen(false)}
+                >
+                  ×
+                </button>
+              </div>
+              <div className="notifications-list">
+                {notifications.map((notif) => (
+                  <div key={notif.id} className="notification-item">
+                    <div className="notification-avatar">
+                      <img src={notif.avatar} alt="avatar" />
+                      <span className={`status-dot ${notif.status}`}></span>
+                    </div>
+                    <div className="notification-content">
+                      <p>
+                        <strong>{notif.name}</strong> {notif.message}
+                      </p>
+                      <span className="notification-time">{notif.time}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="view-all-button">
+                <button onClick={() => alert("Ver todas las notificaciones")}>
+                  View All Notification
+                </button>
+              </div>
+            </div>
+          )}
         </li>
-        <li className="nav-item">
+
+        <li className="nav-item notification-container ">
           <button
             className="nav-icon-btn"
             aria-label="Aplicaciones"
@@ -130,6 +223,7 @@ const NavbarAdmin = () => {
             </div>
           )}
         </li>
+
         <li className="nav-item no-pulse">
           <button
             className="nav-user-btn"
@@ -138,22 +232,28 @@ const NavbarAdmin = () => {
           >
             <span className="user-name">Jhon F. Hidalgo</span>
             <span className="material-symbols-outlined">expand_more</span>
-          </button>        
+          </button>
           {isUserMenuOpen && (
             <div className="user-menu-dropdown">
               <div className="user-menu-header">
                 <img src={avatar} alt="avatar" className="menu-avatar" />
-                <div>                 
+                <div>
                   <p className="user-role">Docente Matemáticas</p>
                   <p className="user-email">jhon.hidalgo@gestion360.com</p>
                 </div>
-              </div>             
+              </div>
               <div className="user-menu-actions-vertical">
-                <div className="user-menu-action" onClick={() => alert("Editar perfil")}>
+                <div
+                  className="user-menu-action"
+                  onClick={() => alert("Editar perfil")}
+                >
                   <span className="material-symbols-outlined">person</span>
                   <p>Editar perfil</p>
                 </div>
-                <div className="user-menu-action" onClick={() => alert("Cambiar contraseña")}>
+                <div
+                  className="user-menu-action"
+                  onClick={() => alert("Cambiar contraseña")}
+                >
                   <span className="material-symbols-outlined">lock</span>
                   <p>Cambiar contraseña</p>
                 </div>
@@ -169,7 +269,7 @@ const NavbarAdmin = () => {
             onClick={() => setIsModalOpen(true)}
           >
             <span
-              className=" icon material-symbols-outlined"
+              className="icon material-symbols-outlined"
               aria-hidden="true"
             >
               logout
@@ -178,6 +278,7 @@ const NavbarAdmin = () => {
         </li>
       </ul>
 
+      {/* Modal de cierre de sesión */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

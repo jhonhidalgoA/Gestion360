@@ -6,7 +6,7 @@ const Modal = ({ isOpen, onClose, title, message, buttons = [] }) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content-teacher" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">
            {title}

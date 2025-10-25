@@ -13,7 +13,7 @@ const Noticias = ({
 
   return (
     <section className="news-section">
-      <div className="card-container">
+      <div className="card-container-notices">
         {displayedCards.map((item) => (
           <Card
             key={item.id}

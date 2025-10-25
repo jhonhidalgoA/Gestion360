@@ -25,14 +25,13 @@ const Card = ({
 
   return (
     <>
-      <div className="card">
+      <div className="card-notices">
         <img src={image} alt={title} className="card-img" />
         <div className="card-content">
           <h4>
             {school} <span className="card-span">STEAM 360</span>
           </h4>
-          <hr className="custom-hr" />
-          
+          <hr className="custom-hr" />         
           
           <h4>{title}</h4>
           <div className="class-button">

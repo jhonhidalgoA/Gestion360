@@ -4,7 +4,7 @@ import white_arrow from "../../icons/white-arrow.png";
 
 const Hero = () => {
   return (
-    <div className="hero container">
+    <div className="hero">
       <div className="hero-text">
         <h1>Matrículas Abiertas 2026 </h1>
         <p>
@@ -12,13 +12,14 @@ const Hero = () => {
           excelencia académica, un proyecto que transforma vidas y abre
           oportunidades para el futuro.
         </p>
-        <div className="button hero-button">
+        
+      </div>
+      <div className="button-hero">
           <Link to="/info-matricula" className="btns dark-btn">
             Más información
             <img src={white_arrow} alt="" className="dark-arrow" />
           </Link>
         </div>
-      </div>
     </div>
   );
 };
