@@ -1,4 +1,3 @@
-import React from 'react';
 import ParentView from './ParentView';
 import TeacherView from './TeacherView';
 import Navbar from "../components/layout/Navbar/Navbar";

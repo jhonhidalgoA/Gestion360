@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, User, BookOpen, Check, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, User, BookOpen, Check, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import './ParentView.css';
 
 const ParentView = () => {
@@ -8,41 +8,63 @@ const ParentView = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [appointmentReason, setAppointmentReason] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const [teachers] = useState([
-    { id: 1, name: 'Sofía Giraldo', subject: 'Historia', avatar: 'MG' },
+    { id: 1, name: 'Sofía Giraldo', subject: 'Historia', avatar: 'SG' },
     { id: 2, name: 'Carlos Andres Rodríguez', subject: 'Español', avatar: 'CR' },
     { id: 3, name: 'Ana Lucía Martínez', subject: 'Ciencias', avatar: 'AM' },
-    { id: 4, name: 'Luis Angel Montoya', subject: 'Matemáticas', avatar: 'LP' }
+    { id: 4, name: 'Luis Angel Montoya', subject: 'Matemáticas', avatar: 'LM' }
   ]);
+
+  // Función para generar disponibilidad de lunes a viernes
+  const generateAvailability = () => {
+    const availability = {};
+    const today = new Date();
+    
+    // Generar disponibilidad para los próximos 30 días
+    for (let i = 0; i < 30; i++) {
+      const date = new Date();
+      date.setDate(today.getDate() + i);
+      
+      // Solo lunes a viernes (1-5)
+      if (date.getDay() >= 1 && date.getDay() <= 5) {
+        const dateStr = date.toISOString().split('T')[0];
+        
+        // Horarios disponibles (mañana y tarde)
+        const morningSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'];
+        const afternoonSlots = ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30'];
+        
+        // Combinar horarios (algunos días tienen menos disponibilidad)
+        let timeSlots = [];
+        if (i % 4 === 0) {
+          timeSlots = [...morningSlots.slice(0, 3), ...afternoonSlots.slice(0, 3)];
+        } else if (i % 4 === 1) {
+          timeSlots = [...morningSlots.slice(2, 5), ...afternoonSlots.slice(1, 4)];
+        } else if (i % 4 === 2) {
+          timeSlots = [...morningSlots, ...afternoonSlots.slice(3)];
+        } else {
+          timeSlots = [...morningSlots.slice(1), ...afternoonSlots];
+        }
+        
+        availability[dateStr] = timeSlots;
+      }
+    }
+    
+    return availability;
+  };
+
+  // Disponibilidad base para todos los profesores
+  const baseAvailability = generateAvailability();
 
   const [teacherAvailability] = useState({
-    1: {
-      '2025-10-06': ['09:00', '09:30', '10:00', '14:00', '14:30'],
-      '2025-10-07': ['10:00', '10:30', '11:00', '15:00'],
-      '2025-10-08': ['09:00', '09:30', '14:00', '14:30', '15:00']
-    },
-    2: {
-      '2025-10-06': ['10:00', '10:30', '11:00', '15:30', '16:00'],
-      '2025-10-07': ['09:00', '09:30', '14:00', '14:30'],
-      '2025-10-08': ['10:00', '10:30', '15:00', '15:30']
-    },
-    3: {
-      '2025-10-06': ['11:00', '11:30', '14:00', '14:30'],
-      '2025-10-07': ['09:00', '09:30', '10:00', '15:00', '15:30'],
-      '2025-10-08': ['11:00', '14:00', '14:30', '15:00']
-    },
-    4: {
-      '2025-10-06': ['09:00', '10:00', '14:00', '15:00'],
-      '2025-10-07': ['10:00', '11:00', '14:00', '15:00'],
-      '2025-10-08': ['09:00', '10:00', '14:00', '15:00', '16:00']
-    }
+    1: baseAvailability,
+    2: baseAvailability,
+    3: baseAvailability,
+    4: baseAvailability
   });
 
-  const [appointments, setAppointments] = useState([
-    { id: 1, teacherId: 1, date: '2025-10-06', time: '10:30', parent: 'Juan Sánchez', reason: 'Rendimiento académico', status: 'confirmed' },
-    { id: 2, teacherId: 2, date: '2025-10-07', time: '10:30', parent: 'Laura Torres', reason: 'Comportamiento en clase', status: 'confirmed' }
-  ]);
+  const [appointments, setAppointments] = useState([]);
 
   const availableDates = selectedTeacher ? Object.keys(teacherAvailability[selectedTeacher.id] || {}) : [];
 
@@ -72,14 +94,126 @@ const ParentView = () => {
     return date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
   };
 
+  // Funciones para el calendario
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    return { daysInMonth, startingDayOfWeek };
+  };
+
+  const isDateAvailable = (date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return availableDates.includes(dateStr);
+  };
+
+  const isToday = (date) => {
+    const today = new Date();
+    return date.getDate() === today.getDate() && 
+           date.getMonth() === today.getMonth() && 
+           date.getFullYear() === today.getFullYear();
+  };
+
+  const isWeekend = (date) => {
+    return date.getDay() === 0 || date.getDay() === 6;
+  };
+
+  const renderCalendar = () => {
+    const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
+    const days = [];
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    
+    // Días vacíos antes del primer día del mes
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(<div key={`empty-${i}`} className="calendar-empty-day" />);
+    }
+    
+    // Días del mes
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+      const dateStr = date.toISOString().split('T')[0];
+      const isAvailable = isDateAvailable(date);
+      const isSelected = selectedDate === dateStr;
+      const today = isToday(date);
+      const weekend = isWeekend(date);
+      
+      days.push(
+        <button
+          key={day}
+          onClick={() => isAvailable && setSelectedDate(dateStr)}
+          disabled={!isAvailable}
+          className={`calendar-day ${isSelected ? 'selected' : ''} ${today ? 'today' : ''} ${isAvailable ? 'available' : 'unavailable'} ${weekend ? 'weekend' : ''}`}
+        >
+          {day}
+        </button>
+      );
+    }
+    
+    return (
+      <div className="calendar-container">
+        <div className="calendar-header">
+          <button
+            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
+            className="calendar-nav-button"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <h4 className="calendar-month-title">
+            {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+          </h4>
+          <button
+            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
+            className="calendar-nav-button"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+        
+        {/* Días de la semana */}
+        <div className="calendar-weekdays">
+          {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
+            <div key={day} className="calendar-weekday">
+              {day}
+            </div>
+          ))}
+        </div>
+        
+        {/* Días del mes */}
+        <div className="calendar-days-grid">
+          {days}
+        </div>
+        
+        {/* Leyenda del calendario */}
+        <div className="calendar-legend">
+          <div className="legend-item">
+            <div className="legend-color today-legend"></div>
+            <span>Hoy</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-color available-legend"></div>
+            <span>Disponible</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-color unavailable-legend"></div>
+            <span>No disponible</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="parent-view">
-      <div className="info-banner info-banner-blue">
-        <div className="info-banner-content">
-          <AlertCircle className="info-banner-icon" />
+    <div className="parent-view-container">
+      <div className="header-banner">
+        <div className="banner-content">
+          <AlertCircle className="banner-icon" />
           <div>
-            <h3 className="info-banner-title">Reserva tu cita</h3>
-            <p className="info-banner-text">Selecciona un docente y elige el horario disponible que mejor te convenga</p>
+            <h3>Reserva tu cita</h3>
+            <p>Selecciona un docente y elige el horario disponible que mejor te convenga</p>
           </div>
         </div>
       </div>
@@ -99,9 +233,9 @@ const ParentView = () => {
                     {teacher.avatar}
                   </div>
                   <div>
-                    <h4 className="teacher-name">{teacher.name}</h4>
+                    <h4>{teacher.name}</h4>
                     <p className="teacher-subject">
-                      <BookOpen className="icon-small" />
+                      <BookOpen className="subject-icon" />
                       {teacher.subject}
                     </p>
                   </div>
@@ -123,129 +257,107 @@ const ParentView = () => {
             ← Cambiar docente
           </button>
 
-          <div className="selected-teacher-card">
-            <div className="teacher-info">
-              <div className="teacher-avatar">
+          <div className="selected-teacher-banner">
+            <div className="selected-teacher-info">
+              <div className="selected-teacher-avatar">
                 {selectedTeacher.avatar}
               </div>
               <div>
-                <h4 className="teacher-name">{selectedTeacher.name}</h4>
-                <p className="teacher-subject">{selectedTeacher.subject}</p>
+                <h4>{selectedTeacher.name}</h4>
+                <p>{selectedTeacher.subject}</p>
               </div>
             </div>
           </div>
 
-          {!selectedDate ? (
-            <div>
-              <h3 className="section-title">Selecciona una Fecha</h3>
-              <div className="dates-grid">
-                {availableDates.map(date => (
-                  <div
-                    key={date}
-                    onClick={() => setSelectedDate(date)}
-                    className="date-card"
-                  >
-                    <Calendar className="date-icon" />
-                    <p className="date-text capitalize">{formatDate(date)}</p>
-                  </div>
-                ))}
-              </div>
+          {/* Layout de 2 columnas: Calendario y Horarios */}
+          <div className="appointment-scheduler">
+            {/* Columna de Calendario */}
+            <div className="calendar-section">
+              <h3>Selecciona una Fecha</h3>
+              {renderCalendar()}
             </div>
-          ) : (
-            <div>
-              <button
-                onClick={() => {
-                  setSelectedDate(null);
-                  setSelectedTime(null);
-                }}
-                className="back-button"
-              >
-                ← Cambiar fecha
-              </button>
 
-              <div className="selected-date">
-                <p className="selected-date-text capitalize">{formatDate(selectedDate)}</p>
-              </div>
-
-              {!selectedTime ? (
+            {/* Columna de Horarios */}
+            <div className="time-section">
+              <h3>{selectedDate ? 'Selecciona un Horario' : 'Horarios Disponibles'}</h3>
+              {!selectedDate ? (
+                <div className="empty-time-section">
+                  <Clock className="empty-icon" />
+                  <p>Selecciona una fecha del calendario<br/>para ver los horarios disponibles</p>
+                </div>
+              ) : (
                 <div>
-                  <h3 className="section-title">Selecciona un Horario</h3>
-                  <div className="times-grid">
-                    {teacherAvailability[selectedTeacher.id][selectedDate].map(time => (
+                  <div className="selected-date-info">
+                    <p>{formatDate(selectedDate)}</p>
+                  </div>
+                  <div className="time-slots-grid">
+                    {teacherAvailability[selectedTeacher.id][selectedDate] && 
+                     teacherAvailability[selectedTeacher.id][selectedDate].map(time => (
                       <button
                         key={time}
                         onClick={() => setSelectedTime(time)}
-                        className="time-button"
+                        className={`time-slot ${selectedTime === time ? 'selected' : ''}`}
                       >
                         <Clock className="time-icon" />
-                        <p className="time-text">{time}</p>
+                        <span>{time}</span>
                       </button>
                     ))}
                   </div>
                 </div>
-              ) : (
-                <div>
-                  <button
-                    onClick={() => setSelectedTime(null)}
-                    className="back-button"
-                  >
-                    ← Cambiar horario
-                  </button>
-
-                  <div className="confirmation-card">
-                    <h3 className="section-title">Confirma tu Cita</h3>
-                    
-                    <div className="appointment-details">
-                      <div className="detail-item">
-                        <User className="detail-icon" />
-                        <span>{selectedTeacher.name} - {selectedTeacher.subject}</span>
-                      </div>
-                      <div className="detail-item">
-                        <Calendar className="detail-icon" />
-                        <span className="capitalize">{formatDate(selectedDate)}</span>
-                      </div>
-                      <div className="detail-item">
-                        <Clock className="detail-icon" />
-                        <span>{selectedTime}</span>
-                      </div>
-                    </div>
-
-                    <div className="reason-section">
-                      <label className="input-label">Motivo de la consulta</label>
-                      <textarea
-                        value={appointmentReason}
-                        onChange={(e) => setAppointmentReason(e.target.value)}
-                        className="reason-textarea"
-                        rows="3"
-                        placeholder="Describe brevemente el motivo de tu consulta..."
-                      />
-                    </div>
-
-                    <button
-                      onClick={handleBookAppointment}
-                      disabled={!appointmentReason.trim()}
-                      className="confirm-button"
-                    >
-                      Confirmar Cita
-                    </button>
-                  </div>
-                </div>
               )}
+            </div>
+          </div>
+
+          {/* Confirmación */}
+          {selectedTime && (
+            <div className="confirmation-section">
+              <h3>Confirma tu Cita</h3>
+              
+              <div className="appointment-details">
+                <div className="detail-item">
+                  <User className="detail-icon" />
+                  <span>{selectedTeacher.name} - {selectedTeacher.subject}</span>
+                </div>
+                <div className="detail-item">
+                  <Calendar className="detail-icon" />
+                  <span>{formatDate(selectedDate)}</span>
+                </div>
+                <div className="detail-item">
+                  <Clock className="detail-icon" />
+                  <span>{selectedTime}</span>
+                </div>
+              </div>
+
+              <div className="reason-input">
+                <label>Motivo de la consulta</label>
+                <textarea
+                  value={appointmentReason}
+                  onChange={(e) => setAppointmentReason(e.target.value)}
+                  rows="3"
+                  placeholder="Describe brevemente el motivo de tu consulta..."
+                />
+              </div>
+
+              <button
+                onClick={handleBookAppointment}
+                disabled={!appointmentReason.trim()}
+                className="confirm-button"
+              >
+                Confirmar Cita
+              </button>
             </div>
           )}
         </div>
       )}
 
       {showConfirmation && (
-        <div className="modal-overlay">
-          <div className="confirmation-modal">
-            <div className="confirmation-content">
-              <div className="success-icon">
-                <Check className="check-icon" />
-              </div>
-              <h3 className="confirmation-title">¡Cita Confirmada!</h3>
-              <p className="confirmation-text">Recibirás un recordatorio por email antes de tu cita</p>
+        <div className="confirmation-modal">
+          <div className="confirmation-content">
+            <div className="success-icon">
+              <Check className="check-icon" />
             </div>
+            <h3>¡Cita Confirmada!</h3>
+            <p>Recibirás un recordatorio por email antes de tu cita</p>
           </div>
         </div>
       )}

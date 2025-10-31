@@ -2,8 +2,25 @@ import "./TareasHacer.css";
 import NavbarModulo from "../../../components/layout/Navbar/NavbarModulo";
 import { useNavigate } from "react-router-dom";
 import TaskStudent from "../../../components/ui/TaskStudent";
-import { useState } from "react";
-import { X, Calendar, FileText, Download, UploadCloud, MessageSquare } from "lucide-react";
+import { useState, useEffect } from "react";
+import MathIcon from "../../../assets/student-img/herramientas.png"
+import ScienceIcon from "../../../assets/student-img/ciencias.png"
+import BookIcon from "../../../assets/student-img/libro.png"
+import EnglishIcon from "../../../assets/student-img/globo.png"
+import EarthIcon from "../../../assets/student-img/mundo.png"
+import ArtIcon from "../../../assets/student-img/paletas.png"
+import BallIcon from "../../../assets/student-img/balon.png"
+import PcIcon from "../../../assets/student-img/pc.png"
+import EticIcon from "../../../assets/student-img/etica.png"
+
+import {
+  X,
+  Calendar,
+  FileText,
+  Download,
+  UploadCloud,
+  MessageSquare,
+} from "lucide-react";
 
 const Tareashacer = () => {
   const navigate = useNavigate();
@@ -11,6 +28,40 @@ const Tareashacer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [comment, setComment] = useState("");
+
+  const [currentTime, setCurrentTime] = useState("");
+  const [currentDateDisplay, setCurrentDateDisplay] = useState("");
+
+  useEffect(() => {
+    const updateCurrentTime = () => {
+      const now = new Date();
+
+      // Día de la semana
+
+      // Hora actual
+      const hours = now.getHours().toString().padStart(2, "0");
+      const minutes = now.getMinutes().toString().padStart(2, "0");
+      setCurrentTime(`${hours}:${minutes}`);
+
+      // Fecha legible con fallback
+      let formattedDate = "";
+      const formatter = new Intl.DateTimeFormat("es-ES", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      });
+      formattedDate = formatter.format(now);
+
+      formattedDate =
+        formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+
+      setCurrentDateDisplay(formattedDate);
+    };
+
+    updateCurrentTime();
+    const interval = setInterval(updateCurrentTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleBack = () => {
     navigate("/estudiante");
@@ -25,9 +76,10 @@ const Tareashacer = () => {
       dueDate: "2024-10-15",
       status: "Pendiente",
       priority: "Alta",
-      icon: "📐",
+      icon: MathIcon,
       color: "#FF6347",
-      instructions: "Resuelve todos los ejercicios mostrando el procedimiento completo. Recuerda verificar tus respuestas y escribir de forma legible.",
+      instructions:
+        "Resuelve todos los ejercicios mostrando el procedimiento completo. Recuerda verificar tus respuestas y escribir de forma legible.",
       materials: [
         { name: "guia_algebra.pdf", type: "Archivo del profesor" },
         { name: "ejemplos_resueltos.pdf", type: "Archivo del profesor" },
@@ -41,12 +93,11 @@ const Tareashacer = () => {
       dueDate: "2024-10-16",
       status: "En proceso",
       priority: "Media",
-      icon: "📚",
+      icon: BookIcon,
       color: "#8A2BE2",
-      instructions: "El resumen debe incluir ideas principales y conclusiones personales.",
-      materials: [
-        { name: "capitulo_3.pdf", type: "Archivo del profesor" },
-      ],
+      instructions:
+        "El resumen debe incluir ideas principales y conclusiones personales.",
+      materials: [{ name: "capitulo_3.pdf", type: "Archivo del profesor" }],
     },
     {
       id: 3,
@@ -56,9 +107,10 @@ const Tareashacer = () => {
       dueDate: "2024-10-18",
       status: "Pendiente",
       priority: "Media",
-      icon: "🔬",
+      icon:ScienceIcon,
       color: "#1E90FF",
-      instructions: "Incluir mínimo 5 planetas, sus características y una imagen por planeta.",
+      instructions:
+        "Incluir mínimo 5 planetas, sus características y una imagen por planeta.",
       materials: [
         { name: "sistema_solar_guia.pdf", type: "Archivo del profesor" },
       ],
@@ -71,10 +123,10 @@ const Tareashacer = () => {
       dueDate: "2024-10-14",
       status: "Completado",
       priority: "Baja",
-      icon: "🌍",
+      icon: EnglishIcon,
       color: "#32CD32",
       instructions: "Escribe las palabras en contexto y define cada una.",
-      materials: [], 
+      materials: [],
     },
   ];
 
@@ -118,10 +170,21 @@ const Tareashacer = () => {
     <div className="taskDo-container" onKeyDown={handleKeyDown} tabIndex={0}>
       <NavbarModulo />
       <div className="page-container">
-        <button onClick={handleBack} className="back-button">
-          <span className="back-icon">←</span>
-          Volver al inicio
-        </button>
+        <div className="header-section">
+          <button onClick={handleBack} className="back-button">
+            <span className="back-icon">←</span>
+            Volver al inicio
+          </button>
+          <div className="current-info">
+            <div className="current-day">
+              <span className="label">Hoy es:</span>{" "}
+              <span className="date-value">{currentDateDisplay}</span>
+            </div>
+            <div className="current-time">
+              <span className="time-value">{currentTime}</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="page-title">
         <h4>Mis Tareas</h4>
@@ -129,11 +192,13 @@ const Tareashacer = () => {
           Gestiona y completa tus actividades académicas
         </p>
       </div>
+
       <div className="tasks-grid">
         {homework.map((task) => (
           <TaskStudent
             key={task.id}
             task={task}
+            icon={task.icon}
             onViewDetails={handleViewTaskDetails}
             variant="default"
             gradientStart={`${task.color} -30)}`}
@@ -195,7 +260,8 @@ const Tareashacer = () => {
                   <FileText size={16} color="#2563eb" />
                   <strong>Material del Profesor</strong>
                 </div>
-                {Array.isArray(selectedTask.materials) && selectedTask.materials.length > 0 ? (
+                {Array.isArray(selectedTask.materials) &&
+                selectedTask.materials.length > 0 ? (
                   selectedTask.materials.map((material, index) => (
                     <div key={index} className="material-item">
                       <div className="material-info">
@@ -213,7 +279,9 @@ const Tareashacer = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="no-materials">No hay material disponible para esta tarea.</p>
+                  <p className="no-materials">
+                    No hay material disponible para esta tarea.
+                  </p>
                 )}
               </div>
 
@@ -230,7 +298,9 @@ const Tareashacer = () => {
                 >
                   <UploadCloud size={40} color="#2563eb" />
                   <p>Arrastra archivos aquí o haz clic para seleccionar</p>
-                  <p className="upload-hint">PDF, Word, PowerPoint, Imágenes (Máx. 10MB)</p>
+                  <p className="upload-hint">
+                    PDF, Word, PowerPoint, Imágenes (Máx. 10MB)
+                  </p>
                 </div>
                 <input
                   id="fileInput"

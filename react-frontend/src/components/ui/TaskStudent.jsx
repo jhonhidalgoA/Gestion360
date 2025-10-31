@@ -1,13 +1,8 @@
-import React from "react";
+
 import { Calendar } from "lucide-react";
 import "./TaskStudent.css";
 
-const TaskCard = ({
-  task,
-  onViewDetails,
-  variant = "default"
- 
-}) => {
+const TaskCard = ({ task, onViewDetails, variant = "default" }) => {
   const { subject, title, description, dueDate, status, icon, color } = task;
 
   const getStatusClass = (status) => {
@@ -36,12 +31,22 @@ const TaskCard = ({
       <div
         className="task-card compact"
         style={{
-          background: color
+          background: color,
         }}
       >
         <div className="task-header">
           <div className="task-meta">
-            <span className="task-icon">{icon}</span>
+            {icon && (
+              <img
+                src={icon}
+                alt={subject}
+                className="subject-icon"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "https://via.placeholder.com/28?text=?";
+                }}
+              />
+            )}
             <div>
               <span className="subject-tag">{subject}</span>
             </div>
@@ -65,12 +70,22 @@ const TaskCard = ({
     <div
       className="schedule-card-student"
       style={{
-        background: color
+        background: color,
       }}
     >
       <div className="task-header">
         <div className="task-meta">
-          <span className="task-icon">{icon}</span>
+          {icon && (
+            <img
+              src={icon}
+              alt={subject}
+              className="subject-icon"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/50?text=?";
+              }}
+            />
+          )}
           <div>
             <span className="subject-tag">{subject}</span>
           </div>

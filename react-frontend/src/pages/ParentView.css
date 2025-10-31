@@ -1,246 +1,471 @@
-.parent-view {
+/* Variables de colores y estilos */
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --primary-color: #667eea;
+  --secondary-color: #764ba2;
+  --text-dark: #1f2937;
+  --text-medium: #374151;
+  --text-light: #6b7280;
+  --border-color: #e5e7eb;
+  --background-light: #f3f4f6;
+  --background-lighter: #f9fafb;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --white: #ffffff;
+  --shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  --shadow-hover: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Estilos generales */
+.parent-view-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Banner de encabezado */
+.header-banner {
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  background: var(--primary-gradient);
+  color: var(--white);
+}
+
+.banner-content {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
+  align-items: center;
+  gap: 15px;
 }
 
-/* Info Banner */
-.info-banner {
-  border-radius: 8px;
-  padding: 16px;
+.banner-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
 }
 
-.info-banner-blue {
-  background-color: #dbeafe;
-  border: 1px solid #bfdbfe;
-}
-
-.info-banner-content {
-  display: flex;
-  align-items: flex-start;
-}
-
-
-
-.info-banner-blue .info-banner-icon {
-  color: #2563eb;
-  width: 50px;
-  height: 50px;
-}
-
-.info-banner-title {
+.header-banner h3 {
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 4px;
-  font-size: 1.3rem;
-  color: #1e40af;
+  margin: 0 0 5px 0;
 }
 
-.info-banner-blue .info-banner-text {
-  color: #1e40af;
-  font-size:1.1rem;
-  margin-top: 4px;
+.header-banner p {
+  margin: 0;
+  opacity: 0.95;
+  font-size: 14px;
 }
 
-/* Section Titles */
+/* Sección de selección de docentes */
 .section-title {
-  font-size: 1.125rem;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 16px;
+  color: var(--text-dark);
+  margin-bottom: 20px;
 }
 
-/* Teachers Grid */
 .teachers-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .teachers-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  margin-bottom: 30px;
 }
 
 .teacher-card {
-  background: white;
-  border: 1px solid #E2E8F0;
+  background: var(--white);
+  border: 2px solid var(--border-color);
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .teacher-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
-  border-color: #2563EB;
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
 }
 
 .teacher-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
 }
 
 .teacher-avatar {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #2563EB, #1E40AF);
+  width: 50px;
+  height: 50px;
+  background: var(--primary-gradient);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-weight: bold;
+  color: var(--white);
+  font-weight: 600;
+  font-size: 16px;
   flex-shrink: 0;
 }
 
-.teacher-name {
+.teacher-card h4 {
+  font-size: 16px;
   font-weight: 600;
+  color: var(--text-dark);
+  margin: 0 0 5px 0;
 }
 
 .teacher-subject {
-  font-size: 0.875rem;
-  color: #6b7280;
   display: flex;
   align-items: center;
+  gap: 6px;
+  color: var(--text-light);
+  font-size: 14px;
+  margin: 0;
 }
 
-.icon-small {
+.subject-icon {
   width: 16px;
   height: 16px;
-  margin-right: 4px;
 }
 
-/* Back Button */
+/* Botón de regresar */
 .back-button {
-  color: #2563eb;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  background: none;
-  border: none;
+  background: transparent;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: var(--text-light);
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 0.875rem;
+  transition: all 0.2s;
+  margin-bottom: 20px;
 }
 
 .back-button:hover {
-  color: #1e40af;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: var(--background-light);
 }
 
-/* Selected Teacher Card */
-.selected-teacher-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 24px;
-  background-color: #f9fafb;
+/* Banner del docente seleccionado */
+.selected-teacher-banner {
+  background: var(--primary-gradient);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  color: var(--white);
 }
 
-/* Dates Grid */
-.dates-grid {
+.selected-teacher-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.selected-teacher-avatar {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.25);
+  border: 2px solid var(--white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.selected-teacher-banner h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 5px 0;
+}
+
+.selected-teacher-banner p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* Layout de citas */
+.appointment-scheduler {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 20px;
 }
 
-@media (min-width: 768px) {
-  .dates-grid {
-    grid-template-columns: repeat(3, 1fr);
+@media (max-width: 768px) {
+  .appointment-scheduler {
+    grid-template-columns: 1fr;
   }
 }
 
-.date-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 16px;
+.calendar-section, .time-section {
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.calendar-section h3, .time-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0 0 20px 0;
+}
+
+/* Estilos del calendario */
+.calendar-container {
+  width: 100%;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 8px;
+}
+
+.calendar-nav-button {
+  background: transparent;
+  border: none;
   cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  color: var(--primary-color);
+  transition: background 0.2s;
+}
+
+.calendar-nav-button:hover {
+  background: var(--background-light);
+}
+
+.calendar-month-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+  padding: 8px 0;
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-empty-day {
+  padding: 12px;
+}
+
+.calendar-day {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 500;
+  font-size: 14px;
   transition: all 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+
+.calendar-day.available {
+  background: var(--background-light);
+  color: var(--text-dark);
+}
+
+.calendar-day.available:hover {
+  background: #e5e7eb;
+  transform: scale(1.05);
+}
+
+.calendar-day.selected {
+  background: var(--primary-gradient);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.calendar-day.today {
+  border: 2px solid var(--primary-color);
+  font-weight: 600;
+}
+
+.calendar-day.unavailable {
+  background: transparent;
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.calendar-day.weekend {
+  background: #fef2f2;
+  color: #fca5a5;
+  cursor: not-allowed;
+}
+
+/* Leyenda del calendario */
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.today-legend {
+  border: 2px solid var(--primary-color);
+}
+
+.available-legend {
+  background: var(--background-light);
+}
+
+.unavailable-legend {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+/* Sección de horarios */
+.empty-time-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--text-light);
+  text-align: center;
+  font-size: 14px;
+}
+
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  opacity: 0.5;
+}
+
+.selected-date-info {
+  background: var(--background-light);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
   text-align: center;
 }
 
-.date-card:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.date-icon {
-  width: 24px;
-  height: 24px;
-  margin: 0 auto 8px;
-  color: #2563eb;
-}
-
-.date-text {
-  font-weight: 500;
+.selected-date-info p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-light);
   text-transform: capitalize;
 }
 
-/* Selected Date */
-.selected-date {
-  margin-bottom: 24px;
-  padding: 12px;
-  background-color: #dbeafe;
-  border-radius: 8px;
-}
-
-.selected-date-text {
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: capitalize;
-}
-
-/* Times Grid */
-.times-grid {
+.time-slots-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
-@media (min-width: 768px) {
-  .times-grid {
-    grid-template-columns: repeat(5, 1fr);
+@media (max-width: 480px) {
+  .time-slots-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-.time-button {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 12px;
-  background: white;
+.time-slot {
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  padding: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-medium);
 }
 
-.time-button:hover {
-  border-color: #3b82f6;
-  background-color: #dbeafe;
+.time-slot:hover {
+  border-color: var(--primary-color);
+  background: var(--background-lighter);
+  transform: scale(1.05);
+}
+
+.time-slot.selected {
+  background: var(--primary-gradient);
+  border-color: var(--primary-color);
+  color: var(--white);
 }
 
 .time-icon {
-  width: 20px;
-  height: 20px;
-  margin: 0 auto 4px;
-  color: #2563eb;
+  width: 18px;
+  height: 18px;
 }
 
-.time-text {
-  font-size: 0.875rem;
-  font-weight: 500;
+.time-slot.selected .time-icon {
+  color: var(--white);
 }
 
-/* Confirmation Card */
-.confirmation-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 24px;
-  background-color: white;
+.time-slot:not(.selected) .time-icon {
+  color: var(--primary-color);
+}
+
+.time-slot span {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Sección de confirmación */
+.confirmation-section {
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 30px;
+  margin-top: 24px;
+}
+
+.confirmation-section h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 20px;
 }
 
 .appointment-details {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  background: var(--background-lighter);
+  border-radius: 10px;
+  padding: 20px;
   margin-bottom: 24px;
 }
 
@@ -248,118 +473,124 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 12px 0;
+  color: var(--text-medium);
+  font-size: 15px;
+  border-bottom: 1px solid var(--border-color);
+  text-transform: capitalize;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
 }
 
 .detail-icon {
   width: 20px;
   height: 20px;
-  color: #6b7280;
+  color: var(--primary-color);
   flex-shrink: 0;
 }
 
-/* Reason Section */
-.reason-section {
+.reason-input {
   margin-bottom: 24px;
 }
 
-.input-label {
+.reason-input label {
   display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-medium);
   margin-bottom: 8px;
 }
 
-.reason-textarea {
+.reason-input textarea {
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   padding: 12px;
-  resize: vertical;
+  font-size: 14px;
   font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
 }
 
-.reason-textarea:focus {
+.reason-input textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-color);
 }
 
-/* Confirm Button */
 .confirm-button {
-  background-color: #2563EB;
-  color: white;
-  padding: 14px;
+  width: 100%;
+  background: var(--primary-gradient);
+  color: var(--white);
+  border: none;
   border-radius: 10px;
+  padding: 16px;
+  font-size: 16px;
   font-weight: 600;
-  font-size: 1rem;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .confirm-button:hover:not(:disabled) {
-  background-color: #1E40AF;
-  transform: scale(1.02);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
 }
 
 .confirm-button:disabled {
-  background-color: #d1d5db;
+  background: #d1d5db;
   cursor: not-allowed;
 }
 
-/* Modal */
-.modal-overlay {
+/* Modal de confirmación */
+.confirmation-modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  z-index: 50;
-}
-
-.confirmation-modal {
-  background-color: white;
-  border-radius: 8px;
-  padding: 24px;
-  max-width: 28rem;
-  width: 100%;
+  z-index: 1000;
 }
 
 .confirmation-content {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 400px;
+  width: 90%;
   text-align: center;
 }
 
 .success-icon {
-  width: 64px;
-  height: 64px;
-  background-color: #dcfce7;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px;
+  margin: 0 auto 24px;
 }
 
 .check-icon {
-  width: 32px;
-  height: 32px;
-  color: #16a34a;
+  width: 40px;
+  height: 40px;
+  color: var(--white);
 }
 
-.confirmation-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 8px;
+.confirmation-content h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 12px 0;
 }
 
-.confirmation-text {
-  color: #6b7280;
-}
-
-/* Utility Classes */
-.capitalize {
-  text-transform: capitalize;
+.confirmation-content p {
+  font-size: 15px;
+  color: var(--text-light);
+  margin: 0;
 }

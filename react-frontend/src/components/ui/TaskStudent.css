@@ -4,7 +4,7 @@
   border-radius: 10px;
   padding: 1.5rem;  
   height:auto;
-   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 }
 
@@ -18,7 +18,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 1rem;
+ 
 }
 
 .task-meta {
