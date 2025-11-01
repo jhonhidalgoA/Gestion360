@@ -10,8 +10,8 @@ const AppointmentSystem = () => {
     <div className="appointment-container">
       <Navbar />  
       <div className="title-appointment">
-        <h1>Sistema de Citas Escolares</h1>
-        <p>Gestión de Atención a Padres de Familia</p>
+        <h1>Reserva tu cita</h1>
+        <p>Selecciona un docente y elige el horario disponible que mejor te convenga</p>
       </div>
 
       <div className="content-card">

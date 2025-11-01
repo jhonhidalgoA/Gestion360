@@ -8,6 +8,7 @@ import Eventos from "../components/layout/Eventos/Eventos";
 import Nosotros from "../components/layout/Nosotros/Nosotros";
 import Institucional from "../components/layout/Institucional/Institucional";
 import Contacto from "../components/layout/Contacto/Contacto";
+import Footer from "../components/layout/Footer/Footer";
 import VideoPlayer from "../components/layout/VideoPlayer/VideoPlayer";
 
 const HomePage = ({ playState, setPlayState }) => {
@@ -37,6 +38,9 @@ const HomePage = ({ playState, setPlayState }) => {
         <div id="contacto">
           <Title subTitle="Contacto" title="Estamos aquí para ayudarte" />
           <Contacto />
+        </div>
+        <div id="footer">          
+          <Footer />
         </div>
       </div>
       <VideoPlayer playState={playState} setPlayState={setPlayState} />

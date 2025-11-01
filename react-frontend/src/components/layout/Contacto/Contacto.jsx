@@ -65,13 +65,7 @@ const Contacto = () => {
           </form>
         </div>
       </div>
-      <div className="footer">
-        <p>Diseñado por:Zirel</p>        
-        <ul>
-          <li>Gestion 360</li>
-          <li>Privacy Policy</li>
-        </ul>
-      </div>
+      
     </>
   );
 };
