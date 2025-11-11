@@ -2,7 +2,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from typing import List, Optional
-from sqlalchemy import String, Text, ForeignKey, Boolean, BigInteger, TIMESTAMP
+from sqlalchemy import String, Text, ForeignKey, Boolean, BigInteger, TIMESTAMP, Column, Integer, String, Date, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .database import Base
 
@@ -43,3 +43,35 @@ class User(Base):
 
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, username={self.username!r}, role_id={self.role_id!r})"
+
+class Estudiante(Base):
+    __tablename__ = "estudiantes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    
+    fecha_registro = Column(Date)
+    nombres = Column(String(100))
+    apellidos = Column(String(100))
+    fecha_nacimiento = Column(Date)
+    edad = Column(Integer)
+    genero = Column(String(20))
+    lugar_nacimiento = Column(String(100))
+    tipo_documento = Column(String(30))
+    numero_documento = Column(String(30), unique=True)
+    telefono = Column(String(20))
+    correo = Column(String(100))
+    grado_id = Column(Integer)
+    grupo = Column(String(10))
+    jornada = Column(String(20))
+    tipo_sangre = Column(String(10))
+    eps = Column(String(50))
+    etnia = Column(String(50))
+    referencia = Column(String(100))
+    direccion = Column(String(100))
+    barrio = Column(String(100))
+    localidad = Column(String(100))
+    zona = Column(String(50))
+
+    # Relación con usuario
+    user_id = Column(ForeignKey("users.id", ondelete="CASCADE"))
+    user = relationship("User", backref="estudiante")
