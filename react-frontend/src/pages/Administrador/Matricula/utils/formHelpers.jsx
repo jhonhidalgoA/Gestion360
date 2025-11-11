@@ -1,6 +1,5 @@
-// src/components/matricula/utils/formHelpers.js
-
 const gradeMap = {
+  "preescolar": 0,  
   "primero": 1,
   "segundo": 2,
   "tercero": 3,
@@ -11,7 +10,20 @@ const gradeMap = {
   "octavo": 8,
   "noveno": 9,
   "decimo": 10,
-  "once": 11
+  "undecimo": 11    
+};
+
+// Calcula edad a partir de la fecha de nacimiento
+const calculateAge = (birthDateString) => {
+  if (!birthDateString) return 0;
+  const birthDate = new Date(birthDateString);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
 };
 
 export const validateTab = async (activeTab, trigger, setIsModalOpen) => {
@@ -19,11 +31,11 @@ export const validateTab = async (activeTab, trigger, setIsModalOpen) => {
     estudiante: [
       "name", "lastname", "studentBirthDate", "studentGender", "studentBirthPlace",
       "studentDocument", "studentDocumentNumber", "studentphone", "studentEmail",
-      "studentGrade", "studentGroup", "studentShift", "studentRegister", "studentPhoto"
+      "studentGrade", "studentGroup", "studentShift"
     ],
     academica: [
       "studentBlood", "studentEPS", "studentEthnic", "studentReference",
-      "studentAddress", "studentNeighborhood", "studentLocality", "studentStatus", "studentZone"
+      "studentAddress", "studentNeighborhood", "studentLocality", "studentZone"
     ],
     familia: [
       "motherName", "motherLastname", "motherTypeDocument", "motherDocument", "motherPhone", "motherEmail", "motherProfesion", "motherOcupation",
@@ -42,110 +54,103 @@ export const validateTab = async (activeTab, trigger, setIsModalOpen) => {
   return true;
 };
 
-// ✅ CORREGIDO: Coincide con los campos del backend (FastAPI schemas.py)
+// ✅ JSON que SÍ funciona con tu backend (basado en el log de éxito)
 export const formatMatriculaData = (data) => {
+  const edad = calculateAge(data.studentBirthDate);
+
   return {
     student: {
-      fecha_registro: data.registerDate,
       nombres: data.name,
       apellidos: data.lastname,
       fecha_nacimiento: data.studentBirthDate,
-      edad: data.studentAge,
+      edad: edad, // Asegura que sea número
       genero: data.studentGender,
       lugar_nacimiento: data.studentBirthPlace,
       tipo_documento: data.studentDocument,
       numero_documento: data.studentDocumentNumber,
       telefono: data.studentphone,
-      correo: data.studentEmail,
-      grado_id: gradeMap[data.studentGrade.toLowerCase()] || 0,
-      grupo: data.studentGroup,
-      jornada: data.studentShift,
-      tipo_sangre: data.studentBlood,
-      eps: data.studentEPS,
-      etnia: data.studentEthnic,
-      referencia: data.studentReference,
-      direccion: data.studentAddress,
-      barrio: data.studentNeighborhood,
-      localidad: data.studentLocality,
-      zona: data.studentZone,
-    },
-    academic: {
-      direccion: data.studentAddress,
-      barrio: data.studentNeighborhood,
-      localidad: data.studentLocality,
-      zona: data.studentZone,
-      estado: data.studentStatus,
+      correo: data.studentEmail || null, // Permite null si no hay correo
+      grado_id: gradeMap[data.studentGrade?.toLowerCase()] || 1,
+      grupo: data.studentGroup || "A",
+      jornada: data.studentShift || "Mañana",
+      tipo_sangre: data.studentBlood || "No especificado",
+      eps: data.studentEPS || "Ninguna",
+      etnia: data.studentEthnic || "No especificado",
+      referencia: data.studentReference || "Ninguna",
+      direccion: data.studentAddress || "",
+      barrio: data.studentNeighborhood || "",
+      localidad: data.studentLocality || "",
+      zona: data.studentZone || "Urbana",
+      password: "temp1234" // o el que uses; tu backend lo hashea
     },
     family: {
       madre: {
-        nombres: data.motherName,
-        apellidos: data.motherLastname,
-        tipo_documento: data.motherTypeDocument,
-        numero_documento: data.motherDocument,
-        telefono: data.motherPhone,
-        correo: data.motherEmail,
-        profesion: data.motherProfesion,
-        ocupacion: data.motherOcupation,
-        parentesco: "Madre",
+        nombres: data.motherName || "",
+        apellidos: data.motherLastname || "",
+        tipo_documento: data.motherTypeDocument || "CC",
+        numero_documento: data.motherDocument || "",
+        telefono: data.motherPhone || "",
+        correo: data.motherEmail || null,
+        profesion: data.motherProfesion || "",
+        ocupacion: data.motherOcupation || "",
+        parentesco: "Madre"
       },
       padre: {
-        nombres: data.fatherName,
-        apellidos: data.fatherLastname,
-        tipo_documento: data.fatherTypeDocument,
-        numero_documento: data.fatherDocument,
-        telefono: data.fatherPhone,
-        correo: data.fatherEmail,
-        profesion: data.fatherProfesion,
-        ocupacion: data.fatherOcupation,
-        parentesco: "Padre",
-      },
-    },
+        nombres: data.fatherName || "",
+        apellidos: data.fatherLastname || "",
+        tipo_documento: data.fatherTypeDocument || "CC",
+        numero_documento: data.fatherDocument || "",
+        telefono: data.fatherPhone || "",
+        correo: data.fatherEmail || null,
+        profesion: data.fatherProfesion || "",
+        ocupacion: data.fatherOcupation || "",
+        parentesco: "Padre"
+      }
+    }
+    // ⚠️ NADA de "academic" → tu backend no lo usa y causa 422
   };
 };
 
-// ✅ Convierte una matrícula obtenida del backend al formato de formulario
+// ✅ Solo para edición — si tu backend devuelve "academic", mapea a los campos del estudiante
 export const transformMatriculaToFormValues = (matricula) => {
   return {
-    registerDate: matricula.student.fecha_registro,
-    name: matricula.student.nombres,
-    lastname: matricula.student.apellidos,
-    studentBirthDate: matricula.student.fecha_nacimiento,
-    studentAge: matricula.student.edad?.toString() || "",
-    studentGender: matricula.student.genero,
-    studentBirthPlace: matricula.student.lugar_nacimiento,
-    studentDocument: matricula.student.tipo_documento,
-    studentDocumentNumber: matricula.student.numero_documento,
-    studentphone: matricula.student.telefono,
-    studentEmail: matricula.student.correo,
-    studentGrade: matricula.student.grado_id,
-    studentGroup: matricula.student.grupo,
-    studentShift: matricula.student.jornada,
-    studentBlood: matricula.student.tipo_sangre,
-    studentEPS: matricula.student.eps,
-    studentEthnic: matricula.student.etnia,
-    studentReference: matricula.student.referencia,
-    studentAddress: matricula.student.direccion,
-    studentNeighborhood: matricula.student.barrio,
-    studentLocality: matricula.student.localidad,
-    studentZone: matricula.student.zona,
-    studentStatus: matricula.academic.estado || "",
+    name: matricula.student.nombres || "",
+    lastname: matricula.student.apellidos || "",
+    studentBirthDate: matricula.student.fecha_nacimiento || "",
+    studentGender: matricula.student.genero || "",
+    studentBirthPlace: matricula.student.lugar_nacimiento || "",
+    studentDocument: matricula.student.tipo_documento || "CC",
+    studentDocumentNumber: matricula.student.numero_documento || "",
+    studentphone: matricula.student.telefono || "",
+    studentEmail: matricula.student.correo || "",
+    studentGrade: Object.keys(gradeMap).find(key => gradeMap[key] === matricula.student.grado_id) || "primero",
+    studentGroup: matricula.student.grupo || "A",
+    studentShift: matricula.student.jornada || "Mañana",
+    studentBlood: matricula.student.tipo_sangre || "",
+    studentEPS: matricula.student.eps || "",
+    studentEthnic: matricula.student.etnia || "",
+    studentReference: matricula.student.referencia || "",
+    studentAddress: matricula.student.direccion || "",
+    studentNeighborhood: matricula.student.barrio || "",
+    studentLocality: matricula.student.localidad || "",
+    studentZone: matricula.student.zona || "Urbana",
 
-    motherName: matricula.family.madre?.nombres || "",
-    motherLastname: matricula.family.madre?.apellidos || "",
-    motherTypeDocument: matricula.family.madre?.tipo_documento || "",
-    motherDocument: matricula.family.madre?.numero_documento || "",
-    motherPhone: matricula.family.madre?.telefono || "",
-    motherEmail: matricula.family.madre?.correo || "",
-    motherProfesion: matricula.family.madre?.profesion || "",
-    motherOcupation: matricula.family.madre?.ocupacion || "",
+    motherName: matricula.family?.madre?.nombres || "",
+    motherLastname: matricula.family?.madre?.apellidos || "",
+    motherTypeDocument: matricula.family?.madre?.tipo_documento || "CC",
+    motherDocument: matricula.family?.madre?.numero_documento || "",
+    motherPhone: matricula.family?.madre?.telefono || "",
+    motherEmail: matricula.family?.madre?.correo || "",
+    motherProfesion: matricula.family?.madre?.profesion || "",
+    motherOcupation: matricula.family?.madre?.ocupacion || "",
 
-    fatherName: matricula.family.padre?.nombres || "",
-    fatherLastname: matricula.family.padre?.apellidos || "",
-    fatherTypeDocument: matricula.family.padre?.tipo_documento || "",
-    fatherDocument: matricula.family.padre?.numero_documento || "",
-    fatherPhone: matricula.family.padre?.telefono || "",
-    fatherEmail: matricula.family.padre?.correo || "",
-    fatherProfesion: matricula.family.padre?.profesion || "",
-    fatherOcupation: matricula.family.padre?.ocupacion || "",
+    fatherName: matricula.family?.padre?.nombres || "",
+    fatherLastname: matricula.family?.padre?.apellidos || "",
+    fatherTypeDocument: matricula.family?.padre?.tipo_documento || "CC",
+    fatherDocument: matricula.family?.padre?.numero_documento || "",
+    fatherPhone: matricula.family?.padre?.telefono || "",
+    fatherEmail: matricula.family?.padre?.correo || "",
+    fatherProfesion: matricula.family?.padre?.profesion || "",
+    fatherOcupation: matricula.family?.padre?.ocupacion || "",
   };
 };
