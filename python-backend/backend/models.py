@@ -75,3 +75,25 @@ class Estudiante(Base):
     # Relación con usuario
     user_id = Column(ForeignKey("users.id", ondelete="CASCADE"))
     user = relationship("User", backref="estudiante")
+    
+class Padre(Base):
+    __tablename__ = "padres"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nombres = Column(String(100), nullable=False)
+    apellidos = Column(String(100), nullable=False)
+    tipo_documento = Column(String(30))
+    numero_documento = Column(String(30))
+    telefono = Column(String(20))
+    correo = Column(String(100))
+    profesion = Column(String(100))
+    ocupacion = Column(String(100))
+    parentesco = Column(String(20))  # Ej: "Madre", "Padre", "Acudiente"
+
+    # 🔗 Relación con estudiante
+    estudiante_id = Column(ForeignKey("estudiantes.id", ondelete="CASCADE"))
+    estudiante = relationship("Estudiante", backref="padres")
+
+    def __repr__(self):
+        return f"<Padre(id={self.id}, nombre={self.nombres} {self.apellidos}, parentesco={self.parentesco})>"
+    

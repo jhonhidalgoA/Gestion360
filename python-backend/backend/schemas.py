@@ -1,54 +1,42 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
 from typing import Optional
-import uuid
+from datetime import date
 
-# Schema para crear usuario
-class UserCreate(BaseModel):
-    username: str
-    full_name: str
-    password: str
-    email: Optional[str]
 
-# Schema para mostrar usuario
-class UserRead(BaseModel):
-    id: uuid.UUID
-    username: str
-    full_name: str
-    email: Optional[str]
-
-    class Config:
-        orm_mode = True
-
-# Schema para roles
-class RoleRead(BaseModel):
-    id: int
-    name: str
-    description: Optional[str]
-
-    class Config:
-        orm_mode = True
-
-# --- Esquema para padres o acudientes ---
+# --- MODELO: Padre o acudiente ---
 class ParentCreate(BaseModel):
-    nombres: Optional[str] = None
-    apellidos: Optional[str] = None
+    nombres: str
+    apellidos: str
     tipo_documento: Optional[str] = None
     numero_documento: Optional[str] = None
     telefono: Optional[str] = None
     correo: Optional[EmailStr] = None
     profesion: Optional[str] = None
     ocupacion: Optional[str] = None
-    parentesco: Optional[str] = None  # "Madre" o "Padre"
+    parentesco: Optional[str] = None  
 
-# --- Esquema para registrar un estudiante ---
+    class Config:
+        orm_mode = True
+
+
+# --- MODELO: Datos académicos ---
+class AcademicData(BaseModel):
+    direccion: Optional[str] = None
+    barrio: Optional[str] = None
+    localidad: Optional[str] = None
+    zona: Optional[str] = None
+    estado: Optional[str] = None  # Activo, Retirado, etc.
+
+    class Config:
+        orm_mode = True
+
+
+# --- MODELO: Estudiante ---
 class StudentRegister(BaseModel):
-    
-    fecha_registro: Optional[str] = None  # YYYY-MM-DD
-    foto: Optional[str] = None
+    fecha_registro: Optional[date] = None
     nombres: str
     apellidos: str
-    username: Optional[str] = None
-    fecha_nacimiento: Optional[str] = None  # YYYY-MM-DD
+    fecha_nacimiento: Optional[date] = None
     edad: Optional[int] = None
     genero: Optional[str] = None
     lugar_nacimiento: Optional[str] = None
@@ -67,9 +55,26 @@ class StudentRegister(BaseModel):
     barrio: Optional[str] = None
     localidad: Optional[str] = None
     zona: Optional[str] = None
+    password: Optional[str] = None  
 
+    class Config:
+        orm_mode = True
+
+
+# --- MODELO: Agrupa datos familiares ---
+class FamilyData(BaseModel):
     madre: Optional[ParentCreate] = None
     padre: Optional[ParentCreate] = None
 
-    username: Optional[str] = None
-    password: Optional[str] = None
+    class Config:
+        orm_mode = True
+
+
+# --- MODELO PRINCIPAL: Matrícula completa ---
+class MatriculaCreate(BaseModel):
+    student: StudentRegister
+    family: Optional[FamilyData] = None
+    academic: Optional[AcademicData] = None
+
+    class Config:
+        orm_mode = True
