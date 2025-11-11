@@ -47,8 +47,7 @@ class User(Base):
 class Estudiante(Base):
     __tablename__ = "estudiantes"
 
-    id = Column(Integer, primary_key=True, index=True)
-    
+    id = Column(Integer, primary_key=True, index=True)    
     fecha_registro = Column(Date)
     nombres = Column(String(100))
     apellidos = Column(String(100))

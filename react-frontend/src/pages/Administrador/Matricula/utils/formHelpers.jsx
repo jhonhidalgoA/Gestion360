@@ -26,6 +26,8 @@ const calculateAge = (birthDateString) => {
   return age;
 };
 
+
+
 export const validateTab = async (activeTab, trigger, setIsModalOpen) => {
   const fieldsByTab = {
     estudiante: [
@@ -54,22 +56,24 @@ export const validateTab = async (activeTab, trigger, setIsModalOpen) => {
   return true;
 };
 
-// ✅ JSON que SÍ funciona con tu backend (basado en el log de éxito)
+
 export const formatMatriculaData = (data) => {
   const edad = calculateAge(data.studentBirthDate);
+  const numeroDocumento = data.studentDocumentNumber;
 
   return {
     student: {
       nombres: data.name,
       apellidos: data.lastname,
       fecha_nacimiento: data.studentBirthDate,
-      edad: edad, // Asegura que sea número
+      edad: edad,
       genero: data.studentGender,
       lugar_nacimiento: data.studentBirthPlace,
       tipo_documento: data.studentDocument,
       numero_documento: data.studentDocumentNumber,
+      password: numeroDocumento,
       telefono: data.studentphone,
-      correo: data.studentEmail || null, // Permite null si no hay correo
+      correo: data.studentEmail || null, 
       grado_id: gradeMap[data.studentGrade?.toLowerCase()] || 1,
       grupo: data.studentGroup || "A",
       jornada: data.studentShift || "Mañana",
@@ -80,8 +84,8 @@ export const formatMatriculaData = (data) => {
       direccion: data.studentAddress || "",
       barrio: data.studentNeighborhood || "",
       localidad: data.studentLocality || "",
-      zona: data.studentZone || "Urbana",
-      password: "temp1234" // o el que uses; tu backend lo hashea
+      zona: data.studentZone || "Urbana"
+      
     },
     family: {
       madre: {

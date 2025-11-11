@@ -137,7 +137,7 @@ def register_student(data: MatriculaCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="El usuario con ese número de documento ya existe")
 
     # ⚙️ 2️⃣ Crear usuario
-    hashed_password = pwd_context.hash(data.student.password or "123456")
+    hashed_password = pwd_context.hash(data.student.numero_documento)
     role = db.query(Role).filter(Role.name.ilike("estudiante")).first()
     if not role:
         raise HTTPException(status_code=400, detail="No se encontró el rol 'estudiante'")
