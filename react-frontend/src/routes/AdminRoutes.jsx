@@ -10,7 +10,7 @@ const adminRoutes = [
   {
     path: "/administrador",
     element: (
-      <PrivateRoute roles={["administrador", "Administrador"]}> 
+      <PrivateRoute roles={["administrador"]}>
         <Administrador />
       </PrivateRoute>
     ),
@@ -18,7 +18,7 @@ const adminRoutes = [
   {
     path: "/matricula",
     element: (
-      <PrivateRoute roles={["Administrador"]}>
+      <PrivateRoute roles={["administrador"]}>
         <Matricula />
       </PrivateRoute>
     ),
@@ -26,7 +26,7 @@ const adminRoutes = [
   {
     path: "/registro-docente",
     element: (
-      <PrivateRoute roles={["Administrador"]}>
+      <PrivateRoute roles={["administrador"]}>
         <RegistrarDocente />
       </PrivateRoute>
     ),
@@ -34,7 +34,7 @@ const adminRoutes = [
   {
     path: "/horario-grados",
     element: (
-      <PrivateRoute roles={["Administrador"]}>
+      <PrivateRoute roles={["administrador"]}>
         <HorarioGrados />
       </PrivateRoute>
     ),
@@ -42,7 +42,7 @@ const adminRoutes = [
   {
     path: "/menu-escolar",
     element: (
-      <PrivateRoute roles={["Administrador"]}>
+      <PrivateRoute roles={["administrador"]}>
         <EditarMenu />
       </PrivateRoute>
     ),
@@ -50,12 +50,11 @@ const adminRoutes = [
   {
     path: "/calendario",
     element: (
-      <PrivateRoute roles={["Administrador"]}>
+      <PrivateRoute roles={["administrador"]}>
         <Calendario />
       </PrivateRoute>
     ),
   },
 ];
-
 
 export default adminRoutes;
