@@ -1,0 +1,41 @@
+.teacher-register{
+  width: 100%;
+  left: 0;
+  right:0;
+  margin: 80px auto; 
+  border-radius: 12px;  
+  overflow: hidden;
+}
+
+.tabs-docente {
+  display: flex;
+  border-bottom: 1px solid #ddd;   
+  margin: 20px auto;
+  width:97%;
+}
+
+.tabs-docente button {
+  padding: 12px 20px;
+  background-color: #e0e0e0;
+  color: #fffffff;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  margin-right: 5px;
+}
+
+.tabs-docente button:hover {
+  background-color: #d0d0d0;
+}
+
+.tabs-docente button.active {
+  background-color: #388e3c;
+  color: white;
+  transform: scale(1.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+

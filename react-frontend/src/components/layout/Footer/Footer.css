@@ -1,0 +1,111 @@
+.footer {   
+  color: #0e0d0dff;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  
+  padding: 3rem 5rem;
+  justify-items: center;
+  align-items: start; 
+  margin-top:110px;
+}
+
+.footer-column h4 { 
+  font-size:18px;
+  font-weight: 600;
+  color: #e2a926;  
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column; 
+  gap: 0.4rem;
+}
+
+.footer-column li {
+  margin: 0.3rem 0;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.footer-column li:hover {
+  opacity: 1;
+}
+
+.footer-column p{
+  margin-top:10px;
+}
+
+.footer-logo{
+    display:flex;
+    align-items:center;     
+}
+
+.footer .logo {
+  height:25px;         
+  margin-right: 10px;  
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background:#212EA0; 
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.clock-icon {
+  width: 32px;
+  height: 32px;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.status-text {
+  font-size: 1rem;
+  flex: 1;
+}
+
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.status-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+  border: 2px solid #fff;
+}
+
+.footer-subtitle{
+    margin-left:20px;
+}
+
+.schedule {
+  font-size: 0.9rem;
+  color: #d1d5db;
+  margin: 0;
+}
+
+/* Responsivo */
+@media (max-width: 900px) {
+  .footer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .footer {
+    grid-template-columns: 1fr;
+  }
+}
+

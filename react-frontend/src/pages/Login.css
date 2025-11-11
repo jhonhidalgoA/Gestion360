@@ -1,0 +1,329 @@
+.login-page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;    
+    background-image: url("../assets/images/img-login.jpg"); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;    
+}
+
+.container-login {
+    width: 600px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    min-height:60vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-login {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.title-login {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--color-primary);
+}
+
+.error-login{
+    margin-top:30px; 
+    min-height:50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    transition: all 0.3s ease; 
+
+}
+
+.error-message-login{
+  background-color: #e53935; /* rojo fuerte */
+  color: #fff; /* texto blanco */
+  padding: 10px 20px;
+  border-radius: 30px;
+  text-align: center;
+  font-size: 1.2rem; 
+  height:50px;
+  width:550px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.input-group label {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: var(--color-black-charcoal);
+    text-align: left;
+    margin-left: 18px;
+}
+
+input[type="text"],
+input[type="password"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    font-family: "Roboto", serif;
+    font-size: var(--size-title-small);
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    padding: 10px 10px 10px 45px;
+    height:50px;
+}
+
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.icon-left {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-black-charcoal);
+    pointer-events: none;
+}
+
+.icon-right {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-black-charcoal);
+    cursor: pointer;
+}
+
+.input-check {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 15px;
+    gap: 80px;
+}
+
+.check {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    font-size: 25px;
+    font-weight: 800;
+    margin-left: 15px;
+}
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin-top: 2px;
+    margin-left: 6px;
+    accent-color: #4C9AFF;
+}
+
+.check p {
+    font-size: 0.95rem;
+}
+
+.check a {
+    margin-top: 2px;
+}
+
+.forgot-password {
+    color: var(--color-primary-dark);
+    font-size: 14px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+ 
+ .forgot-password:hover {
+    color: var(--color-primary);
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.input-btn {
+    width: 100%;
+   
+}
+
+button[type="submit"] {
+    padding: 10px;
+    border: none;
+    background-color: var(--color-primary);
+    border-radius: 25px;
+    cursor:pointer;
+    font-size: 14px;
+    font-weight: 800;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 25px;
+    color: var(--color-text-on-primary);
+    font-size: var(--size-title-small);
+    transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+
+.social-photo p {
+    font-size: 12px;
+    text-align: center;
+    font-weight: 600;
+    margin-top: 15px;    
+}
+
+.social-photo .author {
+    font-size: 12px;
+}
+
+/* móviles pequeños (hasta 480px) */
+@media (max-width: 480px) {
+    .login-page {
+        padding: 10px;
+        background-position:30% 30%;
+        background-size: cover;
+    }
+
+    .container-login {
+        width: 95%;
+        padding: 20px;
+        min-height: 50vh;
+    }
+
+    .form-login {
+        padding: 0 10px;
+    }
+
+    .title-login {
+        font-size: 0.8rem;
+    }
+
+    .input-group label {
+        font-size: 0.8rem;
+        margin-left: 10px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        font-size: 14px;
+        padding: 10px 10px 10px 40px;
+    }
+
+    .icon-left {
+        left: 10px;
+    }
+
+    .check {
+        font-size: 20px;
+        margin-left: 10px;
+    }
+
+    .check p {
+        font-size: 0.8rem;
+    }
+
+    .forgot-password {
+        font-size: 10px;
+        margin-top:5px;
+    }
+
+    button[type="submit"] {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .social-photo p,
+    .social-photo .author {
+        font-size: 11px;
+    }
+}
+
+/* tablets (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .container-login {
+        width: 90%;
+        padding: 25px;
+    }
+
+    .title-login {
+        font-size: 0.85rem;
+    }
+
+    .input-group label {
+        font-size: 0.85rem;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        font-size: 15px;
+    }
+
+    .check {
+        font-size: 22px;
+    }
+
+    .check p {
+        font-size: 0.85rem;
+    }
+
+    .forgot-password {
+        font-size: 13px;
+    }
+
+    button[type="submit"] {
+        font-size: 14px;
+    }
+
+    .social-photo p,
+    .social-photo .author {
+        font-size: 12px;
+    }
+}
+
+/* Tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container-login {
+        width: 80%;
+        padding: 25px;
+    }
+
+    .title-login {
+        font-size: 0.9rem;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        font-size: 16px;
+    }
+
+    button[type="submit"] {
+        font-size: 14px;
+    }
+}

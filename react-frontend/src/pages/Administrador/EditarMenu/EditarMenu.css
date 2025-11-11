@@ -1,0 +1,311 @@
+
+:root {
+  --color-button-generate: #ff6b6b;
+  --color-dark: #2c3e50;
+  --color-shadow: rgba(0, 0, 0, 0.2);
+  --size-text-xl: 2.5rem;
+  --size-title-medium: 1.5rem;
+  --fw-bold: 700;
+}
+
+.edit-menu {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.menu-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 1200px;
+  padding: 20px;
+  margin: 80px auto;
+  position: relative;
+  height: auto;
+}
+
+.left {
+  position: sticky;
+  top: 100px;
+  width: 25%;
+  align-self: flex-start;
+  height: fit-content;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding-right: 15px;
+}
+
+.left__title {
+  text-align: center;
+  margin-top: 20px;
+  border-bottom: 3px solid var(--color-button-generate);
+}
+
+.left__title h1 {
+  font-size: var(--size-text-xl);
+  color: #000;
+}
+
+.left__title p {
+  font-size: var(--size-title-medium);
+  text-align: center;
+  font-weight: var(--fw-bold);
+  color: #000;
+}
+
+.right {
+  width: 100%;
+  height: auto;
+}
+
+.right__card {
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: rgba(248, 249, 250, 0.5);
+  margin-bottom: 30px;
+}
+
+.right__card h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: var(--color-dark);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 15px;
+}
+
+.menu-card {
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  min-height: 150px;
+  background: #e6f7ff;
+}
+
+.card__subtitle {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.card__subtitle .sub__title {
+  display: inline-block;
+  padding: 8px 15px;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: 90%;
+  background-color: #e74c3c;
+}
+
+.menu-vegetariano .card__subtitle span {
+  background: #2ecc71;
+}
+
+.menu-alternativo .card__subtitle span {
+  background: #3498db;
+}
+
+.complementos .card__subtitle span {
+  background: #9b59b6;
+}
+
+.menu-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  min-width: 100px;
+  flex: 1 1 0;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.menu-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.menu-item span {
+  font-size: 1rem;
+  color: #333;
+  text-align: center;
+  font-weight: 500;
+}
+
+.modal {
+  display: flex;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  width: 600px;
+  max-width: 90%;
+  position: relative;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content .close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 28px;
+  cursor: pointer;
+  color: #333;
+  font-weight: bold;
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content .close:hover,
+.modal-content .close:focus {
+  color: red;
+  text-decoration: none;
+}
+
+.modal-content h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#editarForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#editarForm label {
+  font-size: 1.1rem;
+  margin-top: 10px;
+}
+
+#editarForm input[type="text"],
+#editarForm select {
+  padding: 8px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#editarForm button {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+#editarForm button:hover:not(:disabled) {
+  transform: scale(1.05);
+  background-color: #0056b3;
+}
+
+#editarForm button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.confirm-modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.confirm-modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.confirm-modal-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.confirm-modal-buttons button:hover {
+  transform: scale(1.05);
+}
+
+.btn-confirm {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-cancel {
+  background-color: #dc3545;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

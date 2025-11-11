@@ -1,0 +1,145 @@
+.tab-content{
+  width: 100%;   
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-top: 15px;
+  min-height: 450px;
+  display: flex;
+  gap: 10px;
+  box-sizing: border-box; 
+}
+
+.photo-container {
+    width: 170px;
+    height: 220px;
+    margin-top:30px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.photo-label {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background-color: #f8f8f8;   
+}
+
+.photo-label:hover {
+  background: #f8f9fa;
+  border-color: #3b82f6;
+}
+
+.photo-label span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #888;
+    font-size: 16px;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 2;
+}
+
+.photo-label input[type="file"] {
+    display: none;
+}
+
+.photo-preview {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;    
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 10px;    
+}
+
+.photo-preview:empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 0.875rem;
+    background-color: #f1f3f5;
+    border: 2px dashed #adb5bd;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.register-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;  
+
+}
+
+.field-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.group {
+  flex: 1;
+}
+
+.group label {
+  display: block;
+  margin: 0  0  5px 10px;
+  font-weight: 600;
+  color: #000000;
+  font-size: 14px;
+}
+
+.group input,
+.group select {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.group input:focus,
+.group select:focus {
+  outline: none;
+  border-color: #2e86c1;  
+}
+
+.input-autofill {
+  background-color: #f0fdf4 !important; 
+  border-color: #22c55e !important;    
+  font-weight: 500;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius:30px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}             
+  
+.clear-photo-btn{
+  background:red;
+  border:none;
+  color:white;
+  padding:5px;
+  border-radius:3px;
+  margin:5px 0 0 40px;
+
+}

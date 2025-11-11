@@ -1,0 +1,157 @@
+.event-card {
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+    margin-top: 40px;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.event-date {
+    padding: 10px 20px;
+    width: 180px;
+    height: 200px;
+    background: #0056b3;
+    border: none;
+    border-radius: 10px;
+    color: var(--color-bg-primary);
+}
+
+.event-day {
+    font-size: 60px;
+}
+
+.event-month {
+    font-size: 24px;
+}
+
+.event-year {
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+.event-details {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    width: 60%;
+}
+
+.event-time {
+    font-size: 20px;
+    margin-top: 30px;
+    color: #67696b;
+}
+
+.event-name {
+    font-size: 36px;
+    margin-top: 10px;
+    color: var(--color-border-focus);
+}
+
+.event-location {
+    font-size: 20px;
+    margin-top: 15px;
+}
+
+
+/* Móviles pequeños (hasta 480px) */
+@media (max-width: 480px) {
+    .event-card {
+        flex-direction: row;
+        gap: 10px;
+        justify-content: center;
+        align-items: flex-start;
+        width: 90%;        
+        margin: 20px auto;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .event-date {
+        width: 90px;
+        height: 100px;
+        padding: 8px;        
+    }
+
+    .event-day {
+        font-size: 26px;
+        margin-bottom: 3px;
+    }
+
+    .event-month {
+        font-size: 12px;
+        margin-bottom: 1px;
+    }
+
+    .event-year {
+        font-size: 12px;
+    }
+
+    .event-details {
+        width: calc(100% - 100px);
+        height:100px;
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .event-time {
+        font-size: 10px;
+        margin-top: 10px;
+    }
+
+    .event-name {
+        font-size: 12px;
+        margin-top: 8px;
+    }
+
+    .event-location {
+        font-size: 10px;
+        margin-top: 8px;
+    }
+}
+
+/* Tablets (768px+) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .event-card {
+        width: 95%; 
+        margin: 20px auto;
+        gap: 40px;
+    }
+
+    .event-date {
+        width: 140px;
+        height: auto;
+    }
+
+    .event-day {
+        font-size: 46px;
+    }
+
+    .event-month {
+         margin-top:20px;
+        font-size: 18px;       
+    }
+
+    .event-year {
+        margin-top:20px;
+        font-size: 20px;
+    }
+
+    .event-details {
+        width: 75%;
+    }
+
+    .event-time {
+        font-size: 16px;
+    }
+
+    .event-name {
+        font-size: 24px;
+    }
+
+    .event-location {
+        font-size: 18px;
+    }
+}

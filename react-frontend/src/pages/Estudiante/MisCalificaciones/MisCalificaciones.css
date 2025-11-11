@@ -1,0 +1,14 @@
+.schedules-containers{
+  min-height: 100vh;
+  background: linear-gradient(135deg, #5B8FF9, #3A6DD8);
+  color: white;
+  padding: 50px 20px;
+}
+
+.tasks-grid-schedule{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  padding: 20px;
+}
+

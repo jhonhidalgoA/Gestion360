@@ -1,0 +1,62 @@
+.circulares-container{
+    width:100%;
+    min-height:100vh;
+    background:100vh;
+    background:linear-gradient(rgba(8,0,58,0.3),rgba(8,0,25,0.1)),url('../assets/images/fondo_7.jpg');
+    background-size:cover;
+    backgroud-position:center;
+    background-repeat: no-repeat; 
+    background-attachment: fixed; 
+    padding-top: 60px;       
+}
+
+.circular {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  height: 90px; 
+  margin: 40px auto;
+  width: 80%;
+  max-width: 1200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.circular-date{
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  gap:30px;
+}
+
+.circular-date h3{
+    font-size:1.2rem;
+    color:#000239;
+}
+
+.circular-date h6{
+     font-size:0.8rem;
+}
+
+.circular-title{
+     font-size:1.2rem;
+}
+
+.btn-download{
+    display:flex;    
+}
+
+.btn{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+}
+
+
+
+.material-symbols-outlined {
+  font-size: 20px;
+}
+

@@ -1,0 +1,355 @@
+.grid-layout {  
+  min-height: 100vh;
+  background: #E5E7EB;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.grades-grid-layout {  
+  display: grid;
+  grid-template-columns: minmax(800px, 1fr) 400px; 
+  align-items: start; 
+  width: 100%; 
+  margin-top: -20px;  
+}
+
+
+.horario-grados-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem; 
+}
+
+.horario-grados-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.horario-grados-label {
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.horario-grados-select {
+  padding: 0.75rem 1rem;  
+  border-radius: 5px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+}
+
+.horario-grados-stats-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.horario-grados-stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+.horario-grados-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.horario-grados-stat-label {
+  font-size: 0.8rem;
+  color: #718096;
+  text-transform: uppercase;
+}
+
+.schedule-container {
+  padding: 0.5rem;
+  overflow-x: auto;
+}
+
+.horario-grados-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.horario-grados-th {
+  background: #A9A9A9;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.horario-grados-td {
+  padding: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  text-align: center;
+}
+
+.horario-grados-time-cell {
+  background: #f7fafc;
+  padding: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.horario-grados-time-input {
+  display: block;
+  width: 100%;
+  padding: 0.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+.horario-grados-subject-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.grades-actions {
+  padding: 1rem; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;  
+}
+
+.grades-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width:200px;
+  transition: all 0.2s;
+}
+
+.grades-btn:hover{
+  transform:scale(1.05);
+}
+
+.horario-grados-btn-add {
+  background: #FF8C00;
+  color: white;
+}
+
+.horario-grados-btn-save {
+  background: #27ae60;
+  color: white;
+}
+
+.horario-grados-btn-edit {
+  background: #ffc107;
+  color: white;
+}
+
+.horario-grados-btn-delete {
+  background:  #dc3545;
+  color: white;
+}
+
+.horario-grados-btn-view {
+  background: #0a34f0ff;
+  color: white;
+}
+
+.horario-grados-btn-edit-small {
+  background: #ed8936;
+  color: white;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+}
+
+.horario-grados-btn-delete-small {
+  background: #f56565;
+  color: white;
+  padding: 0.5rem 1rem;
+}
+
+.horario-grados-btn-cancel {
+  background: #f56565;
+  color: white;
+}
+
+.horario-grados-btn-confirm {
+  background: #48bb78;
+  color: white;
+}
+
+.horario-grados-sidebar {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  padding: 1.5rem;
+  margin-top:120px;
+  margin-left:-20px;
+}
+
+.horario-grados-sidebar-title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.subjects-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.horario-grados-subject-th {
+  background: #A9A9A9;
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600; 
+}
+
+.horario-grados-subject-name {
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid #e2e8f0;
+  font-weight: 500;
+}
+
+.horario-grados-subject-hours {
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.horario-grados-hours-badge {
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.horario-grados-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.horario-grados-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #48bb78, #667eea);
+  transition: width 0.3s ease;
+}
+
+.horario-grados-break-row {
+  background: #f7fafc;
+}
+
+.horario-grados-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.horario-grados-modal-content {
+  background: white;
+  border-radius: 20px;
+  max-width: 900px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: auto;
+}
+
+.horario-grados-modal-header {
+  background: #667eea;
+  color: white;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.horario-grados-modal-body {
+  padding: 2rem;
+}
+
+.horario-grados-modal-footer {
+  padding: 1rem 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  border-top: 1px solid #e2e8f0;
+}
+
+.horario-grados-close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.horario-grados-grades-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.horario-grados-grade-th {
+  background: #667eea;
+  color: white;
+  padding: 1rem;
+  text-align: left;
+}
+
+.horario-grados-grade-td {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Hover effects */
+.horario-grados-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.horario-grados-close-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.horario-grados-select:hover {
+  border-color: #667eea;
+}
+
+.horario-grados-subject-select:hover {
+  border-color: #667eea;
+}

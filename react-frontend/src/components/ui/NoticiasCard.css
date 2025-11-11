@@ -1,0 +1,265 @@
+.card-container-notices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: -30px auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.card-notices {
+  width: 100%;
+  max-width: 400px; 
+  height: 100%;
+  background-color: var(--bg-card);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  margin: 0 auto;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  position: relative;  
+}
+
+
+.card-content {
+   padding: var(--spacing-lg);
+   background-color: var(--bg-card);
+}
+
+.card-content h4:first-child {  
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: var(--spacing-sm);
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+/* Destacado "STEAM 360" */
+.card-content .card-span {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary-purple);
+  letter-spacing: 1.5px;
+}
+
+/* Línea divisoria decorativa */
+.card-content .custom-hr {
+  border: none;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-orange) 20%,
+    var(--accent-orange) 80%,
+    transparent
+  );
+  width: 80%;
+  margin: var(--spacing-sm) auto var(--spacing-lg);
+  border-radius: 2px;
+}
+
+/* Título del evento */
+.card-content h4:last-of-type { 
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.card-content .class-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+  padding-top: var(--spacing-md);
+  border-top: 1px solid #E2E8F0;
+}
+
+/* Fecha */
+.class-button .date {  
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  letter-spacing: 0.3px;
+}
+
+
+.class-button .btn-card {  
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--link-purple);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 6px;
+  position: relative;
+}
+
+.class-button .btn-card::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background-color: var(--link-purple-hover);
+  transition: width var(--transition-fast);
+}
+
+.class-button .btn-card:hover {
+  color: var(--link-purple-hover);
+  
+}
+
+.class-button .btn-card:hover::after {
+  width: 100%;
+}
+
+/* Focus para accesibilidad */
+.class-button .btn-card:focus {
+  outline: 2px solid var(--link-purple);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   BOTÓN DE CARGAR MÁS
+   ======================================== */
+.button {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg) 0;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Móviles pequeños (hasta 480px) */
+@media (max-width: 480px) {
+  .card-container {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .card {
+    max-width: 100%;
+  }
+
+  .card-img {
+    height: 200px;
+  }
+
+  .card-content {
+    padding: var(--spacing-md);
+  }
+
+  .card-content h4:last-of-type {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .class-button .date,
+  .class-button .btn-card {
+    font-size: 13px;
+  }
+}
+
+/* Tablets (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .card-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+  }
+
+  .card-img {
+    height: 220px;
+  }
+}
+
+/* Tablets grandes (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .card-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xl);
+  }
+
+  .card-img {
+    height: 240px;
+  }
+}
+
+/* Desktop (1025px+) */
+@media (min-width: 1025px) {
+  .card-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card-img {
+    height: 240px;
+  }
+}
+
+/* Desktop grande (1440px+) */
+@media (min-width: 1440px) {
+  .card-container {
+    max-width: 1440px;
+  }
+
+  .card {
+    max-width: 420px;
+  }
+
+  .card-img {
+    height: 260px;
+  }
+}
+
+/* ========================================
+   ACCESIBILIDAD
+   ======================================== */
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+  .card {
+    border: 2px solid var(--text-primary);
+  }
+  
+  .card-content .card-span {
+    color: var(--primary-purple-dark);
+  }
+  
+  .class-button .btn-card {
+    text-decoration: underline;
+  }
+}
+
+/* Reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card-img,
+  .class-button .btn-card,
+  .class-button .btn-card::after {
+    transition: none;
+  }
+  
+  .card:hover {
+    transform: none;
+  }
+  
+  .card:hover .card-img {
+    transform: none;
+  }
+}

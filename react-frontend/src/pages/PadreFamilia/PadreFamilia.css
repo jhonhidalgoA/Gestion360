@@ -1,0 +1,7 @@
+.padre-container{
+  background:linear-gradient(rgba(8,0,58,0.5),rgba(8,0,25,0.1)),url('../../assets/images/fondo_10.jpg');
+  background-size:cover;
+  background-position:center;
+  background-repeat: no-repeat; 
+  background-attachment: fixed;  
+}

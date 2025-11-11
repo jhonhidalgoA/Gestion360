@@ -1,0 +1,224 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap");
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  text-decoration: none;
+  list-style: none; 
+  font-family: "Inter", sans-serif;
+  font-weight: 400;  
+}
+
+:root{   
+  
+  --color-primary: #023E8A;
+  --color-primary-light: #00B4D8;
+  --color-primary-dark: #03045E;  
+  --color-secondary: #ff6f00;
+  --color-secondary-dark: #e2a926;
+  --color-yellow-golden: #e2a926;
+  --color-black-charcoal: #333333;
+  --color-success: #00B4D8;
+  --color-success-light: #90E0EF;
+  --color-error: #ff0000;
+  --color-error-light: #FFE0E0;
+  --color-warning: #EEC03E;
+  --color-warning-dark: #FF6801;
+  --color-info: #0D0907;
+  --color-info-light: #E9E9E9;
+
+  /* ===== TEXTOS ===== */
+  --color-text-primary: #0C0908;
+  --color-text-secondary: #28282B;
+  --color-text-muted: #DBD0BE;
+  --color-text-on-primary: #FFFFFF;
+  --color-text-on-secondary: #0C0908;
+
+  /* ===== FONDOS ===== */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #E9E9E9;
+  --color-bg-tertiary: #DBD0BE;
+  --color-bg-overlay: rgba(12, 9, 8, 0.7);
+
+  --color-border: #DBD0BE;
+  --color-border-focus: #023E8A;
+
+  
+
+    /* buttons */
+    --color-button-load: #ff9800;
+    --color-button-save: #28a745;
+    --color-button-delete: #ff0000;
+    --color-button-edit: #FFC107;
+    --color-button-view: #1fd6f3;
+    --color-button-print: #616161;
+    --color-button-generate: #9c27b0;
+    --color-button-send: #6a00ff; 
+    --color-button-download: #3f51b5; 
+    --color-button-clean: #adcced; 
+    --color-button-load-hover: #e68900;
+    --color-button-save-hover: #218838;
+    --color-button-delete-hover: #d4152c;    
+    --color-button-edit-hover: #e0a800;
+    --color-button-view-hover: #17c2e3;
+    --color-button-print-hover: #3b3939;
+    --color-button-generate-hover: #7b1fa2;
+    --color-button-send-hover: #6204e6;    
+    --color-button-download-hover: #303f9f; 
+    --color-button-clean-hover:#c9daeb; 
+    --color-hover-btn: #0000;
+    --color-hover-btn-2: #d2d4d6;
+    --color-button: #0000FF;
+
+    /*card*/
+    --color-blue-card: #2980B9;
+    --color-orange-card: #E67E22;
+    --color-purple-card: #9B59B6;
+    --color-grey-card: #34495E;
+    --color-red-card: #C0392B;
+    --color-green-card: #27AE60;
+
+    /* font size */
+    --fs-2xs: 0.5rem; /* 8px */
+    --fs-xs: 0.75rem; /* 12px */
+    --fs-sm: 1rem; /* 16px */
+    --fs-base: 1.15rem; /* 18.4px */
+    --fs-md: 1.25rem; /* 20px */
+    --fs-lg: 1.5rem; /* 24px */
+    --fs-xl: 1.75rem; /* 28px */
+    --fs-2xl: 2rem; /* 32px */
+  
+    /* font bold*/
+    --fw-regular: 400;
+    --fw-bold: 600;
+  
+    /* spacing*/
+    --spacing-xxs: 0.25rem;
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+
+
+  --primary-purple: #6B46C1;
+  --primary-purple-dark: #5B3AA8;
+  --accent-orange: #FF8C42;
+  --accent-turquoise: #4ECDC4;
+  --link-purple: #7C3AED;
+  --link-purple-hover: #6B46C1;
+  --primary-purple: #6B46C1;
+  
+  /* Colores de texto */
+  --text-primary: #2D3748;
+  --text-secondary: #4A5568;
+  --text-tertiary: #718096;
+  
+  /* Fondos */
+  --bg-card: #eeeeee;
+  --bg-page: #F7FAFC;
+  --bg-hover: #F8F9FA;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.15);
+  
+  /* Bordes */
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  
+  /* Espaciado */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Transiciones */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.4s ease;
+
+    
+}
+
+@font-face {
+  font-family: 'Namaku';
+  src: url('/tipografias/Namaku.ttf') format('truetype'),
+       url('/tipografias/Namaku.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'HistoryWawa';
+  src: url('/tipografias/History of Wawa.ttf') format('truetype'),
+       url('/tipografias/History of Wawa.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+a{
+  text-decoration:none; 
+  color:inherit;
+  line-height: 1;
+  cursor:pointer;
+}
+
+.container{
+    padding: 0 5% 0 5%;
+    
+}
+
+h1,
+h2,
+h3
+{ 
+  font-family: "Lexend", sans-serif;
+  font-weight: 600;
+}
+
+.btns{  
+   background:var(--color-bg-primary);
+   color: var(--color-text-primary);
+   padding: 14px 25px;
+   font-size:0.9em;
+   border-radius: 30px;
+   cursor:pointer;
+   border:0;
+   outline:0;
+   display:flex;
+   align-items: center;
+   justify-content: center;
+        
+}
+
+.btns img {
+    width:20px;
+    margin-left: 10px;
+}
+
+.btns.dark-btn{
+    background: #212EA0;
+    color: #ffff; 
+    width:250px;
+    height:50px; 
+    border-radius: 30px;
+} 
+
+
+/*--media query--*/
+@media (max-width:1200px){
+    .container{
+        padding-left: 5%;
+        padding-right:5%;
+    }
+
+    .btn{
+        padding: 14px 22px;
+    }
+
+}

@@ -1,0 +1,78 @@
+.schedule-card-student{ 
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 500px;
+  height:250px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header-card-student {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.subject-icon {
+ width:60px;
+ height:60px;
+}
+
+.subject-title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: white;
+  font-weight: 600;
+}
+
+.grades-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top:20px;
+}
+
+.grade-item {
+  text-align: center;
+  flex: 1;
+}
+
+.grade-label {
+  display: block;
+  font-size: 1rem;
+  color: white;
+  font-weight: 500;
+}
+
+.grade-value {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-top:15px;
+  color: white;
+}
+
+.average-section {
+  border: 2px solid white;
+  color: white;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.average-label {
+  display: block;
+  font-size: 0.875rem;
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
+.average-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+}

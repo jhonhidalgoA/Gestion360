@@ -1,0 +1,72 @@
+.student-registration {
+  width: 100%;
+  left: 0;
+  right:0;
+  margin: 100px auto; 
+  border-radius: 12px;  
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;  
+  margin-top:5px;
+  margin: 0 auto;
+  width:97%;
+}
+
+.tabs button {
+  padding: 12px 20px;
+  background-color: #e0e0e0;
+  color: #333;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  margin-right: 5px;
+}
+
+.tabs button:hover {
+  background-color: #d0d0d0;
+}
+
+.tabs button.active {
+  background-color: #F57C00; 
+  color: white;
+  transform: scale(1.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.formStudent{    
+    margin-top:20px;
+    padding: 0 20px;
+}
+
+
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.7rem;
+  margin-top: 0.25rem;
+  display: block;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+.actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+  justify-content: flex-end;
+  padding: 0 20px;
+}
+

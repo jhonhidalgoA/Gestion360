@@ -1,0 +1,81 @@
+.events-school{
+    width:100%;
+    min-height:100vh;
+    background:100vh;
+    background:linear-gradient(rgba(8,0,58,0.4),rgba(8,0,25,0.4)),url('../assets/images/img-eventos.jpg');
+    background-size:cover;
+    backgroud-position:center;
+    background-repeat: no-repeat; 
+    background-attachment: fixed;  
+}
+
+.select{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding: 0 5%;
+    margin-bottom:40px;
+    gap:50px;
+}
+
+.group-select{
+    display:inline-block;
+    justify-content:space-between;
+    align-items:center;   
+}
+.group-select label{
+    font-size:1.3rem;
+    color: var(--color-bg-primary);
+    margin-bottom:20px;
+}
+
+.select-input{
+    width:450px;
+    margin-top:10px;
+}
+
+.title-event{
+    color:white;
+    text-align:center;
+    font-size:2.0rem;
+}
+
+/* Móviles pequeños (hasta 480px) */
+@media (max-width: 480px) {
+    .select {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .group-select {
+        width: 100%;
+        max-width: 320px; 
+        margin: 0 auto;
+    }
+
+    .group-select label{
+        font-size:1.1rem;
+    }
+
+    .select-input {
+        width: 100%;
+    }
+}
+
+/* Tablets (768px+) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .select {
+        flex-direction: column; 
+        gap: 25px;
+    }
+
+    .group-select {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .select-input {
+        width: 100%;
+    }
+}

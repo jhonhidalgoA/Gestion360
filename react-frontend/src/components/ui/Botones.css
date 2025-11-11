@@ -1,0 +1,43 @@
+.actions,
+.form-actions,
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 45px;
+  margin-top: 10px;
+ 
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px !important;
+  font-weight: 600;
+  cursor: pointer; 
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 200px;
+  text-align: center;
+  color: white;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.icon-btn {
+  font-size: 24px;
+}
+
+
+.btn-save { background-color: #27ae60; }
+.btn-edit { background-color: #ffc107; }
+.btn-delet { background-color: #dc3545; }
+.btn-pdf { background-color: #9b59b6; }
+.btn-view { background-color: #0a48f2ff; }
+.btn-load { background-color: #FF8C00; }
+.btn-send {background-color: #1E6FBA;}

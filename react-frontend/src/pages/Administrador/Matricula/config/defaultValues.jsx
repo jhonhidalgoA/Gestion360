@@ -1,0 +1,51 @@
+export const getDefaultValues = () => {
+  const today = new Date().toISOString().split("T")[0];
+  const year = new Date().getFullYear();
+  const random = Math.floor(10000 + Math.random() * 90000);
+  const codigo = `MAT-${year}-${random}`;
+
+  return {
+    registerDate: today,
+    codigo,
+    studentPhoto: null,
+    name: "",
+    lastname: "",
+    studentBirthDate: "",
+    studentAge: "",
+    studentGender: "",
+    studentBirthPlace: "",
+    studentDocument: "",
+    studentDocumentNumber: "",
+    studentphone: "",
+    studentEmail: "",
+    studentGrade: "",
+    studentGroup: "",
+    studentShift: "",
+    studentRegister: "",
+    studentBlood: "",
+    studentEPS: "",
+    studentEthnic: "",
+    studentReference: "",
+    studentAddress: "",
+    studentNeighborhood: "",
+    studentLocality: "",
+    studentStatus: "",
+    studentZone: "",
+    motherName: "",
+    motherLastname: "",
+    motherTypeDocument: "",
+    motherDocument: "",
+    motherPhone: "",
+    motherEmail: "",
+    motherProfesion: "",
+    motherOcupation: "",
+    fatherName: "",
+    fatherLastname: "",
+    fatherTypeDocument: "",
+    fatherDocument: "",
+    fatherPhone: "",
+    fatherEmail: "",
+    fatherProfesion: "",
+    fatherOcupation: "",
+  };
+};

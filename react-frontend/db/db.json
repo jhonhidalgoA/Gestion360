@@ -1,0 +1,224 @@
+{
+  "matriculas": [
+    {
+      "id": "15a7",
+      "registerDate": "2025-10-01",
+      "codigo": "MAT-2025-35810",
+      "student": {
+        "photo": {},
+        "name": "Jhon Fredy",
+        "lastname": "Hidalgo Arango",
+        "birthDate": "1980-01-25",
+        "age": 45,
+        "gender": "masculino",
+        "birthPlace": "Manizales",
+        "documentType": "CC",
+        "documentNumber": "75065705",
+        "phone": "3128103686",
+        "email": "jhon@gmail.com",
+        "eps": "Sanitas",
+        "grade": "decimo",
+        "group": "A",
+        "bloodType": "A+",
+        "shift": "unica",
+        "ethnicGroup": "ninguna",
+        "reference": "ninguno",
+        "registerType": "nueva"
+      },
+      "academic": {
+        "address": "Calle 102 No 45-23",
+        "neighborhood": "La Enea",
+        "locality": "Tesorito",
+        "status": "4",
+        "zone": "urbana"
+      },
+      "family": {
+        "mother": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "CC",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "CC",
+          "document": "30258963",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    },
+    {
+      "id": "df7d",
+      "registerDate": "2025-10-01",
+      "codigo": "MAT-2025-39593",
+      "student": {
+        "photo": {},
+        "name": "Camila",
+        "lastname": "Arango",
+        "birthDate": "2000-01-25",
+        "age": 25,
+        "gender": "masculino",
+        "birthPlace": "Medellin",
+        "documentType": "CC",
+        "documentNumber": "30401700",
+        "phone": "3128103686",
+        "email": "camiarango@gmail.com",
+        "eps": "",
+        "grade": "noveno",
+        "group": "A",
+        "bloodType": "",
+        "shift": "manana",
+        "ethnicGroup": "",
+        "reference": "",
+        "registerType": "repite"
+      },
+      "academic": {
+        "address": "",
+        "neighborhood": "",
+        "locality": "",
+        "status": "",
+        "zone": ""
+      },
+      "family": {
+        "mother": {
+          "name": "",
+          "lastname": "",
+          "documentType": "",
+          "document": "",
+          "phone": "",
+          "email": "",
+          "profession": "",
+          "occupation": ""
+        },
+        "father": {
+          "name": "",
+          "lastname": "",
+          "documentType": "",
+          "document": "",
+          "phone": "",
+          "email": "",
+          "profession": "",
+          "occupation": ""
+        }
+      }
+    },
+    {
+      "id": "4d9a",
+      "registerDate": "2025-10-01",
+      "codigo": "MAT-2025-55130",
+      "student": {
+        "photo": null,
+        "name": "Adalberto",
+        "lastname": "Mondragon",
+        "birthDate": "2000-01-25",
+        "age": 25,
+        "gender": "femenino",
+        "birthPlace": "Medellin",
+        "documentType": "TI",
+        "documentNumber": "75065701",
+        "phone": "3128103686",
+        "email": "ada@gmail.com",
+        "eps": "",
+        "grade": "decimo",
+        "group": "A",
+        "bloodType": "",
+        "shift": "manana",
+        "ethnicGroup": "",
+        "reference": "",
+        "registerType": "repite"
+      },
+      "academic": {
+        "address": "",
+        "neighborhood": "",
+        "locality": "",
+        "status": "",
+        "zone": ""
+      },
+      "family": {
+        "mother": {
+          "name": "",
+          "lastname": "",
+          "documentType": "",
+          "document": "",
+          "phone": "",
+          "email": "",
+          "profession": "",
+          "occupation": ""
+        },
+        "father": {
+          "name": "",
+          "lastname": "",
+          "documentType": "",
+          "document": "",
+          "phone": "",
+          "email": "",
+          "profession": "",
+          "occupation": ""
+        }
+      }
+    },
+    {
+      "id": "a3bc",
+      "registerDate": "2025-10-01",
+      "codigo": "MAT-2025-56775",
+      "student": {
+        "photo": {},
+        "name": "Rosa Maria",
+        "lastname": "Benjumea",
+        "birthDate": "2000-12-20",
+        "age": 24,
+        "gender": "femenino",
+        "birthPlace": "Medellin",
+        "documentType": "TI",
+        "documentNumber": "30258963",
+        "phone": "314852369",
+        "email": "rosab@gmail.com",
+        "eps": "Fomag",
+        "grade": "sexto",
+        "group": "A",
+        "bloodType": "A-",
+        "shift": "unica",
+        "ethnicGroup": "afro",
+        "reference": "victima",
+        "registerType": "nueva"
+      },
+      "academic": {
+        "address": "Calle 102 No 45-23",
+        "neighborhood": "La Enea",
+        "locality": "Tesorito",
+        "status": "4",
+        "zone": "urbana"
+      },
+      "family": {
+        "mother": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "CC",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        },
+        "father": {
+          "name": "Camila",
+          "lastname": "Arango",
+          "documentType": "CC",
+          "document": "30401700",
+          "phone": "3128103686",
+          "email": "camiarango@gmail.com",
+          "profession": "wert",
+          "occupation": "wert"
+        }
+      }
+    }
+  ]
+}

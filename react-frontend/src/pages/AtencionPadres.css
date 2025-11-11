@@ -1,0 +1,24 @@
+.appointment-container {
+    width:100%;
+    min-height:100vh;
+    background:100vh;
+    background: linear-gradient(rgba(8,0,58,0.5),rgba(8,0,25,0.1)),url('../assets/images/fondo_3.jpg') center/cover no-repeat fixed;    
+    padding-top: 60px;  
+}
+
+.title-appointment h1 {
+  font-size: 2.5rem;
+  font-weight: 800; 
+  color: #edf0f6ff;  
+  margin-bottom: 8px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.title-appointment p {
+  font-size: 1.25rem;
+  color: #edf0f6ff; 
+  text-align: center;
+  margin-top: 20px;  
+}
+
