@@ -218,3 +218,100 @@ def register_student(data: MatriculaCreate, db: Session = Depends(get_db)):
         "username": new_user.username,
         "id_estudiante": str(new_student.id)
     }
+    
+
+@app.get("/matriculas")
+def get_all_matriculas(db: Session = Depends(get_db)):
+    estudiantes = db.query(Estudiante).all()
+    matriculas = []
+
+    for est in estudiantes:
+        padres = db.query(Padre).filter(Padre.estudiante_id == est.id).all()
+        madre = None
+        padre = None
+
+        for p in padres:
+            parentesco_str = str(p.parentesco) if p.parentesco is not None else ""
+            if parentesco_str.strip().lower() == "madre":
+                madre = p
+            elif parentesco_str.strip().lower() == "padre":
+                padre = p
+
+        # Forzar a int
+        grado_id_val = getattr(est, "grado_id", None)
+        grado_id_int = int(grado_id_val) if isinstance(grado_id_val, (int, float)) else -1
+
+        grado_nombre = {
+            0: "preescolar",
+            1: "primero",
+            2: "segundo",
+            3: "tercero",
+            4: "cuarto",
+            5: "quinto",
+            6: "sexto",
+            7: "septimo",
+            8: "octavo",
+            9: "noveno",
+            10: "decimo",
+            11: "undecimo"
+        }.get(grado_id_int, "Sin asignar")
+
+        grupo_str = str(est.grupo) if est.grupo is not None else ""
+        grado_display = f"{grado_nombre} - {grupo_str}" if grupo_str else grado_nombre
+
+        matricula = {
+            "id": str(est.id),
+            "student": {
+                "nombres": est.nombres,
+                "apellidos": est.apellidos,
+                "fecha_nacimiento": est.fecha_nacimiento,
+                "edad": est.edad,
+                "genero": est.genero,
+                "lugar_nacimiento": est.lugar_nacimiento,
+                "tipo_documento": est.tipo_documento,
+                "numero_documento": est.numero_documento,
+                "telefono": est.telefono,
+                "correo": est.correo,
+                "grado_id": est.grado_id,
+                "grupo": est.grupo,
+                "jornada": est.jornada,
+                "tipo_sangre": est.tipo_sangre,
+                "eps": est.eps,
+                "etnia": est.etnia,
+                "referencia": est.referencia,
+                "direccion": est.direccion,
+                "barrio": est.barrio,
+                "localidad": est.localidad,
+                "zona": est.zona,
+                "foto": est.foto,
+                "grade": grado_display
+            },
+            "family": {
+                "madre": {
+                    "nombres": madre.nombres if madre else "",
+                    "apellidos": madre.apellidos if madre else "",
+                    "tipo_documento": madre.tipo_documento if madre else "",
+                    "numero_documento": madre.numero_documento if madre else "",
+                    "telefono": madre.telefono if madre else "",
+                    "correo": madre.correo if madre else "",
+                    "profesion": madre.profesion if madre else "",
+                    "ocupacion": madre.ocupacion if madre else "",
+                    "parentesco": "Madre"
+                } if madre else None,
+                "padre": {
+                    "nombres": padre.nombres if padre else "",
+                    "apellidos": padre.apellidos if padre else "",
+                    "tipo_documento": padre.tipo_documento if padre else "",
+                    "numero_documento": padre.numero_documento if padre else "",
+                    "telefono": padre.telefono if padre else "",
+                    "correo": padre.correo if padre else "",
+                    "profesion": padre.profesion if padre else "",
+                    "ocupacion": padre.ocupacion if padre else "",
+                    "parentesco": "Padre"
+                } if padre else None
+            }
+        }
+
+        matriculas.append(matricula)
+
+    return matriculas

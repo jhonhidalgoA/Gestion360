@@ -7,18 +7,26 @@ const ModalListaEstudiantes = ({ isOpen, onClose, onSelect }) => {
 
   useEffect(() => {
     if (!isOpen) return;
-    fetch("http://localhost:3001/matriculas")
-      .then(res => res.json())
-      .then(data => setMatriculas(Array.isArray(data) ? data : []))
-      .catch(err => console.error("Error al cargar estudiantes:", err));
+    fetch("http://localhost:8000/matriculas")
+      .then((res) => res.json())
+      .then((data) => setMatriculas(Array.isArray(data) ? data : []))
+      .catch((err) => console.error("Error al cargar estudiantes:", err));
   }, [isOpen]);
 
-  const filteredMatriculas = matriculas.filter(m =>
-    m.student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.student.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.student.documentNumber.includes(searchTerm) ||
-    m.student.grade.includes(searchTerm)
-  );
+  const filteredMatriculas = matriculas.filter((m) => {
+    const name = (m.student?.nombres || "").toLowerCase();
+    const lastname = (m.student?.apellidos || "").toLowerCase();
+    const documentNumber = m.student?.numero_documento || "";
+    const grade = (m.student?.grade || "").toLowerCase();
+    const term = searchTerm.toLowerCase();
+
+    return (
+      name.includes(term) ||
+      lastname.includes(term) ||
+      documentNumber.includes(searchTerm) ||
+      grade.includes(term)
+    );
+  });
 
   return (
     <>
@@ -70,7 +78,9 @@ const ModalListaEstudiantes = ({ isOpen, onClose, onSelect }) => {
               ×
             </button>
 
-            <h3 style={{ marginBottom: "15px", color: "#333" }}>Lista de Estudiantes</h3>
+            <h3 style={{ marginBottom: "15px", color: "#333" }}>
+              Lista de Estudiantes
+            </h3>
 
             <input
               type="text"
@@ -86,13 +96,15 @@ const ModalListaEstudiantes = ({ isOpen, onClose, onSelect }) => {
               }}
             />
 
-            <div style={{
-              maxHeight: "300px",
-              overflowY: "auto",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              padding: "10px",
-            }}>
+            <div
+              style={{
+                maxHeight: "300px",
+                overflowY: "auto",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                padding: "10px",
+              }}
+            >
               {filteredMatriculas.length === 0 ? (
                 <p>No se encontraron estudiantes.</p>
               ) : (
@@ -108,10 +120,13 @@ const ModalListaEstudiantes = ({ isOpen, onClose, onSelect }) => {
                   </thead>
                   <tbody>
                     {filteredMatriculas.map((m, index) => (
-                      <tr key={m.id} style={{ borderBottom: "1px solid #eee" }}>
+                      <tr
+                        key={m.id}
+                        style={{ borderBottom: "1px solid #eee" }}
+                      >
                         <td style={{ padding: "8px" }}>{index + 1}</td>
-                        <td style={{ padding: "8px" }}>{m.student.name}</td>
-                        <td style={{ padding: "8px" }}>{m.student.lastname}</td>
+                        <td style={{ padding: "8px" }}>{m.student.nombres}</td>
+                        <td style={{ padding: "8px" }}>{m.student.apellidos}</td>
                         <td style={{ padding: "8px" }}>{m.student.grade}</td>
                         <td style={{ padding: "8px" }}>
                           <button
