@@ -159,3 +159,74 @@ export const transformMatriculaToFormValues = (matricula) => {
     fatherOcupation: matricula.family?.padre?.ocupacion || "",
   };
 };
+
+export const mapMatriculaToFrontend = (matricula) => {
+  const student = matricula.student;
+  const family = matricula.family || {};
+  const madre = family.madre || {};
+  const padre = family.padre || {};
+
+  const gradeIdToName = {
+    0: "preescolar",
+    1: "primero",
+    2: "segundo",
+    3: "tercero",
+    4: "cuarto",
+    5: "quinto",
+    6: "sexto",
+    7: "septimo",
+    8: "octavo",
+    9: "noveno",
+    10: "decimo",
+    11: "undecimo"
+  };
+
+  return {
+    // Estudiante
+    name: student.nombres || "",
+    lastname: student.apellidos || "",
+    studentBirthDate: student.fecha_nacimiento ? student.fecha_nacimiento.split("T")[0] : "",
+    studentGender: student.genero || "",
+    studentBirthPlace: student.lugar_nacimiento || "",
+    studentDocument: student.tipo_documento || "CC",
+    studentDocumentNumber: student.numero_documento || "",
+    studentphone: student.telefono || "",
+    studentEmail: student.correo || "",
+    studentGrade: gradeIdToName[student.grado_id] || "primero",
+    studentGroup: student.grupo || "A",
+    studentShift: student.jornada || "Mañana",
+    studentRegister: "",
+
+    // Académica
+    studentBlood: student.tipo_sangre || "No especificado",
+    studentEPS: student.eps || "Ninguna",
+    studentEthnic: student.etnia || "No especificado",
+    studentReference: student.referencia || "Ninguna",
+    studentAddress: student.direccion || "",
+    studentNeighborhood: student.barrio || "",
+    studentLocality: student.localidad || "",
+    studentZone: student.zona || "Urbana",
+
+    // Familia
+    motherName: madre.nombres || "",
+    motherLastname: madre.apellidos || "",
+    motherTypeDocument: madre.tipo_documento || "CC",
+    motherDocument: madre.numero_documento || "",
+    motherPhone: madre.telefono || "",
+    motherEmail: madre.correo || "",
+    motherProfesion: madre.profesion || "",
+    motherOcupation: madre.ocupacion || "",
+
+    fatherName: padre.nombres || "",
+    fatherLastname: padre.apellidos || "",
+    fatherTypeDocument: padre.tipo_documento || "CC",
+    fatherDocument: padre.numero_documento || "",
+    fatherPhone: padre.telefono || "",
+    fatherEmail: padre.correo || "",
+    fatherProfesion: padre.profesion || "",
+    fatherOcupation: padre.ocupacion || "",
+
+    // Foto
+    studentPhoto: student.foto || null
+  };
+};

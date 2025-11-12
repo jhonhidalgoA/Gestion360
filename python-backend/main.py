@@ -212,7 +212,7 @@ def register_student(data: MatriculaCreate, db: Session = Depends(get_db)):
 
     db.commit()
 
-    # Respuesta final
+   
     return {
         "message": "Estudiante registrado exitosamente",
         "username": new_user.username,

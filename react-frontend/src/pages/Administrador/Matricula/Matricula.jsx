@@ -4,6 +4,7 @@ import { getDefaultValues } from "../Matricula/config/defaultValues";
 import {
   validateTab,
   formatMatriculaData,
+  mapMatriculaToFrontend // ✅ importado
 } from "../Matricula/utils/formHelpers";
 import { postMatricula } from "../Matricula/utils/apiHelpers";
 import ModalListaEstudiantes from "../Matricula/ModalListaEstudiante";
@@ -58,63 +59,14 @@ const Matricula = () => {
     }
   };
 
-  // Función para limpiar el formulario
   const handleClear = () => {
     reset(getDefaultValues());
     setActiveTab("estudiante");
   };
 
+  // ✅ CORREGIDO: usa mapMatriculaToFrontend
   const loadStudentForEdit = (matricula) => {
-    const values = {
-      // Datos del estudiante (TabEstudiante)
-      name: matricula.student.name,
-      lastname: matricula.student.lastname,
-      studentBirthDate: matricula.student.birthDate,
-      studentAge: matricula.student.age,
-      studentGender: matricula.student.gender,
-      studentBirthPlace: matricula.student.birthPlace,
-      studentDocument: matricula.student.documentType,
-      studentDocumentNumber: matricula.student.documentNumber,
-      studentphone: matricula.student.phone,
-      studentEmail: matricula.student.email,
-      studentGrade: matricula.student.grade,
-      studentGroup: matricula.student.group,
-      studentShift: matricula.student.shift,
-      studentRegister: matricula.student.registerType || "",
-
-      // Datos de TabAcademica
-      studentBlood: matricula.student.bloodType,
-      studentEPS: matricula.student.eps,
-      studentEthnic: matricula.student.ethnicGroup,
-      studentReference: matricula.student.reference,
-
-      // Dirección y ubicación
-      studentAddress: matricula.academic.address,
-      studentNeighborhood: matricula.academic.neighborhood,
-      studentLocality: matricula.academic.locality,
-      studentStatus: matricula.academic.status,
-      studentZone: matricula.academic.zone,
-
-      // Datos familiares
-      motherName: matricula.family.mother.name,
-      motherLastname: matricula.family.mother.lastname,
-      motherTypeDocument: matricula.family.mother.documentType,
-      motherDocument: matricula.family.mother.document,
-      motherPhone: matricula.family.mother.phone,
-      motherEmail: matricula.family.mother.email,
-      motherProfesion: matricula.family.mother.profession,
-      motherOcupation: matricula.family.mother.occupation,
-
-      fatherName: matricula.family.father.name,
-      fatherLastname: matricula.family.father.lastname,
-      fatherTypeDocument: matricula.family.father.documentType,
-      fatherDocument: matricula.family.father.document,
-      fatherPhone: matricula.family.father.phone,
-      fatherEmail: matricula.family.father.email,
-      fatherProfesion: matricula.family.father.profession,
-      fatherOcupation: matricula.family.father.occupation,
-    };
-
+    const values = mapMatriculaToFrontend(matricula);
     reset(values);
     setActiveTab("estudiante");
   };
