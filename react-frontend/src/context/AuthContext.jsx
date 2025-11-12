@@ -30,6 +30,7 @@ function AuthProvider({ children }) {
         role: data.role || data.rol,
         accessToken: data.access_token,
         redirect: data.redirect,
+        correo: data.correo || data.email || data.username 
       };
 
       

@@ -3,7 +3,8 @@ import Modal from "../../ui/Modal";
 import { FaCheck } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
 import logo from "../../icons/espiral.svg";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../../context/AuthContext"; 
 
 import facebook from "../../../assets/app-icons/facebook.png";
 import github from "../../../assets/app-icons/github.png";
@@ -17,13 +18,14 @@ import discord from "../../../assets/app-icons/discord.png";
 import avatar from "../../../assets/app-icons/man_3.png";
 
 const NavbarAdmin = () => {
+  const { user, logout } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("role");
+    logout(); // Limpia el contexto
     window.location.href = "/";
   };
 
@@ -113,23 +115,35 @@ const NavbarAdmin = () => {
     },
   ];
 
+  // Función para obtener el nombre del módulo según el rol
+  const getModuleName = (role) => {
+    const roleMap = {
+      administrador: "Administrador",
+      docente: "Docente",
+      estudiante: "Estudiante",
+      padre: "Padre de Familia"
+    };
+    return roleMap[role] || "Desconocido";
+  };
+
+  // Función para obtener el título del rol (puedes personalizar según necesites)
+  const getRoleTitle = (role) => {
+    const roleTitles = {
+      administrador: "Administrador del Sistema",
+      docente: "Docente",
+      estudiante: "Estudiante",
+      padre: "Padre de Familia"
+    };
+    return roleTitles[role] || "Usuario";
+  };
+
   return (
     <nav className="navbar-admin">
       <div className="nav-logo">
         <img src={logo} alt="logo" className="logo" />
         <div className="nav-logo-text">
           <h3>Gestión 360</h3>
-          <p>
-            Módulo{" "}
-            {(() => {
-              const role = localStorage.getItem("role");
-              if (role === "administrador") return "Administrador";
-              if (role === "docente") return "Docente";
-              if (role === "estudiante") return "Estudiante";
-              if (role === "padre") return "Padre de Familia";
-              return "Desconocido";
-            })()}
-          </p>
+          <p>Módulo {getModuleName(user?.role)}</p>
         </div>
       </div>
       <ul>
@@ -242,7 +256,7 @@ const NavbarAdmin = () => {
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
           >
             <span className="user-name">
-              {localStorage.getItem("full_name") || "Usuario"}
+              {user?.fullName || "Usuario"}
             </span>
             <span className="material-symbols-outlined">expand_more</span>
           </button>
@@ -251,8 +265,8 @@ const NavbarAdmin = () => {
               <div className="user-menu-header">
                 <img src={avatar} alt="avatar" className="menu-avatar" />
                 <div>
-                  <p className="user-role">Docente Matemáticas</p>
-                  <p className="user-email">jhon.hidalgo@gestion360.com</p>
+                  <p className="user-role">{user?.role ? getRoleTitle(user.role) : "Usuario"}</p>
+                  <p className="user-email">{user?.correo || "usuario@ejemplo.com"}</p>
                 </div>
               </div>
               <div className="user-menu-actions-vertical">
