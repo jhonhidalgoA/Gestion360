@@ -2,7 +2,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import (
     SimpleDocTemplate, Table, TableStyle, Paragraph, 
-    Spacer, Image, PageBreak, KeepTogether
+    Spacer, Image
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
@@ -11,56 +11,54 @@ from datetime import datetime
 from io import BytesIO
 import base64
 from typing import Dict, List, Optional, Any
+import qrcode
+import qrcode
+from reportlab.platypus import Image
+from typing import Optional
+from io import BytesIO
+from reportlab.platypus import Image
+import qrcode
+from PIL import Image as PilImage
 
 
 class PDFStyles:
     """Clase para gestionar los estilos del documento PDF"""
     
-    # Paleta de colores moderna
-    PRIMARY = colors.HexColor("#1E40AF")      # Azul profundo
-    SECONDARY = colors.HexColor("#3B82F6")    # Azul medio
-    ACCENT = colors.HexColor("#60A5FA")       # Azul claro
-    BACKGROUND = colors.HexColor("#F8FAFC")   # Gris muy claro
-    TEXT_DARK = colors.HexColor("#1E293B")    # Gris oscuro
-    TEXT_LIGHT = colors.HexColor("#64748B")   # Gris medio
-    BORDER = colors.HexColor("#E2E8F0")       # Gris claro
-    SUCCESS = colors.HexColor("#10B981")      # Verde
+    # Nueva paleta de colores moderna y profesional
+    PRIMARY = colors.HexColor("#0D7DED")      # Azul oscuro elegante
+    SECONDARY = colors.HexColor("#34495E")    # Azul oscuro secundario
+    ACCENT = colors.HexColor("#1ABC9C")       # Verde azulado moderno
+    BACKGROUND = colors.HexColor("#F8F9FA")   # Gris muy claro
+    TEXT_DARK = colors.HexColor("#2C3E50")    # Texto oscuro
+    TEXT_LIGHT = colors.HexColor("#7F8C8D")   # Texto gris
+    BORDER = colors.HexColor("#E9ECEF")       # Borde suave
+    SUCCESS = colors.HexColor("#27AE60")      # Verde éxito profesional
     
     @staticmethod
     def create_styles() -> Dict[str, ParagraphStyle]:
-        """Crea y retorna todos los estilos personalizados"""
+       
         base_styles = getSampleStyleSheet()
         
         return {
             'header': ParagraphStyle(
                 'HeaderStyle',
                 parent=base_styles['Heading1'],
-                fontSize=22,
+                fontSize=20,
                 textColor=colors.white,
                 alignment=TA_CENTER,
-                spaceAfter=8,
-                spaceBefore=8,
+                spaceAfter=6,
+                spaceBefore=6,
                 fontName='Helvetica-Bold',
-                leading=26
+                leading=22
             ),
-            'subheader': ParagraphStyle(
-                'SubheaderStyle',
-                parent=base_styles['Heading2'],
-                fontSize=16,
-                textColor=PDFStyles.PRIMARY,
+            'institution': ParagraphStyle(
+                'InstitutionStyle',
+                parent=base_styles['Normal'],
+                fontSize=14,
+                textColor=colors.white,
                 alignment=TA_CENTER,
-                spaceAfter=12,
-                fontName='Helvetica-Bold'
-            ),
-            'section_title': ParagraphStyle(
-                'SectionTitleStyle',
-                parent=base_styles['Heading3'],
-                fontSize=13,
-                textColor=PDFStyles.PRIMARY,
-                spaceBefore=8,
-                spaceAfter=8,
-                fontName='Helvetica-Bold',
-                leftIndent=10
+                fontName='Helvetica',
+                spaceAfter=4
             ),
             'student_name': ParagraphStyle(
                 'StudentNameStyle',
@@ -74,10 +72,20 @@ class PDFStyles:
             'student_code': ParagraphStyle(
                 'StudentCodeStyle',
                 parent=base_styles['Normal'],
-                fontSize=11,
+                fontSize=12,
                 textColor=PDFStyles.TEXT_LIGHT,
                 alignment=TA_CENTER,
                 fontName='Helvetica'
+            ),
+            'section_title': ParagraphStyle(
+                'SectionTitleStyle',
+                parent=base_styles['Heading3'],
+                fontSize=11,
+                textColor=colors.white,
+                spaceBefore=8,
+                spaceAfter=8,
+                fontName='Helvetica-Bold',
+                leftIndent=12
             ),
             'footer': ParagraphStyle(
                 'FooterStyle',
@@ -85,20 +93,44 @@ class PDFStyles:
                 fontSize=8,
                 textColor=PDFStyles.TEXT_LIGHT,
                 alignment=TA_CENTER,
-                spaceBefore=15
+                spaceBefore=10
+            ),
+            'footer_code': ParagraphStyle(
+                'FooterCodeStyle',
+                parent=base_styles['Normal'],
+                fontSize=8,
+                textColor=PDFStyles.TEXT_DARK,
+                alignment=TA_CENTER,
+                fontName='Helvetica-Bold'
             ),
             'label': ParagraphStyle(
                 'LabelStyle',
                 parent=base_styles['Normal'],
-                fontSize=10,
-                textColor=PDFStyles.TEXT_LIGHT,
+                fontSize=9,
+                textColor=PDFStyles.TEXT_DARK,
                 fontName='Helvetica-Bold'
             ),
             'value': ParagraphStyle(
                 'ValueStyle',
                 parent=base_styles['Normal'],
-                fontSize=10,
+                fontSize=9,
                 textColor=PDFStyles.TEXT_DARK,
+                fontName='Helvetica'
+            ),
+            'status': ParagraphStyle(
+                'StatusStyle',
+                parent=base_styles['Normal'],
+                fontSize=9,
+                textColor=PDFStyles.SUCCESS,
+                alignment=TA_CENTER,
+                fontName='Helvetica-Bold'
+            ),
+            'qr_text': ParagraphStyle(
+                'QRTextStyle',
+                parent=base_styles['Normal'],
+                fontSize=7,
+                textColor=PDFStyles.TEXT_LIGHT,
+                alignment=TA_CENTER,
                 fontName='Helvetica'
             )
         }
@@ -124,7 +156,7 @@ class PDFDataFormatter:
             return "No registrado"
         try:
             date_obj = datetime.strptime(str(date_str), "%Y-%m-%d")
-            return date_obj.strftime("%d de %B de %Y")
+            return date_obj.strftime("%Y-%m-%d")
         except:
             return str(date_str)
     
@@ -134,7 +166,35 @@ class PDFDataFormatter:
         value = data.get(key, "")
         return str(value) if value else default
 
+import qrcode
+from io import BytesIO
+from reportlab.platypus import Image
+from typing import Optional
 
+
+class QRCodeGenerator:
+    """Generador de códigos QR"""
+
+    @staticmethod  # Corregido: "staticmethod" no "statismethod"
+    def generate_qr_code(data: str, size: int = 80) -> Optional[Image]:
+        
+        try:
+            # Versión simplificada y funcional
+            qr = qrcode.make(data)  # Esta línea genera el QR correctamente
+            
+            # Convertir a BytesIO
+            img_buffer = BytesIO()
+            qr.save(img_buffer)  # Eliminado el parámetro 'format' que causa error
+            img_buffer.seek(0)
+
+            # Crear imagen para ReportLab
+            img = Image(img_buffer, width=size, height=size)
+            img.hAlign = 'CENTER'
+            return img
+            
+        except Exception as e:
+            print(f"Error generando QR: {e}")
+            return None
 class MatriculaPDFGenerator:
     """Generador principal de PDF de matrícula"""
     
@@ -144,28 +204,28 @@ class MatriculaPDFGenerator:
         self.family = estudiante_data.get("family", {})
         self.styles = PDFStyles.create_styles()
         self.formatter = PDFDataFormatter()
+        self.qr_generator = QRCodeGenerator()
         self.buffer = BytesIO()
         
     def _create_header(self) -> Table:
-        """Crea el encabezado del documento"""
-        institution_name = Paragraph(
-            "INSTITUCIÓN EDUCATIVA SGAPA",
-            self.styles['subheader']
+        """Crea el encabezado del documento con diseño moderno"""
+        institution = Paragraph(
+            "COLEGIO STEAM 360",
+            self.styles['institution']
         )
         
-        doc_title = Paragraph(
-            "REGISTRO DE MATRÍCULA ESTUDIANTE",
+        title = Paragraph(
+            "REGISTRO MATRÍCULA ESTUDIANTE",
             self.styles['header']
         )
         
-        header_data = [[institution_name], [doc_title]]
+        header_data = [[institution], [title]]
         header_table = Table(header_data, colWidths=[6.5*inch])
         
         header_table.setStyle(TableStyle([
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('BACKGROUND', (0, 1), (0, 1), PDFStyles.PRIMARY),
-            ('ROUNDEDCORNERS', [6, 6, 6, 6]),
+            ('BACKGROUND', (0, 0), (-1, -1), PDFStyles.PRIMARY),
             ('TOPPADDING', (0, 0), (-1, -1), 12),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
         ]))
@@ -186,7 +246,7 @@ class MatriculaPDFGenerator:
             image_data = base64.b64decode(foto_base64)
             img_buffer = BytesIO(image_data)
             
-            img = Image(img_buffer, width=1.5*inch, height=1.5*inch)
+            img = Image(img_buffer, width=1.6*inch, height=1.6*inch)
             img.hAlign = 'CENTER'
             return img
         except Exception as e:
@@ -200,6 +260,7 @@ class MatriculaPDFGenerator:
         # Foto
         photo = self._create_student_photo()
         if photo:
+            elements.append(Spacer(1, 12))
             elements.append(photo)
             elements.append(Spacer(1, 12))
         
@@ -218,68 +279,67 @@ class MatriculaPDFGenerator:
         return elements
     
     def _create_info_section(self, title: str, data: List[tuple]) -> List:
-        """Crea una sección de información con título y tabla"""
+        """Crea una sección de información con título y tabla estilo moderno"""
         elements = []
         
-        # Título de sección con barra lateral decorativa
+        # Título de sección con fondo azul oscuro
         title_table = Table(
             [[Paragraph(title, self.styles['section_title'])]],
             colWidths=[6.5*inch]
         )
         title_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, -1), PDFStyles.BACKGROUND),
-            ('LEFTPADDING', (0, 0), (-1, -1), 15),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 15),
-            ('TOPPADDING', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
-            ('LINEABOVE', (0, 0), (-1, 0), 3, PDFStyles.PRIMARY),
-            ('ROUNDEDCORNERS', [4, 4, 0, 0]),
+            ('BACKGROUND', (0, 0), (-1, -1), PDFStyles.PRIMARY),
+            ('LEFTPADDING', (0, 0), (-1, -1), 12),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 12),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
         ]))
         
         elements.append(title_table)
-        elements.append(Spacer(1, 2))
+        elements.append(Spacer(1, 8))
         
-        # Tabla de datos
-        formatted_data = [
-            [Paragraph(f"<b>{label}</b>", self.styles['label']), 
-             Paragraph(value, self.styles['value'])]
-            for label, value in data
-        ]
+        # Tabla de datos con diseño limpio
+        formatted_data = []
+        for label, value in data:
+            if label and value:  # Solo agregar si hay datos
+                formatted_data.append([
+                    Paragraph(f"{label}", self.styles['label']), 
+                    Paragraph(value, self.styles['value'])
+                ])
         
-        data_table = Table(formatted_data, colWidths=[2*inch, 4.5*inch])
-        data_table.setStyle(TableStyle([
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 15),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 15),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('ROWBACKGROUNDS', (0, 0), (-1, -1), [colors.white, PDFStyles.BACKGROUND]),
-            ('LINEBELOW', (0, 0), (-1, -2), 0.5, PDFStyles.BORDER),
-            ('LINEBELOW', (0, -1), (-1, -1), 1, PDFStyles.BORDER),
-        ]))
+        if formatted_data:
+            data_table = Table(formatted_data, colWidths=[2.2*inch, 4.3*inch])
+            data_table.setStyle(TableStyle([
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('LEFTPADDING', (0, 0), (-1, -1), 12),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 12),
+                ('TOPPADDING', (0, 0), (-1, -1), 8),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+                ('LINEBELOW', (0, 0), (-1, -1), 0.5, PDFStyles.BORDER),
+                ('BACKGROUND', (0, 0), (-1, -1), colors.white),
+            ]))
+            
+            elements.append(data_table)
         
-        elements.append(data_table)
-        elements.append(Spacer(1, 20))
+        elements.append(Spacer(1, 15))
         
         return elements
     
     def _get_personal_data(self) -> List[tuple]:
         """Obtiene los datos personales formateados"""
         return [
-            ("Documento de Identidad:", self.formatter.format_document(
+            ("Documento:", self.formatter.format_document(
                 self.student.get('tipo_documento', ''),
                 self.student.get('numero_documento', '')
             )),
             ("Edad:", self.formatter.safe_get(self.student, 'edad')),
             ("Género:", self.formatter.safe_get(self.student, 'genero')),
-            ("Fecha de Nacimiento:", self.formatter.format_date(
+            ("Fecha Nacimiento:", self.formatter.format_date(
                 self.student.get('fecha_nacimiento', '')
             )),
-            ("Lugar de Nacimiento:", self.formatter.safe_get(
+            ("Lugar Nacimiento:", self.formatter.safe_get(
                 self.student, 'lugar_nacimiento'
             )),
-            ("Teléfono:", self.formatter.safe_get(self.student, 'telefono')),
-            ("Correo Electrónico:", self.formatter.safe_get(self.student, 'correo')),
         ]
     
     def _get_academic_data(self) -> List[tuple]:
@@ -288,9 +348,7 @@ class MatriculaPDFGenerator:
             ("Grado:", self.formatter.safe_get(self.student, 'grade')),
             ("Jornada:", self.formatter.safe_get(self.student, 'jornada')),
             ("Grupo:", self.formatter.safe_get(self.student, 'grupo')),
-            ("Dirección de Residencia:", self.formatter.safe_get(
-                self.student, 'direccion'
-            )),
+            ("Dirección:", self.formatter.safe_get(self.student, 'direccion')),
             ("Barrio:", self.formatter.safe_get(self.student, 'barrio')),
             ("Localidad:", self.formatter.safe_get(self.student, 'localidad')),
             ("Zona:", self.formatter.safe_get(self.student, 'zona')),
@@ -305,9 +363,9 @@ class MatriculaPDFGenerator:
         
         data = []
         
-        if madre:
+        if madre and madre.get("nombres"):
             data.extend([
-                ("Nombre de la Madre:", self.formatter.format_full_name(
+                ("Madre:", self.formatter.format_full_name(
                     madre.get("nombres", ""),
                     madre.get("apellidos", "")
                 )),
@@ -319,12 +377,12 @@ class MatriculaPDFGenerator:
                 ("Ocupación Madre:", self.formatter.safe_get(madre, 'ocupacion')),
             ])
         
-        if padre:
-            if data:  # Añadir separador si ya hay datos de madre
+        if padre and padre.get("nombres"):
+            if data:
                 data.append(("", ""))
             
             data.extend([
-                ("Nombre del Padre:", self.formatter.format_full_name(
+                ("Padre:", self.formatter.format_full_name(
                     padre.get("nombres", ""),
                     padre.get("apellidos", "")
                 )),
@@ -341,30 +399,80 @@ class MatriculaPDFGenerator:
         
         return data
     
-    def _create_footer(self) -> Paragraph:
-        """Crea el pie de página del documento"""
-        current_date = datetime.now().strftime("%d de %B de %Y")
-        student_code = self.student.get('numero_documento', 'N/A')
+    def _create_footer(self) -> List:
+        """Crea el pie de página del documento con QR centrado"""
+        elements = []
         
+        # Checkmark de información completa
+        status_table = Table(
+            [[Paragraph("✓ Información Completa", self.styles['status'])]],
+            colWidths=[6.5*inch]
+        )
+        status_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ]))
+        
+        elements.append(status_table)
+        elements.append(Spacer(1, 8))
+        
+        # Generar código QR
+        student_code = self.student.get('numero_documento', 'N/A')
+        qr_data = f"SGAPA-{student_code}|{self.student.get('nombres', '')} {self.student.get('apellidos', '')}|{datetime.now().strftime('%Y-%m-%d')}"
+        
+        qr_image = self.qr_generator.generate_qr_code(qr_data, size=150)
+        
+        if qr_image:
+            elements.append(qr_image)
+            elements.append(Spacer(1, 5))
+            
+            # Texto descriptivo del QR
+            qr_text = Paragraph("Código de verificación - SGAPA", self.styles['qr_text'])
+            elements.append(qr_text)
+            elements.append(Spacer(1, 8))
+        
+        # Información del documento
+        current_date = datetime.now().strftime("%d de %B, %Y")
         footer_text = f"""
         <para alignment="center">
-            Documento generado automáticamente el {current_date}<br/>
-            <b>Sistema de Gestión Administrativa y Procesos Académicos (SGAPA)</b><br/>
-            Versión 1.0 | Código Único: <b>SGAPA-{student_code}</b>
+            Documento generado automáticamente el: {current_date}<br/>
+            Sistema de Gestión Administrativa y Procesos Académicos (SGAPA) - Versión 1.0
         </para>
         """
         
-        return Paragraph(footer_text, self.styles['footer'])
+        elements.append(Paragraph(footer_text, self.styles['footer']))
+        elements.append(Spacer(1, 6))
+        
+        # Código único con fondo gris claro
+        code_text = f"Código Único: SGAPA-{student_code}"
+        
+        code_table = Table(
+            [[Paragraph(code_text, self.styles['footer_code'])]],
+            colWidths=[6.5*inch]
+        )
+        code_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BACKGROUND', (0, 0), (-1, -1), PDFStyles.BACKGROUND),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ]))
+        
+        elements.append(code_table)
+        
+        return elements
     
     def generate(self) -> BytesIO:
         """Genera el PDF completo y retorna el buffer"""
         doc = SimpleDocTemplate(
             self.buffer,
             pagesize=A4,
-            topMargin=25*mm,
-            bottomMargin=25*mm,
-            leftMargin=20*mm,
-            rightMargin=20*mm,
+            topMargin=15*mm,
+            bottomMargin=15*mm,
+            leftMargin=15*mm,
+            rightMargin=15*mm,
             title=f"Matrícula - {self.student.get('numero_documento', 'N/A')}",
             author="SGAPA"
         )
@@ -373,27 +481,24 @@ class MatriculaPDFGenerator:
         
         # Construir documento
         elements.append(self._create_header())
-        elements.append(Spacer(1, 20))
-        
         elements.extend(self._create_student_header())
         
         elements.extend(self._create_info_section(
-            "📋 Información Personal",
+            "Información Personal",
             self._get_personal_data()
         ))
         
         elements.extend(self._create_info_section(
-            "🎓 Información Académica",
+            "Información Académica",
             self._get_academic_data()
         ))
         
         elements.extend(self._create_info_section(
-            "👨‍👩‍👧‍👦 Datos Familiares",
+            "Datos Familiares",
             self._get_family_data()
         ))
         
-        elements.append(Spacer(1, 10))
-        elements.append(self._create_footer())
+        elements.extend(self._create_footer())
         
         # Construir PDF
         doc.build(elements)
@@ -414,58 +519,3 @@ def generate_matricula_pdf(estudiante_data: Dict[str, Any]) -> BytesIO:
     """
     generator = MatriculaPDFGenerator(estudiante_data)
     return generator.generate()
-
-
-# Ejemplo de uso
-if __name__ == "__main__":
-    # Datos de ejemplo
-    ejemplo_data = {
-        "student": {
-            "nombres": "Juan Pablo",
-            "apellidos": "García Rodríguez",
-            "tipo_documento": "TI",
-            "numero_documento": "1234567890",
-            "edad": 15,
-            "genero": "Masculino",
-            "fecha_nacimiento": "2009-03-15",
-            "lugar_nacimiento": "Medellín, Antioquia",
-            "telefono": "3001234567",
-            "correo": "juan.garcia@email.com",
-            "grade": "10°",
-            "jornada": "Mañana",
-            "grupo": "10-A",
-            "direccion": "Calle 50 # 20-30",
-            "barrio": "El Poblado",
-            "localidad": "Medellín",
-            "zona": "Urbana",
-            "eps": "Sura EPS",
-            "tipo_sangre": "O+",
-        },
-        "family": {
-            "madre": {
-                "nombres": "María",
-                "apellidos": "Rodríguez",
-                "numero_documento": "43123456",
-                "telefono": "3009876543",
-                "correo": "maria.rodriguez@email.com",
-                "ocupacion": "Ingeniera"
-            },
-            "padre": {
-                "nombres": "Carlos",
-                "apellidos": "García",
-                "numero_documento": "70123456",
-                "telefono": "3007654321",
-                "correo": "carlos.garcia@email.com",
-                "ocupacion": "Médico"
-            }
-        }
-    }
-    
-    # Generar PDF
-    pdf_buffer = generate_matricula_pdf(ejemplo_data)
-    
-    # Guardar en archivo
-    with open("matricula_estudiante.pdf", "wb") as f:
-        f.write(pdf_buffer.getvalue())
-    
-    print("PDF generado exitosamente: matricula_estudiante.pdf")
