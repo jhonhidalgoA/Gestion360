@@ -70,6 +70,7 @@ class Estudiante(Base):
     barrio = Column(String(100))
     localidad = Column(String(100))
     zona = Column(String(50))
+    foto = Column(String(500)) 
 
     # Relación con usuario
     user_id = Column(ForeignKey("users.id", ondelete="CASCADE"))

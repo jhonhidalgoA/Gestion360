@@ -56,6 +56,7 @@ class StudentRegister(BaseModel):
     localidad: Optional[str] = None
     zona: Optional[str] = None
     password: Optional[str] = None  
+    foto: Optional[str] = None
 
     class Config:
         orm_mode = True

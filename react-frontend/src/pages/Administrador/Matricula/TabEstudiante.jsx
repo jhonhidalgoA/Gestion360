@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./TabEstudiante.css";
 import InputField from "../../../components/ui/InputField";
 import SelectField from "../../../components/ui/SelectField";
-import PhotoUpload from "../../../components/ui/PhotoUpload"; 
+import PhotoUpload from "../../../components/ui/PhotoUpload";
 import {
   documentOptions,
   genderOptions,
@@ -14,7 +14,6 @@ import {
 const TabEstudiante = ({ register, errors, setValue, watch }) => {
   const [age, setAge] = useState("");
 
-  
   const watchedPhoto = watch("studentPhoto");
   const watchedBirthDate = watch("studentBirthDate");
 
@@ -41,7 +40,6 @@ const TabEstudiante = ({ register, errors, setValue, watch }) => {
     setValue("studentAge", calculatedAge);
   };
 
-  
   useEffect(() => {
     if (watchedBirthDate) {
       const calculatedAge = calculateAge(watchedBirthDate);
@@ -51,13 +49,20 @@ const TabEstudiante = ({ register, errors, setValue, watch }) => {
     }
   }, [watchedBirthDate]);
 
-  
   const handlePhotoChange = (file) => {
-    setValue("studentPhoto", file);
+    if (!file) {
+      setValue("studentPhoto", null);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setValue("studentPhoto", reader.result); // ← base64 string
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
-    <div className="tab-content">    
+    <div className="tab-content">
       <PhotoUpload
         id="student-photo"
         label="Foto del Estudiante"

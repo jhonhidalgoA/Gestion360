@@ -21,6 +21,8 @@ const Matricula = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isStudentListModalOpen, setIsStudentListModalOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const {
     register,
@@ -48,8 +50,11 @@ const Matricula = () => {
       setActiveTab("estudiante");
       setIsSuccessModalOpen(true);
     } catch (error) {
-      console.error("❌ Error al enviar a la API:", error);
-      alert("No se pudo registrar la matrícula. Verifique el servidor.");
+      console.error(" Error al enviar a la API:", error);
+      setErrorMessage(
+        "No se pudo registrar la matrícula. Debe completar todos los campos y/o Verifique el servidor."
+      );
+      setIsErrorModalOpen(true);
     }
   };
 
@@ -152,7 +157,7 @@ const Matricula = () => {
         )}
 
         <div className="form-actions">
-          <Botones          
+          <Botones
             onSave={handleSubmit(onSubmit)}
             onEdit={() => setIsStudentListModalOpen(true)}
             onDelete={handleClear}
@@ -175,7 +180,7 @@ const Matricula = () => {
           {
             text: "Entendido",
             variant: "success",
-             icon: <FaExclamation />,
+            icon: <FaExclamation />,
             onClick: () => setIsModalOpen(false),
           },
         ]}
@@ -195,6 +200,24 @@ const Matricula = () => {
             text: "Aceptar",
             variant: "success",
             onClick: () => setIsSuccessModalOpen(false),
+          },
+        ]}
+      />
+
+      <Modal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        title={
+          <>
+            Colegio <span className="modal-title-360">STEM 360</span>
+          </>
+        }
+        message={errorMessage}
+        buttons={[
+          {
+            text: "Aceptar",
+            variant: "danger",
+            onClick: () => setIsErrorModalOpen(false),
           },
         ]}
       />

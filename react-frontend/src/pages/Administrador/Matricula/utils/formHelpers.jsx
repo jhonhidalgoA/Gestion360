@@ -84,7 +84,8 @@ export const formatMatriculaData = (data) => {
       direccion: data.studentAddress || "",
       barrio: data.studentNeighborhood || "",
       localidad: data.studentLocality || "",
-      zona: data.studentZone || "Urbana"
+      zona: data.studentZone || "Urbana",
+      foto: data.studentPhoto || null
       
     },
     family: {

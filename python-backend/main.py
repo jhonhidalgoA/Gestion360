@@ -12,9 +12,9 @@ from backend.database import SessionLocal, Base, engine
 from backend.models import User, Role, Estudiante, Padre
 from backend.schemas import MatriculaCreate  # ✅ Nuevo esquema que agrupa estudiante + padres + datos académicos
 
-# ------------------------------------------------------------
-# CONFIGURACIÓN GENERAL
-# ------------------------------------------------------------
+
+# Configuración General
+
 
 app = FastAPI(title="Gestión 360 API")
 
@@ -36,10 +36,6 @@ SECRET_KEY = "tu_clave_secreta_aqui_cambiar_en_produccion"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-
-# ------------------------------------------------------------
-# DEPENDENCIAS Y UTILIDADES
-# ------------------------------------------------------------
 
 # Conexión a la base de datos
 def get_db():
@@ -63,10 +59,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-# ------------------------------------------------------------
-# SCHEMA INTERNO PARA LOGIN
-# ------------------------------------------------------------
-
 from pydantic import BaseModel
 
 class LoginRequest(BaseModel):
@@ -74,16 +66,14 @@ class LoginRequest(BaseModel):
     password: str
 
 
-# ------------------------------------------------------------
-# RUTAS
-# ------------------------------------------------------------
+# Rutas
 
 @app.get("/")
 def root():
     return {"message": "API funcionando correctamente 🚀"}
 
 
-# ------------------- LOGIN -------------------
+
 @app.post("/login")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == data.username).first()
@@ -124,19 +114,19 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     }
 
 
-# ------------------- REGISTRO DE ESTUDIANTE -------------------
+# Registro estudiante
 @app.post("/register-student", status_code=status.HTTP_201_CREATED)
 def register_student(data: MatriculaCreate, db: Session = Depends(get_db)):
     """
     Registro completo de un estudiante (usuario + estudiante + padres)
     """
 
-    # ⚙️ 1️⃣ Verificar si el usuario ya existe (por número de documento)
+    # Verificar si el usuario ya existe (por número de documento)
     existing_user = db.query(User).filter(User.username == data.student.numero_documento).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="El usuario con ese número de documento ya existe")
 
-    # ⚙️ 2️⃣ Crear usuario
+    # Crear usuario
     hashed_password = pwd_context.hash(data.student.numero_documento)
     role = db.query(Role).filter(Role.name.ilike("estudiante")).first()
     if not role:
@@ -156,7 +146,7 @@ def register_student(data: MatriculaCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # ⚙️ 3️⃣ Crear estudiante
+    # Crear estudiante
     new_student = Estudiante(
         fecha_registro=data.student.fecha_registro,
         nombres=data.student.nombres,
@@ -180,14 +170,15 @@ def register_student(data: MatriculaCreate, db: Session = Depends(get_db)):
         barrio=data.student.barrio,
         localidad=data.student.localidad,
         zona=data.student.zona,
-        user_id=new_user.id
+        user_id=new_user.id,
+        foto=data.student.foto,
     )
 
     db.add(new_student)
     db.commit()
     db.refresh(new_student)
 
-    # ⚙️ 4️⃣ Registrar padres (si existen)
+    # Registrar padres 
     if data.family:
         if data.family.madre:
             madre = Padre(
@@ -221,7 +212,7 @@ def register_student(data: MatriculaCreate, db: Session = Depends(get_db)):
 
     db.commit()
 
-    # ✅ Respuesta final
+    # Respuesta final
     return {
         "message": "Estudiante registrado exitosamente",
         "username": new_user.username,
