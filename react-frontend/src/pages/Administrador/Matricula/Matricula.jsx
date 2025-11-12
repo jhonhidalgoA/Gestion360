@@ -33,6 +33,7 @@ const Matricula = () => {
     setValue,
     reset,
     watch,
+    getValues,
   } = useForm({
     mode: "onBlur",
     defaultValues: getDefaultValues(),
@@ -45,38 +46,16 @@ const Matricula = () => {
 
   const onSubmit = async (data) => {
     try {
-      const isEditing = !!data.id_estudiante;
-
-      if (isEditing) {
-        // Actualizar
-        const response = await fetch(
-          `http://localhost:8000/student/${data.id_estudiante}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formatMatriculaData(data)),
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.detail || "Error al actualizar");
-        }
-
-        await response.json();
-      } else {
-        // Crear
-        await postMatricula(formatMatriculaData(data));
-      }
-
+      const formattedData = formatMatriculaData(data);
+      await postMatricula(formattedData);
       reset(getDefaultValues());
       setActiveTab("estudiante");
       setIsSuccessModalOpen(true);
     } catch (error) {
-      console.error("Error al enviar a la API:", error);
-      setErrorMessage("No se pudo guardar. Verifique los datos.");
+      console.error(" Error al enviar a la API:", error);
+      setErrorMessage(
+        "No se pudo registrar la matrícula. Debe completar todos los campos y/o Verifique el servidor."
+      );
       setIsErrorModalOpen(true);
     }
   };
@@ -86,13 +65,16 @@ const Matricula = () => {
     setActiveTab("estudiante");
   };
 
- 
+  // ✅ CORREGIDO: usa mapMatriculaToFrontend
   const loadStudentForEdit = (matricula) => {
     const values = mapMatriculaToFrontend(matricula);
     values.id_estudiante = matricula.id;
+    
     reset(values);
     setActiveTab("estudiante");
   };
+
+  
 
   return (
     <div className="student-registration">
@@ -130,16 +112,23 @@ const Matricula = () => {
         {activeTab === "familia" && (
           <TabFamiliar register={register} errors={errors} />
         )}
-
         <div className="form-actions">
-          <Botones
-            onSave={handleSubmit(onSubmit)}
-            onEdit={() => setIsStudentListModalOpen(true)}
-            onDelete={handleClear}
-            onGeneratePDF={() => alert("Generar PDF")}
-            disabled={!isValid}
-          />
-        </div>
+        <Botones
+          onSave={handleSubmit(onSubmit)}
+          onEdit={() => setIsStudentListModalOpen(true)}
+          onDelete={handleClear}
+          onLoadPDF={() => {
+            const id = getValues("id_estudiante");
+            if (id) {
+              window.open(`http://localhost:8000/matricula-pdf/${id}`, '_blank');
+            }
+          }}
+          saveDisabled={!isValid}
+          pdfDisabled={!getValues("id_estudiante")}
+        />
+      </div>
+
+        
       </form>
 
       <Modal

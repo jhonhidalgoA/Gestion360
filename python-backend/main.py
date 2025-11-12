@@ -10,7 +10,9 @@ import uuid
 # Importaciones locales
 from backend.database import SessionLocal, Base, engine
 from backend.models import User, Role, Estudiante, Padre
-from backend.schemas import MatriculaCreate  # ✅ Nuevo esquema que agrupa estudiante + padres + datos académicos
+from backend.schemas import MatriculaCreate  
+from fastapi.responses import StreamingResponse
+from backend.pdf_generator import generate_matricula_pdf
 
 
 # Configuración General
@@ -379,3 +381,98 @@ def update_student(student_id: int, data: MatriculaCreate, db: Session = Depends
         "message": "Estudiante actualizado exitosamente",
         "id_estudiante": str(estudiante.id)
     }
+    
+@app.get("/matricula-pdf/{student_id}")
+def download_matricula_pdf(student_id: int, db: Session = Depends(get_db)):
+    print(f"🟢 Entrando a /matricula-pdf/{student_id}")  # ← AÑADE ESTO
+    estudiante = db.query(Estudiante).filter(Estudiante.id == student_id).first()
+    if not estudiante:
+        raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+    print(f"🟢 Estudiante encontrado: {estudiante.nombres} {estudiante.apellidos}") 
+    estudiante = db.query(Estudiante).filter(Estudiante.id == student_id).first()
+    if not estudiante:
+        raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+
+    padres = db.query(Padre).filter(Padre.estudiante_id == student_id).all()
+    madre = None
+    padre = None
+
+    for p in padres:
+        parentesco_str = str(p.parentesco) if p.parentesco is not None else ""
+        if parentesco_str.strip().lower() == "madre":
+            madre = p
+        elif parentesco_str.strip().lower() == "padre":
+            padre = p
+
+    grado_map = {
+        0: "preescolar",
+        1: "primero",
+        2: "segundo",
+        3: "tercero",
+        4: "cuarto",
+        5: "quinto",
+        6: "sexto",
+        7: "septimo",
+        8: "octavo",
+        9: "noveno",
+        10: "decimo",
+        11: "undecimo"
+    }
+
+    # Convertir grado_id a int seguro
+    grado_id_int = int(estudiante.grado_id) if estudiante.grado_id is not None else -1  # type: ignore
+    grado_nombre = grado_map.get(grado_id_int, "Sin asignar")
+
+    # Convertir grupo a string seguro
+    grupo_str = str(estudiante.grupo) if estudiante.grupo is not None else ""
+    grado_display = f"{grado_nombre} - {grupo_str}" if grupo_str else grado_nombre
+
+    data = {
+        "student": {
+            "nombres": estudiante.nombres,
+            "apellidos": estudiante.apellidos,
+            "tipo_documento": estudiante.tipo_documento,
+            "numero_documento": estudiante.numero_documento,
+            "fecha_nacimiento": estudiante.fecha_nacimiento,
+            "edad": estudiante.edad,
+            "genero": estudiante.genero,
+            "lugar_nacimiento": estudiante.lugar_nacimiento,
+            "telefono": estudiante.telefono,
+            "correo": estudiante.correo,
+            "jornada": estudiante.jornada,
+            "grupo": estudiante.grupo,
+            "grade": grado_display,
+            "direccion": estudiante.direccion,
+            "barrio": estudiante.barrio,
+            "localidad": estudiante.localidad,
+            "zona": estudiante.zona,
+            "eps": estudiante.eps,
+            "tipo_sangre": estudiante.tipo_sangre,
+            "foto": estudiante.foto,
+        },
+        "family": {
+            "madre": {
+                "nombres": madre.nombres,
+                "apellidos": madre.apellidos,
+                "numero_documento": madre.numero_documento,
+                "telefono": madre.telefono,
+                "correo": madre.correo,
+                "ocupacion": madre.ocupacion,
+            } if madre else None,
+            "padre": {
+                "nombres": padre.nombres,
+                "apellidos": padre.apellidos,
+                "numero_documento": padre.numero_documento,
+                "telefono": padre.telefono,
+                "correo": padre.correo,
+                "ocupacion": padre.ocupacion,
+            } if padre else None
+        }
+    }
+
+    pdf_buffer = generate_matricula_pdf(data)
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"inline; filename=matricula_{estudiante.numero_documento}.pdf"}
+    )
