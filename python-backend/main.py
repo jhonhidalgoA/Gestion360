@@ -211,7 +211,6 @@ def register_student(data: MatriculaCreate, db: Session = Depends(get_db)):
             db.add(padre)
 
     db.commit()
-
    
     return {
         "message": "Estudiante registrado exitosamente",
@@ -313,5 +312,70 @@ def get_all_matriculas(db: Session = Depends(get_db)):
         }
 
         matriculas.append(matricula)
-
     return matriculas
+
+
+
+@app.put("/student/{student_id}", status_code=status.HTTP_200_OK)
+def update_student(student_id: int, data: MatriculaCreate, db: Session = Depends(get_db)):
+    # Buscar estudiante
+    estudiante = db.query(Estudiante).filter(Estudiante.id == student_id).first()
+    if not estudiante:
+        raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+
+    # Verificar si otro estudiante ya usa ese documento (excluyendo al actual)
+    existing = db.query(Estudiante).filter(
+        Estudiante.numero_documento == data.student.numero_documento,
+        Estudiante.id != student_id
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Número de documento ya en uso")
+
+    # Actualizar estudiante
+    for key, value in data.student.dict().items():
+        if key != "password":  # no se actualiza password aquí
+            setattr(estudiante, key, value)
+
+    # Actualizar padres
+    if data.family:
+        # Eliminar padres actuales
+        db.query(Padre).filter(Padre.estudiante_id == student_id).delete()
+
+        # Crear nuevos
+        if data.family.madre:
+            madre = Padre(
+                nombres=data.family.madre.nombres,
+                apellidos=data.family.madre.apellidos,
+                tipo_documento=data.family.madre.tipo_documento,
+                numero_documento=data.family.madre.numero_documento,
+                telefono=data.family.madre.telefono,
+                correo=data.family.madre.correo,
+                profesion=data.family.madre.profesion,
+                ocupacion=data.family.madre.ocupacion,
+                parentesco="Madre",
+                estudiante_id=student_id
+            )
+            db.add(madre)
+
+        if data.family.padre:
+            padre = Padre(
+                nombres=data.family.padre.nombres,
+                apellidos=data.family.padre.apellidos,
+                tipo_documento=data.family.padre.tipo_documento,
+                numero_documento=data.family.padre.numero_documento,
+                telefono=data.family.padre.telefono,
+                correo=data.family.padre.correo,
+                profesion=data.family.padre.profesion,
+                ocupacion=data.family.padre.ocupacion,
+                parentesco="Padre",
+                estudiante_id=student_id
+            )
+            db.add(padre)
+
+    db.commit()
+    db.refresh(estudiante)
+
+    return {
+        "message": "Estudiante actualizado exitosamente",
+        "id_estudiante": str(estudiante.id)
+    }

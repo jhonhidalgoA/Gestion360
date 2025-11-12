@@ -74,6 +74,7 @@ const TabEstudiante = ({ register, errors, setValue, watch }) => {
       />
 
       <div className="register-fields">
+        <input type="hidden" {...register("id_estudiante")} />
         <div className="field-row">
           <div className="group">
             <label htmlFor="register-date">Fecha de Matrícula:</label>

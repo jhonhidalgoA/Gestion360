@@ -4,7 +4,7 @@ import { getDefaultValues } from "../Matricula/config/defaultValues";
 import {
   validateTab,
   formatMatriculaData,
-  mapMatriculaToFrontend // ✅ importado
+  mapMatriculaToFrontend, // ✅ importado
 } from "../Matricula/utils/formHelpers";
 import { postMatricula } from "../Matricula/utils/apiHelpers";
 import ModalListaEstudiantes from "../Matricula/ModalListaEstudiante";
@@ -45,16 +45,38 @@ const Matricula = () => {
 
   const onSubmit = async (data) => {
     try {
-      const formattedData = formatMatriculaData(data);
-      await postMatricula(formattedData);
+      const isEditing = !!data.id_estudiante;
+
+      if (isEditing) {
+        // Actualizar
+        const response = await fetch(
+          `http://localhost:8000/student/${data.id_estudiante}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formatMatriculaData(data)),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || "Error al actualizar");
+        }
+
+        await response.json();
+      } else {
+        // Crear
+        await postMatricula(formatMatriculaData(data));
+      }
+
       reset(getDefaultValues());
       setActiveTab("estudiante");
       setIsSuccessModalOpen(true);
     } catch (error) {
-      console.error(" Error al enviar a la API:", error);
-      setErrorMessage(
-        "No se pudo registrar la matrícula. Debe completar todos los campos y/o Verifique el servidor."
-      );
+      console.error("Error al enviar a la API:", error);
+      setErrorMessage("No se pudo guardar. Verifique los datos.");
       setIsErrorModalOpen(true);
     }
   };
@@ -64,9 +86,10 @@ const Matricula = () => {
     setActiveTab("estudiante");
   };
 
-  // ✅ CORREGIDO: usa mapMatriculaToFrontend
+ 
   const loadStudentForEdit = (matricula) => {
     const values = mapMatriculaToFrontend(matricula);
+    values.id_estudiante = matricula.id;
     reset(values);
     setActiveTab("estudiante");
   };
