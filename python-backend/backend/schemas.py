@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 
 
@@ -103,3 +103,19 @@ class DocenteCreate(BaseModel):
 
     class Config:
         orm_mode = True        
+        
+class MateriaDia(BaseModel):
+    dia: str
+    materia: str | None
+
+class FilaHorario(BaseModel):
+    inicio: str
+    fin: str
+    dias: List[MateriaDia]
+
+class HorarioRequest(BaseModel):
+    grado_nombre: str
+    docente_id: int
+    filas: List[FilaHorario]       
+    
+        

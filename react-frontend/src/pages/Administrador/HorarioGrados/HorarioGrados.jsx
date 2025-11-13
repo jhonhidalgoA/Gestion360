@@ -191,7 +191,7 @@ const HorarioGrados = () => {
     setModal({ show: false, title: "", message: "", action: null });
   };
 
-  const guardarHorario = () => {
+  const guardarHorario = async () => {
     if (!grado || !director) {
       showModal(
         "Campos Requeridos",
@@ -201,13 +201,55 @@ const HorarioGrados = () => {
       );
       return;
     }
-
     if (totalHoras === 0) {
       showModal("Sin Datos", "No hay horas asignadas para guardar", null, true);
       return;
     }
 
-    showModal("Éxito", "Horario guardado exitosamente", null, true);
+    const gradoNombreMap = {
+      6: "Sexto",
+      7: "Séptimo",
+      8: "Octavo",
+      9: "Noveno",
+      10: "Décimo",
+      11: "Undécimo",
+    };
+    const gradoNombre = gradoNombreMap[grado];
+    if (!gradoNombre) {
+      showModal("Error", "Grado no válido", null, true);
+      return;
+    }
+
+    const payload = {
+      grado_nombre: gradoNombre,
+      docente_id: parseInt(director),
+      filas: filas.map((fila) => ({
+        inicio: fila.inicio,
+        fin: fila.fin,
+        dias: DIAS.map((dia) => ({
+          dia,
+          materia: fila.materias[dia] || null,
+        })),
+      })),
+    };
+
+    try {
+      const response = await fetch("http://localhost:8000/api/horarios", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        showModal("Éxito", "Horario guardado en la base de datos", null, true);
+      } else {
+        showModal("Error", data.detail || "Error al guardar", null, true);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      showModal("Error", "No se pudo conectar con el servidor", null, true);
+    }
   };
 
   const showModal = (title, message, action, single = false) => {
@@ -219,7 +261,7 @@ const HorarioGrados = () => {
 
   return (
     <div className="grid-layout">
-      <NavbarSection title="Horario Grados" color="#A9A9A9" />    
+      <NavbarSection title="Horario Grados" color="#A9A9A9" />
       <div className="grades-grid-layout">
         <main className="main-content">
           <div className="horario-grados-controls">
@@ -257,17 +299,13 @@ const HorarioGrados = () => {
             <div className="horario-grados-stats-container">
               <div className="horario-grados-stat-item">
                 <div className="horario-grados-stat-value">{totalHoras}</div>
-                <div className="horario-grados-stat-label">
-                  Horas Asignadas
-                </div>
+                <div className="horario-grados-stat-label">Horas Asignadas</div>
               </div>
               <div className="horario-grados-stat-item">
                 <div className="horario-grados-stat-value">
                   {horasRestantes}
                 </div>
-                <div className="horario-grados-stat-label">
-                  Horas Restantes
-                </div>
+                <div className="horario-grados-stat-label">Horas Restantes</div>
               </div>
               <div className="horario-grados-stat-item">
                 <div className="horario-grados-stat-value">{porcentaje}%</div>
@@ -391,7 +429,7 @@ const HorarioGrados = () => {
 
         <aside className="horario-grados-sidebar">
           <div className="horario-grados-sidebar-title">
-            <h3>Asignación de Materias</h3>            
+            <h3>Asignación de Materias</h3>
           </div>
           <table className="subjects-table">
             <thead>
@@ -404,9 +442,7 @@ const HorarioGrados = () => {
               {MATERIAS_CONFIG.map((materia) => (
                 <tr
                   key={materia.nombre}
-                  className={
-                    materia.isBreak ? "horario-grados-break-row" : ""
-                  }
+                  className={materia.isBreak ? "horario-grados-break-row" : ""}
                 >
                   <td className="horario-grados-subject-name">
                     {materia.nombre}

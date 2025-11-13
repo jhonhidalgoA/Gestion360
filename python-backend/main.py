@@ -6,11 +6,13 @@ from passlib.context import CryptContext
 from typing import Optional
 import jwt
 import uuid
+from sqlalchemy import text
+from datetime import time
 
 # Importaciones locales
 from backend.database import SessionLocal, Base, engine
 from backend.models import User, Role, Estudiante, Padre, Docente
-from backend.schemas import MatriculaCreate, DocenteCreate  
+from backend.schemas import MatriculaCreate, DocenteCreate, HorarioRequest  
 from fastapi.responses import StreamingResponse
 from backend.pdf_generator import generate_matricula_pdf, generate_docente_pdf
 
@@ -606,3 +608,62 @@ def download_docente_pdf(docente_id: int, db: Session = Depends(get_db)):
         media_type="application/pdf",
         headers={"Content-Disposition": f"inline; filename=docente_{docente.teacherDocumentNumber}.pdf"}
     )
+    
+@app.post("/api/horarios")
+def guardar_horario(horario: HorarioRequest, db: Session = Depends(get_db)):
+    try:
+        # 1. Obtener grade_id desde grados.nombre
+        res = db.execute(
+            text("SELECT id FROM grados WHERE nombre = :n"),
+            {"n": horario.grado_nombre}
+        ).fetchone()
+        if not res:
+            raise HTTPException(status_code=400, detail="Grado no encontrado")
+        grade_id = res[0]
+
+        # 2. Validar que el docente exista
+        res = db.execute(
+            text("SELECT id FROM docentes WHERE id = :id"),
+            {"id": horario.docente_id}
+        ).fetchone()
+        if not res:
+            raise HTTPException(status_code=400, detail="Docente no encontrado")
+
+        # 3. Limpiar horarios anteriores del mismo docente y grado (opcional)
+        db.execute(
+            text("DELETE FROM horarios WHERE grade_id = :g AND teacher_id = :t"),
+            {"g": grade_id, "t": horario.docente_id}
+        )
+
+        # 4. Insertar las nuevas asignaciones
+        for fila in horario.filas:
+            for item in fila.dias:
+                if item.materia:
+                    # Buscar subject_id por nombre
+                    res = db.execute(
+                        text("SELECT subject_id FROM asignaturas WHERE name = :name"),
+                        {"name": item.materia}
+                    ).fetchone()
+                    if not res:
+                        raise HTTPException(status_code=400, detail=f"Asignatura no encontrada: {item.materia}")
+                    subject_id = res[0]
+
+                    db.execute(
+                        text("""
+                            INSERT INTO horarios (grade_id, teacher_id, day_of_week, start_time, end_time, subject_id)
+                            VALUES (:grade_id, :teacher_id, :day, :inicio, :fin, :subject_id)
+                        """),
+                        {
+                            "grade_id": grade_id,
+                            "teacher_id": horario.docente_id,
+                            "day": item.dia,
+                            "inicio": time.fromisoformat(fila.inicio),
+                            "fin": time.fromisoformat(fila.fin),
+                            "subject_id": subject_id,
+                        }
+                    )
+        db.commit()
+        return {"mensaje": "Horario guardado exitosamente"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
