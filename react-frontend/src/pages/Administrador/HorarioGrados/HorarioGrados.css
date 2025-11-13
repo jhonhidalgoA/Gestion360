@@ -141,7 +141,7 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  width:200px;
+  width:300px;
   transition: all 0.2s;
 }
 
@@ -152,6 +152,7 @@
 .horario-grados-btn-add {
   background: #FF8C00;
   color: white;
+  
 }
 
 .horario-grados-btn-save {
@@ -179,22 +180,43 @@
   color: white;
   padding: 0.5rem 1rem;
   margin-right: 0.5rem;
+  font-size:18px;
+  border:none;
+  border-radius:5px;
+  width:120px;
 }
 
 .horario-grados-btn-delete-small {
   background: #f56565;
   color: white;
   padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  font-size:18px;
+  border:none;
+  border-radius:5px;
+  width:120px;
 }
 
 .horario-grados-btn-cancel {
   background: #f56565;
   color: white;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  font-size:18px;
+  border:none;
+  border-radius:5px;
+  width:120px;
 }
 
 .horario-grados-btn-confirm {
   background: #48bb78;
   color: white;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  font-size:18px;
+  border:none;
+  border-radius:5px;
+  width:120px;
 }
 
 .horario-grados-sidebar {
@@ -281,24 +303,33 @@
 
 .horario-grados-modal-content {
   background: white;
-  border-radius: 20px;
-  max-width: 900px;
+  border-radius: 10px;
+  max-width: 600px;
   width: 90%;
   max-height: 80vh;
   overflow: auto;
 }
 
-.horario-grados-modal-header {
-  background: #667eea;
-  color: white;
-  padding: 2rem;
+.horario-grados-modal-header {  
+  color: #000000;
+  padding: 1em;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.horario-grados-modal-header h2{
+  font-size:20px;
 }
 
 .horario-grados-modal-body {
   padding: 2rem;
+}
+
+.horario-grados-modal-body p{
+  text-align:center;
+  font-size:20px;
 }
 
 .horario-grados-modal-footer {
@@ -306,13 +337,12 @@
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  border-top: 1px solid #e2e8f0;
-}
+} 
 
 .horario-grados-close-btn {
   background: transparent;
   border: none;
-  color: white;
+  color: #000000;
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
@@ -338,7 +368,7 @@
 
 /* Hover effects */
 .horario-grados-btn:hover {
-  transform: translateY(-2px);
+  transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 

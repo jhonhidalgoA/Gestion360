@@ -40,7 +40,7 @@ const HorarioGrados = () => {
         setGrados(data);
       } catch (err) {
         console.error("Error al cargar grados:", err);
-        showModal("Error", "No se pudieron cargar los grados", null, true);
+        showModal("Colegio STEM 360", "No se pudieron cargar los grados", null, true);
       }
     };
     cargarGrados();
@@ -103,7 +103,7 @@ const HorarioGrados = () => {
 
           if (hI * 60 + mI >= hF * 60 + mF) {
             showModal(
-              "Error",
+              "Colegio STEM 360",
               "La hora de inicio debe ser anterior a la hora de fin",
               null,
               true
@@ -182,15 +182,15 @@ const HorarioGrados = () => {
   const guardarHorario = async () => {
     if (!grado || !director) {
       showModal(
-        "Campos Requeridos",
-        "Por favor complete Grado y Director de Grupo",
+        "Colegio STEM 360",
+        "Por favor seleccionar Grado y/o Director de Grupo",
         null,
         true
       );
       return;
     }
     if (totalHoras === 0) {
-      showModal("Sin Datos", "No hay horas asignadas para guardar", null, true);
+      showModal("Colegio STEM 360", "No hay horas asignadas para guardar", null, true);
       return;
     }
 
@@ -223,13 +223,13 @@ const HorarioGrados = () => {
 
       const data = await response.json();
       if (response.ok) {
-        showModal("Éxito", "Horario guardado en la base de datos", null, true);
+        showModal("Colegio STEM 360", "Horario guardado en la base de datos", null, true);
       } else {
-        showModal("Error", data.detail || "Error al guardar", null, true);
+        showModal("Colegio STEM 360", data.detail || "Error al guardar", null, true);
       }
     } catch (error) {
       console.error("Error:", error);
-      showModal("Error", "No se pudo conectar con el servidor", null, true);
+      showModal("Colegio STEM 360", "No se pudo conectar con el servidor", null, true);
     }
   };
 
@@ -396,7 +396,7 @@ const HorarioGrados = () => {
               className="grades-btn horario-grados-btn-delete"
               onClick={() =>
                 showModal(
-                  "Confirmar",
+                  "Colegio STEM 360",
                   "¿Estás seguro de borrar todo el horario?",
                   borrarHorario
                 )
@@ -481,7 +481,7 @@ const HorarioGrados = () => {
                   className="horario-grados-btn horario-grados-btn-cancel"
                   onClick={() => setModal({ ...modal, show: false })}
                 >
-                  <X size={20} /> Cancelar
+                 Cancelar
                 </button>
               )}
               <button
@@ -491,7 +491,7 @@ const HorarioGrados = () => {
                   setModal({ ...modal, show: false });
                 }}
               >
-                <Check size={20} /> Aceptar
+                Aceptar
               </button>
             </div>
           </div>
