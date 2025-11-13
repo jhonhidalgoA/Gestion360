@@ -13,7 +13,6 @@ from backend.models import User, Role, Estudiante, Padre, Docente
 from backend.schemas import MatriculaCreate, DocenteCreate  
 from fastapi.responses import StreamingResponse
 from backend.pdf_generator import generate_matricula_pdf, generate_docente_pdf
- 
 
 
 # Configuración General
@@ -481,7 +480,8 @@ def download_matricula_pdf(student_id: int, db: Session = Depends(get_db)):
  # --- MODULO DOCENTE --- #
  
     
-# -- Registrar docente -- #  
+# -- Registrar docente -- #   
+
 @app.post("/api/docentes", status_code=status.HTTP_201_CREATED)
 def registrar_docente(data: DocenteCreate, db: Session = Depends(get_db)):
     
@@ -542,7 +542,8 @@ def registrar_docente(data: DocenteCreate, db: Session = Depends(get_db)):
         "id_docente": new_docente.id
     }    
     
-# -- Editar docente -- #   
+# -- Editar docente -- #    
+
 @app.get("/api/docentes")
 def get_docentes(db: Session = Depends(get_db)):
     docentes = db.query(Docente).all()
@@ -579,22 +580,23 @@ def download_docente_pdf(docente_id: int, db: Session = Depends(get_db)):
 
     data = {
         "docente": {
-            "nombre_completo": f"{docente.teacherName} {docente.teacherLastname}",
-            "fecha_registro": docente.registerDate,
+            "teacherName": docente.teacherName,
+            "teacherLastname": docente.teacherLastname,
             "codigo": docente.codigo,
-            "fecha_nacimiento": docente.teacherBirthDate,
-            "edad": docente.teacherAge,
-            "genero": docente.teacherGender,
-            "lugar_nacimiento": docente.teacherBirthPlace,
-            "tipo_documento": docente.teacherDocument,
-            "numero_documento": docente.teacherDocumentNumber,
-            "telefono": docente.teacherPhone,
-            "correo": docente.teacherEmail,
-            "profesion": docente.teacherProfession,
-            "area": docente.teacherArea,
-            "resolucion": docente.teacherResolutionNumber,
-            "escalafon": docente.teacherScale,
-            "foto": docente.photo,
+            "registerDate": docente.registerDate,
+            "teacherBirthDate": docente.teacherBirthDate,
+            "teacherAge": docente.teacherAge,
+            "teacherGender": docente.teacherGender,
+            "teacherBirthPlace": docente.teacherBirthPlace,
+            "teacherDocument": docente.teacherDocument,
+            "teacherDocumentNumber": docente.teacherDocumentNumber,
+            "teacherPhone": docente.teacherPhone,
+            "teacherEmail": docente.teacherEmail,
+            "teacherProfession": docente.teacherProfession,
+            "teacherArea": docente.teacherArea,
+            "teacherResolutionNumber": docente.teacherResolutionNumber,
+            "teacherScale": docente.teacherScale,
+            "photo": docente.photo,
         }
     }
 
