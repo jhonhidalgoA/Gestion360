@@ -19,27 +19,27 @@ const RegistrarDocente = () => {
     trigger,
     reset,
     setValue,
-    watch 
+    watch,
   } = useForm({
     mode: "onBlur",
     defaultValues: {
       // Datos básicos
       registerDate: "",
       codigo: "",
-      teacherPhoto: null, 
+      teacherPhoto: null,
       teacherName: "",
       teacherLastname: "",
       teacherBirthDate: "",
       teacherAge: "",
       teacherGender: "",
       teacherBirthPlace: "",
-      
+
       // Documento
       teacherDocument: "",
       teacherDocumentNumber: "",
       teacherPhone: "",
       teacherEmail: "",
-      
+
       // Profesional
       teacherProfession: "",
       teacherArea: "",
@@ -48,21 +48,21 @@ const RegistrarDocente = () => {
     },
   });
 
-  
   useEffect(() => {
     const today = new Date();
     const isoDate = today.toISOString().split("T")[0];
     setValue("registerDate", isoDate, { shouldValidate: false });
 
-   
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const code = `DOC-${today.getFullYear()}${String(
       today.getMonth() + 1
-    ).padStart(2, "0")}${String(today.getDate()).padStart(2, "0")}-${randomSuffix}`;
+    ).padStart(2, "0")}${String(today.getDate()).padStart(
+      2,
+      "0"
+    )}-${randomSuffix}`;
     setValue("codigo", code, { shouldValidate: false });
   }, [setValue]);
 
-  
   const validateTab = async () => {
     const valid = await trigger();
     if (!valid) setIsModalOpen(true);
@@ -74,54 +74,75 @@ const RegistrarDocente = () => {
     if (isValidTab) setActiveTab(tab);
   };
 
-  const onSubmit = async (data) => {
-    try {
-      console.log("📌 Datos enviados del docente:", data);
-      
-      // ✅ Si necesitas enviar como FormData (para la foto)
-      const formData = new FormData();
-      
-      // Agregar foto si existe
-      if (data.teacherPhoto) {
-        formData.append("photo", data.teacherPhoto);
-      }
-      
-      // Agregar resto de campos
-      Object.keys(data).forEach((key) => {
-        if (key !== "teacherPhoto" && data[key] !== null) {
-          formData.append(key, data[key]);
-        }
-      });
-
-      // TODO: Llamada a la API
-      // await fetch("/api/docentes", {
-      //   method: "POST",
-      //   body: formData
-      // });
-
-      reset();
-      setActiveTab("docente");
-      setIsSuccessModalOpen(true);
-    } catch (error) {
-      console.error("❌ Error al registrar docente:", error);
-      alert("No se pudo registrar el docente.");
-    }
-  };
-
-  
   const handleClear = () => {
     reset();
     setActiveTab("docente");
-    
-  
+
     const today = new Date();
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const code = `DOC-${today.getFullYear()}${String(
       today.getMonth() + 1
-    ).padStart(2, "0")}${String(today.getDate()).padStart(2, "0")}-${randomSuffix}`;
+    ).padStart(2, "0")}${String(today.getDate()).padStart(
+      2,
+      "0"
+    )}-${randomSuffix}`;
     setValue("codigo", code, { shouldValidate: false });
   };
+const onSubmit = async (data) => {
+  try {
+    // Extraer base64 si existe (el valor ya es una cadena desde PhotoUpload)
+    const photoBase64 = data.teacherPhoto 
+      ? data.teacherPhoto.split(",")[1] 
+      : null;
 
+    // Construir payload asegurando que todos los campos sean strings
+    const payload = {
+      registerDate: String(data.registerDate || ""),
+      codigo: String(data.codigo || ""),
+      teacherName: String(data.teacherName || ""),
+      teacherLastname: String(data.teacherLastname || ""),
+      teacherBirthDate: String(data.teacherBirthDate || ""),
+      teacherAge: String(data.teacherAge || ""),
+      teacherGender: String(data.teacherGender || ""),
+      teacherBirthPlace: String(data.teacherBirthPlace || ""),
+      teacherDocument: String(data.teacherDocument || ""),
+      teacherDocumentNumber: String(data.teacherDocumentNumber || ""),
+      teacherPhone: String(data.teacherPhone || ""),
+      teacherEmail: String(data.teacherEmail || ""),
+      teacherProfession: String(data.teacherProfession || ""),
+      teacherArea: String(data.teacherArea || ""),
+      teacherResolutionNumber: String(data.teacherResolutionNumber || ""),
+      teacherScale: String(data.teacherScale || ""),
+      photo: photoBase64,
+    };
+
+    // Enviar a la API
+    const response = await fetch("http://localhost:8000/api/docentes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      const errorMsg =
+        error.detail?.[0]?.msg || error.detail || "Error desconocido al registrar docente";
+      throw new Error(errorMsg);
+    }
+
+    // Éxito
+    reset();
+    setActiveTab("docente");
+    setIsSuccessModalOpen(true);
+  } catch (error) {
+    console.error("❌ Error al registrar docente:", error);
+    alert("Error: " + error.message);
+  }
+};
+  
+  
   return (
     <div className="teacher-register">
       <NavbarSection title="Registro Docente" color="#388e3c" />
@@ -145,7 +166,7 @@ const RegistrarDocente = () => {
             register={register}
             errors={errors}
             setValue={setValue}
-            watch={watch} 
+            watch={watch}
           />
         )}
         {activeTab === "profesional" && (
@@ -160,7 +181,7 @@ const RegistrarDocente = () => {
           <Botones
             onSave={handleSubmit(onSubmit)}
             onEdit={() => alert("Editar (próximamente)")}
-            onDelete={handleClear} 
+            onDelete={handleClear}
             onGeneratePDF={() => alert("Generar PDF")}
             disabled={!isValid}
           />

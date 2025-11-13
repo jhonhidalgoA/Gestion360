@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./TabDocenteDatos.css";
 import InputField from "../../../components/ui/InputField";
 import SelectField from "../../../components/ui/SelectField";
-import PhotoUpload from "../../../components/ui/PhotoUpload"; 
+import PhotoUpload from "../../../components/ui/PhotoUpload";
 
 const TabDocenteDatos = ({ register, errors, setValue, watch }) => {
   const [age, setAge] = useState("");
@@ -63,7 +63,7 @@ const TabDocenteDatos = ({ register, errors, setValue, watch }) => {
     { value: "3d", label: "3D" },
   ];
 
-   const calculateAge = (birthDateString) => {
+  const calculateAge = (birthDateString) => {
     if (!birthDateString) return "";
     const birthDate = new Date(birthDateString);
     const today = new Date();
@@ -95,22 +95,30 @@ const TabDocenteDatos = ({ register, errors, setValue, watch }) => {
     }
   }, [watchedBirthDate]);
 
-  const handlePhotoChange = (file) => {
-    setValue("teacherPhoto", file);
+ const handlePhotoChange = (file) => {
+  if (!file) {
+    setValue("teacherPhoto", null);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    setValue("teacherPhoto", reader.result); // ← cadena base64 completa
   };
+  reader.readAsDataURL(file);
+};
 
   return (
     <div className="tab-content-teacher">
       <div className="photo-container">
         <PhotoUpload
-        id="teacher-photo"
-        label="Foto del Docente"
-        value={watchedPhoto}
-        onChange={handlePhotoChange}
-        error={errors.teacherPhoto}
-        maxSizeMB={5}
-        allowedTypes={["image/jpeg", "image/png", "image/webp"]}
-      />
+          id="teacher-photo"
+          label="Foto del Docente"
+          value={watchedPhoto}
+          onChange={handlePhotoChange}
+          error={errors.teacherPhoto}
+          maxSizeMB={5}
+          allowedTypes={["image/jpeg", "image/png", "image/webp"]}
+        />
       </div>
 
       <div className="register-fields">
@@ -178,7 +186,7 @@ const TabDocenteDatos = ({ register, errors, setValue, watch }) => {
             <input
               type="date"
               id="teacherBirthDate"
-              {...register("studentBirthDate", {
+              {...register("teacherBirthDate", {
                 required: "La fecha de nacimiento es requerida",
                 validate: {
                   notFuture: (value) => {
@@ -212,7 +220,7 @@ const TabDocenteDatos = ({ register, errors, setValue, watch }) => {
           <div className="group">
             <label htmlFor="teacherAge">Edad:</label>
             <input
-              type="number"
+              type="text"
               id="teacherAge"
               value={age}
               readOnly
@@ -330,7 +338,7 @@ const TabDocenteDatos = ({ register, errors, setValue, watch }) => {
           />
           <SelectField
             label="Escalafon Docente"
-            id="teacherStatus"
+            id="teacherScale"
             register={register}
             errors={errors}
             required

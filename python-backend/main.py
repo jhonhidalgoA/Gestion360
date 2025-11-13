@@ -9,8 +9,8 @@ import uuid
 
 # Importaciones locales
 from backend.database import SessionLocal, Base, engine
-from backend.models import User, Role, Estudiante, Padre
-from backend.schemas import MatriculaCreate  
+from backend.models import User, Role, Estudiante, Padre, Docente
+from backend.schemas import MatriculaCreate, DocenteCreate  
 from fastapi.responses import StreamingResponse
 from backend.pdf_generator import generate_matricula_pdf
 
@@ -119,9 +119,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 # Registro estudiante
 @app.post("/register-student", status_code=status.HTTP_201_CREATED)
 def register_student(data: MatriculaCreate, db: Session = Depends(get_db)):
-    """
-    Registro completo de un estudiante (usuario + estudiante + padres)
-    """
+    
 
     # Verificar si el usuario ya existe (por número de documento)
     existing_user = db.query(User).filter(User.username == data.student.numero_documento).first()
@@ -383,12 +381,11 @@ def update_student(student_id: int, data: MatriculaCreate, db: Session = Depends
     }
     
 @app.get("/matricula-pdf/{student_id}")
-def download_matricula_pdf(student_id: int, db: Session = Depends(get_db)):
-    print(f"🟢 Entrando a /matricula-pdf/{student_id}")  # ← AÑADE ESTO
+def download_matricula_pdf(student_id: int, db: Session = Depends(get_db)):    
     estudiante = db.query(Estudiante).filter(Estudiante.id == student_id).first()
     if not estudiante:
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
-    print(f"🟢 Estudiante encontrado: {estudiante.nombres} {estudiante.apellidos}") 
+   
     estudiante = db.query(Estudiante).filter(Estudiante.id == student_id).first()
     if not estudiante:
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
@@ -476,3 +473,64 @@ def download_matricula_pdf(student_id: int, db: Session = Depends(get_db)):
         media_type="application/pdf",
         headers={"Content-Disposition": f"inline; filename=matricula_{estudiante.numero_documento}.pdf"}
     )
+    
+@app.post("/api/docentes", status_code=status.HTTP_201_CREATED)
+def registrar_docente(data: DocenteCreate, db: Session = Depends(get_db)):
+    
+    # Verificar si ya existe un usuario con ese número de documento
+    existing_user = db.query(User).filter(User.username == data.teacherDocumentNumber).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Número de documento ya registrado")
+
+    # Buscar rol 'docente'
+    role = db.query(Role).filter(Role.name.ilike("docente")).first()
+    if not role:
+        raise HTTPException(status_code=400, detail="No se encontró el rol 'docente' en la base de datos")
+
+    # Crear usuario
+    hashed_password = pwd_context.hash(data.teacherDocumentNumber)
+    new_user = User(
+        id=uuid.uuid4(),
+        full_name=f"{data.teacherName} {data.teacherLastname}",
+        username=data.teacherDocumentNumber,
+        password_hash=hashed_password,
+        document_number=data.teacherDocumentNumber,
+        role_id=role.id,
+        must_change_password=True
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    
+    new_docente = Docente(
+        registerDate=data.registerDate,
+        codigo=data.codigo,
+        teacherName=data.teacherName,
+        teacherLastname=data.teacherLastname,
+        teacherBirthDate=data.teacherBirthDate,
+        teacherAge=data.teacherAge,
+        teacherGender=data.teacherGender,
+        teacherBirthPlace=data.teacherBirthPlace,
+        teacherDocument=data.teacherDocument,
+        teacherDocumentNumber=data.teacherDocumentNumber,
+        teacherPhone=data.teacherPhone,
+        teacherEmail=data.teacherEmail,
+        teacherProfession=data.teacherProfession,
+        teacherArea=data.teacherArea,
+        teacherResolutionNumber=data.teacherResolutionNumber,
+        teacherScale=data.teacherScale,
+        photo=data.photo,
+        user_id=new_user.id
+    )
+    db.add(new_docente)
+    db.commit()
+    db.refresh(new_docente)
+
+    return {
+        "message": "Docente registrado exitosamente",
+        "username": new_user.username,
+        "id_usuario": str(new_user.id),
+        "id_docente": new_docente.id
+    }    
+    

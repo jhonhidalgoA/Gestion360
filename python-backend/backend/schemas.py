@@ -71,7 +71,7 @@ class FamilyData(BaseModel):
         orm_mode = True
 
 
-# --- MODELO PRINCIPAL: Matrícula completa ---
+# Matrícula completa-
 class MatriculaCreate(BaseModel):
     student: StudentRegister
     family: Optional[FamilyData] = None
@@ -79,3 +79,27 @@ class MatriculaCreate(BaseModel):
 
     class Config:
         orm_mode = True
+        
+    
+# --- MODELO: Docente --- 
+class DocenteCreate(BaseModel):
+    registerDate: str
+    codigo: str
+    teacherName: str
+    teacherLastname: str
+    teacherBirthDate: str
+    teacherAge: str
+    teacherGender: str
+    teacherBirthPlace: str
+    teacherDocument: str
+    teacherDocumentNumber: str
+    teacherPhone: str
+    teacherEmail: str
+    teacherProfession: str
+    teacherArea: str
+    teacherResolutionNumber: str
+    teacherScale: str
+    photo: Optional[str] = None  # base64
+
+    class Config:
+        orm_mode = True        

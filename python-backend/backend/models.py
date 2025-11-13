@@ -97,3 +97,30 @@ class Padre(Base):
     def __repr__(self):
         return f"<Padre(id={self.id}, nombre={self.nombres} {self.apellidos}, parentesco={self.parentesco})>"
     
+class Docente(Base):
+    __tablename__ = "docentes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    registerDate = Column(String(10))       # "YYYY-MM-DD"
+    codigo = Column(String(50), unique=True, nullable=False)
+    teacherName = Column(String(100))
+    teacherLastname = Column(String(100))
+    teacherBirthDate = Column(String(10))
+    teacherAge = Column(String(10))
+    teacherGender = Column(String(20))
+    teacherBirthPlace = Column(String(100))
+    teacherDocument = Column(String(30))
+    teacherDocumentNumber = Column(String(30), unique=True)
+    teacherPhone = Column(String(20))
+    teacherEmail = Column(String(100))
+    teacherProfession = Column(String(100))
+    teacherArea = Column(String(100))
+    teacherResolutionNumber = Column(String(100))
+    teacherScale = Column(String(50))
+    photo = Column(Text)
+
+    # Relación con usuario
+    user_id = Column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
+    user = relationship("User", backref="docente")    
+    
+    
