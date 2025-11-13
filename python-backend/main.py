@@ -472,8 +472,15 @@ def download_matricula_pdf(student_id: int, db: Session = Depends(get_db)):
         pdf_buffer,
         media_type="application/pdf",
         headers={"Content-Disposition": f"inline; filename=matricula_{estudiante.numero_documento}.pdf"}
+        
     )
     
+    
+ # --- MODULO DOCENTE --- #
+ 
+    
+# Registrar docente    
+
 @app.post("/api/docentes", status_code=status.HTTP_201_CREATED)
 def registrar_docente(data: DocenteCreate, db: Session = Depends(get_db)):
     
@@ -534,3 +541,30 @@ def registrar_docente(data: DocenteCreate, db: Session = Depends(get_db)):
         "id_docente": new_docente.id
     }    
     
+# --- Editar docente --- #    
+@app.get("/api/docentes")
+def get_docentes(db: Session = Depends(get_db)):
+    docentes = db.query(Docente).all()
+    return [
+        {
+            "id": d.id,
+            "registerDate": d.registerDate,
+            "codigo": d.codigo,
+            "teacherName": d.teacherName,
+            "teacherLastname": d.teacherLastname,
+            "teacherBirthDate": d.teacherBirthDate,
+            "teacherAge": d.teacherAge,
+            "teacherGender": d.teacherGender,
+            "teacherBirthPlace": d.teacherBirthPlace,
+            "teacherDocument": d.teacherDocument,
+            "teacherDocumentNumber": d.teacherDocumentNumber,
+            "teacherPhone": d.teacherPhone,
+            "teacherEmail": d.teacherEmail,
+            "teacherProfession": d.teacherProfession,
+            "teacherArea": d.teacherArea,
+            "teacherResolutionNumber": d.teacherResolutionNumber,
+            "teacherScale": d.teacherScale,
+            "photo": d.photo,
+        }
+        for d in docentes
+    ]  

@@ -5,12 +5,16 @@ import Botones from "../../../components/ui/Botones";
 import Modal from "../../../components/ui/Modal";
 import TabDocenteDatos from "./TabDocenteDatos";
 import TabDocenteProfesional from "./TabDocenteProfesional";
+import ModalListaDocente from "./ModalListaDocente";
 import "./RegistrarDocente.css";
 
 const RegistrarDocente = () => {
   const [activeTab, setActiveTab] = useState("docente");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isDocenteListModalOpen, setIsDocenteListModalOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const {
     register,
@@ -23,7 +27,6 @@ const RegistrarDocente = () => {
   } = useForm({
     mode: "onBlur",
     defaultValues: {
-      // Datos básicos
       registerDate: "",
       codigo: "",
       teacherPhoto: null,
@@ -33,14 +36,10 @@ const RegistrarDocente = () => {
       teacherAge: "",
       teacherGender: "",
       teacherBirthPlace: "",
-
-      // Documento
       teacherDocument: "",
       teacherDocumentNumber: "",
       teacherPhone: "",
       teacherEmail: "",
-
-      // Profesional
       teacherProfession: "",
       teacherArea: "",
       teacherResolutionNumber: "",
@@ -88,61 +87,86 @@ const RegistrarDocente = () => {
     )}-${randomSuffix}`;
     setValue("codigo", code, { shouldValidate: false });
   };
-const onSubmit = async (data) => {
-  try {
-    // Extraer base64 si existe (el valor ya es una cadena desde PhotoUpload)
-    const photoBase64 = data.teacherPhoto 
-      ? data.teacherPhoto.split(",")[1] 
-      : null;
 
-    // Construir payload asegurando que todos los campos sean strings
-    const payload = {
-      registerDate: String(data.registerDate || ""),
-      codigo: String(data.codigo || ""),
-      teacherName: String(data.teacherName || ""),
-      teacherLastname: String(data.teacherLastname || ""),
-      teacherBirthDate: String(data.teacherBirthDate || ""),
-      teacherAge: String(data.teacherAge || ""),
-      teacherGender: String(data.teacherGender || ""),
-      teacherBirthPlace: String(data.teacherBirthPlace || ""),
-      teacherDocument: String(data.teacherDocument || ""),
-      teacherDocumentNumber: String(data.teacherDocumentNumber || ""),
-      teacherPhone: String(data.teacherPhone || ""),
-      teacherEmail: String(data.teacherEmail || ""),
-      teacherProfession: String(data.teacherProfession || ""),
-      teacherArea: String(data.teacherArea || ""),
-      teacherResolutionNumber: String(data.teacherResolutionNumber || ""),
-      teacherScale: String(data.teacherScale || ""),
-      photo: photoBase64,
+  const mapDocenteToFrontend = (docente) => {
+    return {
+      registerDate: docente.registerDate || "",
+      codigo: docente.codigo || "",
+      teacherPhoto: docente.photo ? `data:image/png;base64,${docente.photo}` : null,
+      teacherName: docente.teacherName || "",
+      teacherLastname: docente.teacherLastname || "",
+      teacherBirthDate: docente.teacherBirthDate || "",
+      teacherAge: docente.teacherAge || "",
+      teacherGender: docente.teacherGender || "",
+      teacherBirthPlace: docente.teacherBirthPlace || "",
+      teacherDocument: docente.teacherDocument || "",
+      teacherDocumentNumber: docente.teacherDocumentNumber || "",
+      teacherPhone: docente.teacherPhone || "",
+      teacherEmail: docente.teacherEmail || "",
+      teacherProfession: docente.teacherProfession || "",
+      teacherArea: docente.teacherArea || "",
+      teacherResolutionNumber: docente.teacherResolutionNumber || "",
+      teacherScale: docente.teacherScale || "",
     };
+  };
 
-    // Enviar a la API
-    const response = await fetch("http://localhost:8000/api/docentes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      const errorMsg =
-        error.detail?.[0]?.msg || error.detail || "Error desconocido al registrar docente";
-      throw new Error(errorMsg);
-    }
-
-    // Éxito
-    reset();
+  const loadDocenteForEdit = (docente) => {
+    const values = mapDocenteToFrontend(docente);
+    reset(values);
     setActiveTab("docente");
-    setIsSuccessModalOpen(true);
-  } catch (error) {
-    console.error("❌ Error al registrar docente:", error);
-    alert("Error: " + error.message);
-  }
-};
-  
-  
+  };
+
+  const onSubmit = async (data) => {
+    try {
+      const photoBase64 = data.teacherPhoto
+        ? data.teacherPhoto.split(",")[1]
+        : null;
+
+      const payload = {
+        registerDate: String(data.registerDate || ""),
+        codigo: String(data.codigo || ""),
+        teacherName: String(data.teacherName || ""),
+        teacherLastname: String(data.teacherLastname || ""),
+        teacherBirthDate: String(data.teacherBirthDate || ""),
+        teacherAge: String(data.teacherAge || ""),
+        teacherGender: String(data.teacherGender || ""),
+        teacherBirthPlace: String(data.teacherBirthPlace || ""),
+        teacherDocument: String(data.teacherDocument || ""),
+        teacherDocumentNumber: String(data.teacherDocumentNumber || ""),
+        teacherPhone: String(data.teacherPhone || ""),
+        teacherEmail: String(data.teacherEmail || ""),
+        teacherProfession: String(data.teacherProfession || ""),
+        teacherArea: String(data.teacherArea || ""),
+        teacherResolutionNumber: String(data.teacherResolutionNumber || ""),
+        teacherScale: String(data.teacherScale || ""),
+        photo: photoBase64,
+      };
+
+      const response = await fetch("http://localhost:8000/api/docentes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        const errorMsg =
+          error.detail?.[0]?.msg ||
+          error.detail ||
+          "Error desconocido al registrar docente";
+        throw new Error(errorMsg);
+      }
+
+      reset();
+      setActiveTab("docente");
+      setIsSuccessModalOpen(true);
+    } catch (error) {
+      console.error("❌ Error al registrar docente:", error);
+      setErrorMessage("No se pudo registrar el docente: " + error.message);
+      setIsErrorModalOpen(true);
+    }
+  };
+
   return (
     <div className="teacher-register">
       <NavbarSection title="Registro Docente" color="#388e3c" />
@@ -155,7 +179,9 @@ const onSubmit = async (data) => {
             onClick={() => handleTabChange(tab)}
             type="button"
           >
-            {tab === "docente" ? "Datos Docente" : "Información Profesional"}
+            {tab === "docente"
+              ? "Datos Docente"
+              : "Información Profesional"}
           </button>
         ))}
       </div>
@@ -180,7 +206,7 @@ const onSubmit = async (data) => {
         <div className="form-actions">
           <Botones
             onSave={handleSubmit(onSubmit)}
-            onEdit={() => alert("Editar (próximamente)")}
+            onEdit={() => setIsDocenteListModalOpen(true)}
             onDelete={handleClear}
             onGeneratePDF={() => alert("Generar PDF")}
             disabled={!isValid}
@@ -188,6 +214,7 @@ const onSubmit = async (data) => {
         </div>
       </form>
 
+      {/* Modal: campos incompletos */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -202,6 +229,7 @@ const onSubmit = async (data) => {
         ]}
       />
 
+      {/* Modal: éxito */}
       <Modal
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
@@ -212,6 +240,28 @@ const onSubmit = async (data) => {
             text: "Aceptar",
             variant: "success",
             onClick: () => setIsSuccessModalOpen(false),
+          },
+        ]}
+      />
+
+      {/* Modal: lista de docentes (editar) */}
+      <ModalListaDocente
+        isOpen={isDocenteListModalOpen}
+        onClose={() => setIsDocenteListModalOpen(false)}
+        onSelect={loadDocenteForEdit}
+      />
+
+      {/* Modal: error */}
+      <Modal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        title="Error"
+        message={errorMessage}
+        buttons={[
+          {
+            text: "Cerrar",
+            variant: "danger",
+            onClick: () => setIsErrorModalOpen(false),
           },
         ]}
       />
