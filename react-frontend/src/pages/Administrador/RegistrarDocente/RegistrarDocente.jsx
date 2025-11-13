@@ -24,6 +24,7 @@ const RegistrarDocente = () => {
     reset,
     setValue,
     watch,
+    getValues,
   } = useForm({
     mode: "onBlur",
     defaultValues: {
@@ -90,9 +91,12 @@ const RegistrarDocente = () => {
 
   const mapDocenteToFrontend = (docente) => {
     return {
+      id_docente: docente.id,
       registerDate: docente.registerDate || "",
       codigo: docente.codigo || "",
-      teacherPhoto: docente.photo ? `data:image/png;base64,${docente.photo}` : null,
+      teacherPhoto: docente.photo
+        ? `data:image/png;base64,${docente.photo}`
+        : null,
       teacherName: docente.teacherName || "",
       teacherLastname: docente.teacherLastname || "",
       teacherBirthDate: docente.teacherBirthDate || "",
@@ -179,14 +183,13 @@ const RegistrarDocente = () => {
             onClick={() => handleTabChange(tab)}
             type="button"
           >
-            {tab === "docente"
-              ? "Datos Docente"
-              : "Información Profesional"}
+            {tab === "docente" ? "Datos Docente" : "Información Profesional"}
           </button>
         ))}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="formTeacher">
+        <input type="hidden" {...register("id_docente")} />
         {activeTab === "docente" && (
           <TabDocenteDatos
             register={register}
@@ -208,7 +211,19 @@ const RegistrarDocente = () => {
             onSave={handleSubmit(onSubmit)}
             onEdit={() => setIsDocenteListModalOpen(true)}
             onDelete={handleClear}
-            onGeneratePDF={() => alert("Generar PDF")}
+            onLoadPDF={() => {              
+              const id = getValues("id_docente");
+              if (id) {
+                window.open(
+                  `http://localhost:8000/docente-pdf/${id}`,
+                  "_blank"
+                );
+              } else {
+                alert(
+                  "No se puede generar el PDF: el docente no ha sido guardado aún."
+                );
+              }
+            }}
             disabled={!isValid}
           />
         </div>

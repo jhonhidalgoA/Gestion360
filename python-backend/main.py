@@ -12,7 +12,8 @@ from backend.database import SessionLocal, Base, engine
 from backend.models import User, Role, Estudiante, Padre, Docente
 from backend.schemas import MatriculaCreate, DocenteCreate  
 from fastapi.responses import StreamingResponse
-from backend.pdf_generator import generate_matricula_pdf
+from backend.pdf_generator import generate_matricula_pdf, generate_docente_pdf
+ 
 
 
 # Configuración General
@@ -69,13 +70,12 @@ class LoginRequest(BaseModel):
 
 
 # Rutas
-
 @app.get("/")
 def root():
     return {"message": "API funcionando correctamente 🚀"}
 
 
-
+# Login
 @app.post("/login")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == data.username).first()
@@ -116,7 +116,9 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     }
 
 
-# Registro estudiante
+# --- MODULO ESTUDIANTE --- #
+
+#-- Registro estudiante -- #
 @app.post("/register-student", status_code=status.HTTP_201_CREATED)
 def register_student(data: MatriculaCreate, db: Session = Depends(get_db)):
     
@@ -479,8 +481,7 @@ def download_matricula_pdf(student_id: int, db: Session = Depends(get_db)):
  # --- MODULO DOCENTE --- #
  
     
-# Registrar docente    
-
+# -- Registrar docente -- #  
 @app.post("/api/docentes", status_code=status.HTTP_201_CREATED)
 def registrar_docente(data: DocenteCreate, db: Session = Depends(get_db)):
     
@@ -541,7 +542,7 @@ def registrar_docente(data: DocenteCreate, db: Session = Depends(get_db)):
         "id_docente": new_docente.id
     }    
     
-# --- Editar docente --- #    
+# -- Editar docente -- #   
 @app.get("/api/docentes")
 def get_docentes(db: Session = Depends(get_db)):
     docentes = db.query(Docente).all()
@@ -568,3 +569,38 @@ def get_docentes(db: Session = Depends(get_db)):
         }
         for d in docentes
     ]  
+
+# -- Generar PDF docente -- #    
+@app.get("/docente-pdf/{docente_id}")
+def download_docente_pdf(docente_id: int, db: Session = Depends(get_db)):
+    docente = db.query(Docente).filter(Docente.id == docente_id).first()
+    if not docente:
+        raise HTTPException(status_code=404, detail="Docente no encontrado")
+
+    data = {
+        "docente": {
+            "nombre_completo": f"{docente.teacherName} {docente.teacherLastname}",
+            "fecha_registro": docente.registerDate,
+            "codigo": docente.codigo,
+            "fecha_nacimiento": docente.teacherBirthDate,
+            "edad": docente.teacherAge,
+            "genero": docente.teacherGender,
+            "lugar_nacimiento": docente.teacherBirthPlace,
+            "tipo_documento": docente.teacherDocument,
+            "numero_documento": docente.teacherDocumentNumber,
+            "telefono": docente.teacherPhone,
+            "correo": docente.teacherEmail,
+            "profesion": docente.teacherProfession,
+            "area": docente.teacherArea,
+            "resolucion": docente.teacherResolutionNumber,
+            "escalafon": docente.teacherScale,
+            "foto": docente.photo,
+        }
+    }
+
+    pdf_buffer = generate_docente_pdf(data)
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"inline; filename=docente_{docente.teacherDocumentNumber}.pdf"}
+    )

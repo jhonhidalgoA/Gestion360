@@ -47,9 +47,9 @@ const ModalListaDocente = ({ isOpen, onClose, onSelect }) => {
             className="modal-lista-docentes"
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={onClose} className="close-button">
+            <buttons onClick={onClose} className="close-button">
               ×
-            </button>
+            </buttons>
 
             <h3>Lista de Docentes</h3>
 

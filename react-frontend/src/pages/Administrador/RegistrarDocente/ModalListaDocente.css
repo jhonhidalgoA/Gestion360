@@ -26,10 +26,10 @@
 .close-button {
   position: absolute;
   top: 10px;
-  right: 10px;
+  right: 20px;
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 30px;
   cursor: pointer;
   color: #666;
 }
@@ -63,7 +63,7 @@
 .modal-lista-docentes th {
   padding: 8px;
   text-align: left;
-  background: #388e3c; /* Verde: mismo que el Navbar de docentes */
+  background: #007bff; 
   color: white;
 }
 
@@ -73,15 +73,16 @@
 }
 
 .modal-lista-docentes button {
-  background: #388e3c; /* Verde */
-  color: white;
+  background: #ffc107;
+  color: #000000;
   border: none;
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
+  font-size:16px;
 }
 
 /* Opcional: estilo del botón "Editar" cuando pasa el mouse */
 .modal-lista-docentes button:hover {
-  background: #2e7d32;
+  transform:scale(1.1);
 }

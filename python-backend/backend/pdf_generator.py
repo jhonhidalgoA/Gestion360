@@ -519,3 +519,109 @@ def generate_matricula_pdf(estudiante_data: Dict[str, Any]) -> BytesIO:
     """
     generator = MatriculaPDFGenerator(estudiante_data)
     return generator.generate()
+
+
+def generate_docente_pdf(docente_data: Dict[str, Any]) -> BytesIO:
+    """Genera el PDF para un docente"""
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER
+    from reportlab.lib.units import inch, mm
+    from reportlab.lib import colors
+    from io import BytesIO
+    import base64
+    from datetime import datetime
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        topMargin=15*mm,
+        bottomMargin=15*mm,
+        leftMargin=15*mm,
+        rightMargin=15*mm
+    )
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # ====== ENCABEZADO ======
+    header_style = ParagraphStyle(
+        'Header',
+        parent=styles['Heading1'],
+        fontSize=18,
+        textColor=colors.HexColor("#388e3c"),
+        alignment=TA_CENTER,
+        spaceAfter=10
+    )
+    title_style = ParagraphStyle(
+        'Title',
+        parent=styles['Heading2'],
+        fontSize=14,
+        alignment=TA_CENTER,
+        spaceAfter=20
+    )
+
+    elements.append(Paragraph("COLEGIO STEM 360", header_style))
+    elements.append(Paragraph("FICHA DE DOCENTE", title_style))
+
+    # ====== FOTO ======
+    foto = docente_data["docente"].get("foto")
+    if foto:
+        try:
+            img_data = base64.b64decode(foto)
+            img_buffer = BytesIO(img_data)
+            img = Image(img_buffer, width=1.2*inch, height=1.2*inch)
+            img.hAlign = 'CENTER'
+            elements.append(img)
+            elements.append(Spacer(1, 10))
+        except:
+            pass
+
+    # ====== DATOS BÁSICOS ======
+    d = docente_data["docente"]
+    nombre = d.get("nombre_completo", "No disponible")
+    documento = f"{d.get('tipo_documento', '')} {d.get('numero_documento', '')}".strip() or "No disponible"
+
+    elements.append(Paragraph(f"<b>Nombre:</b> {nombre}", styles['Normal']))
+    elements.append(Paragraph(f"<b>Documento:</b> {documento}", styles['Normal']))
+    elements.append(Paragraph(f"<b>Código:</b> {d.get('codigo', 'N/A')}", styles['Normal']))
+    elements.append(Spacer(1, 15))
+
+    # ====== TABLA DE INFORMACIÓN ======
+    info_data = [
+        ["Fecha de Registro", d.get("fecha_registro", "N/A")],
+        ["Fecha de Nacimiento", d.get("fecha_nacimiento", "N/A")],
+        ["Edad", d.get("edad", "N/A")],
+        ["Género", d.get("genero", "N/A")],
+        ["Lugar de Nacimiento", d.get("lugar_nacimiento", "N/A")],
+        ["Teléfono", d.get("telefono", "N/A")],
+        ["Correo Electrónico", d.get("correo", "N/A")],
+        ["Profesión", d.get("profesion", "N/A")],
+        ["Área de Especialización", d.get("area", "N/A")],
+        ["Número de Resolución", d.get("resolucion", "N/A")],
+        ["Escalafón Docente", d.get("escalafon", "N/A")],
+    ]
+
+    table = Table(info_data, colWidths=[2.5*inch, 4*inch])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#e8f5e9")),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ]))
+
+    elements.append(table)
+    elements.append(Spacer(1, 20))
+
+    # ====== PIE DE PÁGINA ======
+    fecha = datetime.now().strftime("%d de %B de %Y")
+    elements.append(Paragraph(f"<i>Documento generado el {fecha}</i>", styles['Normal']))
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer

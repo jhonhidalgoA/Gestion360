@@ -65,7 +65,7 @@ const Matricula = () => {
     setActiveTab("estudiante");
   };
 
-  // ✅ CORREGIDO: usa mapMatriculaToFrontend
+  
   const loadStudentForEdit = (matricula) => {
     const values = mapMatriculaToFrontend(matricula);
     values.id_estudiante = matricula.id;
