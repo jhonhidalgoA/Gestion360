@@ -19,7 +19,6 @@ from backend.pdf_generator import generate_matricula_pdf, generate_docente_pdf
 
 # Configuración General
 
-
 app = FastAPI(title="Gestión 360 API")
 
 # Habilitar CORS para el frontend
@@ -608,7 +607,9 @@ def download_docente_pdf(docente_id: int, db: Session = Depends(get_db)):
         media_type="application/pdf",
         headers={"Content-Disposition": f"inline; filename=docente_{docente.teacherDocumentNumber}.pdf"}
     )
-    
+ 
+ 
+ #-- Crear horario -- #   
 @app.post("/api/horarios")
 def guardar_horario(horario: HorarioRequest, db: Session = Depends(get_db)):
     try:
@@ -667,3 +668,52 @@ def guardar_horario(horario: HorarioRequest, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+    
+# -- Listar grados -- #
+@app.get("/api/grados")
+def get_grados(db: Session = Depends(get_db)):
+    try:
+        # Obtener todos los grados ordenados por id
+        grados = db.execute(text("SELECT id, nombre FROM grados ORDER BY id")).fetchall()
+        return [
+            {
+                "id": g[0],
+                "nombre": g[1]
+            }
+            for g in grados
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+# -- listar docentes -- #   
+@app.get("/api/docentes-select")
+def get_docentes_select(db: Session = Depends(get_db)):
+    try:
+        result = db.execute(text("""
+            SELECT id, "teacherName", "teacherLastname"
+            FROM docentes
+            ORDER BY
+                COALESCE("teacherName", ''),
+                COALESCE("teacherLastname", '')
+        """)).fetchall()
+        
+        docentes = []
+        for row in result:
+            id_doc = row[0]
+            name = row[1] if row[1] is not None else ""
+            lastname = row[2] if row[2] is not None else ""
+            nombre_completo = f"{name} {lastname}".strip()
+            if not nombre_completo:
+                nombre_completo = f"Docente {id_doc}"
+            docentes.append({
+                "id": id_doc,
+                "nombre_completo": nombre_completo
+            })
+        
+        return docentes
+    except Exception as e:
+        print("Error en /api/docentes-select:", str(e))
+        raise HTTPException(status_code=500, detail="Error al cargar docentes")
+    
+    
+    

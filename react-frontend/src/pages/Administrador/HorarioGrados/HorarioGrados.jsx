@@ -1,53 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Save, Plus, Edit, Trash2, Eye, X, Check } from "lucide-react";
 import NavbarSection from "../../../components/layout/Navbar/NavbarSection";
+import { MATERIAS, MATERIAS_CONFIG } from "../../../data/MateriasData";
 import "./HorarioGrados.css";
 
-const MATERIAS = [
-  { nombre: "Matemáticas", color: "#667eea" },
-  { nombre: "Geometría", color: "#764ba2" },
-  { nombre: "Estadística", color: "#f093fb" },
-  { nombre: "Tecnología", color: "#4ecdc4" },
-  { nombre: "Castellano", color: "#45b7d1" },
-  { nombre: "C. Lectora", color: "#96ceb4" },
-  { nombre: "Inglés", color: "#ffeaa7" },
-  { nombre: "Biología", color: "#55a3ff" },
-  { nombre: "Física", color: "#fd79a8" },
-  { nombre: "Química", color: "#fdcb6e" },
-  { nombre: "Artística", color: "#e17055" },
-  { nombre: "Ética", color: "#a29bfe" },
-  { nombre: "Religión", color: "#fd7f6e" },
-  { nombre: "Cátedra de Paz", color: "#74b9ff" },
-  { nombre: "E. Física", color: "#00b894" },
-  { nombre: "C. Sociales", color: "#fdaf6e" },
-  { nombre: "Historia y Geografía", color: "#e84393" },
-  { nombre: "Descanso", color: "#b2bec3" },
-  { nombre: "Almuerzo", color: "#ddd6d6" },
-];
-
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
-
-const MATERIAS_CONFIG = [
-  { nombre: "Castellano", max: 5 },
-  { nombre: "Inglés", max: 4 },
-  { nombre: "Matemáticas", max: 4 },
-  { nombre: "C. Sociales", max: 3 },
-  { nombre: "Historia y Geografía", max: 3 },
-  { nombre: "Artística", max: 2 },
-  { nombre: "Biología", max: 2 },
-  { nombre: "E. Física", max: 2 },
-  { nombre: "Tecnología", max: 2 },
-  { nombre: "C. Lectora", max: 1 },
-  { nombre: "Cátedra de Paz", max: 1 },
-  { nombre: "Ética", max: 1 },
-  { nombre: "Estadística", max: 1 },
-  { nombre: "Física", max: 1 },
-  { nombre: "Geometría", max: 1 },
-  { nombre: "Química", max: 1 },
-  { nombre: "Religión", max: 1 },
-  { nombre: "Descanso", max: 5, isBreak: true },
-  { nombre: "Almuerzo", max: 5, isBreak: true },
-];
 
 const HorarioGrados = () => {
   const [filas, setFilas] = useState([]);
@@ -61,7 +18,10 @@ const HorarioGrados = () => {
     message: "",
     action: null,
   });
+
   const [gradeModal, setGradeModal] = useState(false);
+  const [grados, setGrados] = useState([]);
+  const [docentes, setDocentes] = useState([]);
 
   useEffect(() => {
     const inicial = {};
@@ -69,6 +29,34 @@ const HorarioGrados = () => {
       inicial[m.nombre] = { count: 0, max: m.max };
     });
     setContadores(inicial);
+  }, []);
+
+  useEffect(() => {
+    const cargarGrados = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/grados");
+        if (!res.ok) throw new Error("Error al cargar grados");
+        const data = await res.json();
+        setGrados(data);
+      } catch (err) {
+        console.error("Error al cargar grados:", err);
+        showModal("Error", "No se pudieron cargar los grados", null, true);
+      }
+    };
+    cargarGrados();
+  }, []);
+
+  useEffect(() => {
+    const cargarDocentes = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/docentes-select");
+        const data = await res.json();
+        setDocentes(data);
+      } catch (err) {
+        console.error("Error al cargar docentes:", err);
+      }
+    };
+    cargarDocentes();
   }, []);
 
   const agregarFila = () => {
@@ -206,19 +194,12 @@ const HorarioGrados = () => {
       return;
     }
 
-    const gradoNombreMap = {
-      6: "Sexto",
-      7: "Séptimo",
-      8: "Octavo",
-      9: "Noveno",
-      10: "Décimo",
-      11: "Undécimo",
-    };
-    const gradoNombre = gradoNombreMap[grado];
-    if (!gradoNombre) {
-      showModal("Error", "Grado no válido", null, true);
+    const gradoSeleccionado = grados.find((g) => g.id == grado);
+    if (!grados.length) {
+      showModal("Cargando", "Espere un momento...", null, true);
       return;
     }
+    const gradoNombre = gradoSeleccionado.nombre;
 
     const payload = {
       grado_nombre: gradoNombre,
@@ -274,12 +255,11 @@ const HorarioGrados = () => {
                   onChange={(e) => setGrado(e.target.value)}
                 >
                   <option value="">Seleccionar</option>
-                  <option value="6">Grado Sexto</option>
-                  <option value="7">Grado Séptimo</option>
-                  <option value="8">Grado Octavo</option>
-                  <option value="9">Grado Noveno</option>
-                  <option value="10">Grado Décimo</option>
-                  <option value="11">Grado Undécimo</option>
+                  {grados.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.nombre}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="horario-grados-form-group">
@@ -290,8 +270,11 @@ const HorarioGrados = () => {
                   onChange={(e) => setDirector(e.target.value)}
                 >
                   <option value="">Seleccionar</option>
-                  <option value="1">Director 1</option>
-                  <option value="2">Director 2</option>
+                  {docentes.map((docente) => (
+                    <option key={docente.id} value={docente.id}>
+                      {docente.nombre_completo}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
