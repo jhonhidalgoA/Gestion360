@@ -87,49 +87,49 @@ const HorarioGrados = () => {
 
   // Función para cargar un horario existente por grado
   const cargarHorarioExistente = async (gradoId) => {
-    try {
-      const res = await fetch(`http://localhost:8000/api/horarios/grado/${gradoId}`);
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.detail || "No se encontró horario");
-      }
-      const data = await res.json();
-
-      const nuevasFilas = data.filas.map(fila => ({
-        id: Date.now() + Math.random(),
-        inicio: fila.inicio.slice(0, 5),
-        fin: fila.fin.slice(0, 5),
-        materias: fila.dias
-      }));
-
-      setFilas(nuevasFilas);
-      setGrado(gradoId);
-      setDirector("");
-
-      // Recalcular contadores y totalHoras
-      const nuevosContadores = {};
-      MATERIAS_CONFIG.forEach(m => {
-        nuevosContadores[m.nombre] = { count: 0, max: m.max };
-      });
-
-      let total = 0;
-      nuevasFilas.forEach(fila => {
-        Object.values(fila.materias).forEach(materia => {
-          if (materia) {
-            nuevosContadores[materia].count += 1;
-            total += 1;
-          }
-        });
-      });
-
-      setContadores(nuevosContadores);
-      setTotalHoras(total);
-
-    } catch (err) {
-      console.error("Error al cargar horario:", err);
-      showModal("Colegio STEM 360", err.message || "Error al cargar horario", null, true);
+  try {
+    const res = await fetch(`http://localhost:8000/api/horarios/grado/${gradoId}`);
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.detail || "No se encontró horario");
     }
-  };
+    const data = await res.json();
+
+    const nuevasFilas = data.filas.map(fila => ({
+      id: Date.now() + Math.random(),
+      inicio: fila.inicio.slice(0, 5),
+      fin: fila.fin.slice(0, 5),
+      materias: fila.dias
+    }));
+
+    setFilas(nuevasFilas);
+    setGrado(gradoId);
+    setDirector(data.teacher_id); // 👈 ¡esto era lo que faltaba!
+
+    // ... resto del recálculo de contadores
+    const nuevosContadores = {};
+    MATERIAS_CONFIG.forEach(m => {
+      nuevosContadores[m.nombre] = { count: 0, max: m.max };
+    });
+
+    let total = 0;
+    nuevasFilas.forEach(fila => {
+      Object.values(fila.materias).forEach(materia => {
+        if (materia) {
+          nuevosContadores[materia].count += 1;
+          total += 1;
+        }
+      });
+    });
+
+    setContadores(nuevosContadores);
+    setTotalHoras(total);
+
+  } catch (err) {
+    console.error("Error al cargar horario:", err);
+    showModal("Colegio STEM 360", err.message || "Error al cargar horario", null, true);
+  }
+};
 
   const agregarFila = () => {
     let inicio = "07:00";
@@ -141,7 +141,9 @@ const HorarioGrados = () => {
       const fecha = new Date();
       fecha.setHours(h, m + 60, 0, 0);
       inicio = ultimaFila.fin;
-      fin = `${String(fecha.getHours()).padStart(2, "0")}:${String(fecha.getMinutes()).padStart(2, "0")}`;
+      fin = `${String(fecha.getHours()).padStart(2, "0")}:${String(
+        fecha.getMinutes()
+      ).padStart(2, "0")}`;
     }
 
     const nuevaFila = {
@@ -164,8 +166,12 @@ const HorarioGrados = () => {
     setFilas(
       filas.map((f) => {
         if (f.id === id) {
-          const [hI, mI] = (tipo === "inicio" ? valor : f.inicio).split(":").map(Number);
-          const [hF, mF] = (tipo === "fin" ? valor : f.fin).split(":").map(Number);
+          const [hI, mI] = (tipo === "inicio" ? valor : f.inicio)
+            .split(":")
+            .map(Number);
+          const [hF, mF] = (tipo === "fin" ? valor : f.fin)
+            .split(":")
+            .map(Number);
 
           if (hI * 60 + mI >= hF * 60 + mF) {
             showModal(
@@ -198,7 +204,10 @@ const HorarioGrados = () => {
     }
 
     if (nuevaMateria) {
-      if (nuevosContadores[nuevaMateria].count >= nuevosContadores[nuevaMateria].max) {
+      if (
+        nuevosContadores[nuevaMateria].count >=
+        nuevosContadores[nuevaMateria].max
+      ) {
         showModal(
           "Límite Alcanzado",
           `Has alcanzado el límite de horas para ${nuevaMateria}`,
@@ -367,7 +376,9 @@ const HorarioGrados = () => {
                 <div className="horario-grados-stat-label">Horas Asignadas</div>
               </div>
               <div className="horario-grados-stat-item">
-                <div className="horario-grados-stat-value">{horasRestantes}</div>
+                <div className="horario-grados-stat-value">
+                  {horasRestantes}
+                </div>
                 <div className="horario-grados-stat-label">Horas Restantes</div>
               </div>
               <div className="horario-grados-stat-item">
@@ -396,13 +407,17 @@ const HorarioGrados = () => {
                       <input
                         type="time"
                         value={fila.inicio}
-                        onChange={(e) => cambiarHora(fila.id, "inicio", e.target.value)}
+                        onChange={(e) =>
+                          cambiarHora(fila.id, "inicio", e.target.value)
+                        }
                         className="horario-grados-time-input"
                       />
                       <input
                         type="time"
                         value={fila.fin}
-                        onChange={(e) => cambiarHora(fila.id, "fin", e.target.value)}
+                        onChange={(e) =>
+                          cambiarHora(fila.id, "fin", e.target.value)
+                        }
                         className="horario-grados-time-input"
                       />
                     </td>
@@ -410,11 +425,15 @@ const HorarioGrados = () => {
                       <td key={dia} className="horario-grados-td">
                         <select
                           value={fila.materias[dia]}
-                          onChange={(e) => cambiarMateria(fila.id, dia, e.target.value)}
+                          onChange={(e) =>
+                            cambiarMateria(fila.id, dia, e.target.value)
+                          }
                           className="horario-grados-subject-select"
                           style={{
                             backgroundColor: fila.materias[dia]
-                              ? MATERIAS.find((m) => m.nombre === fila.materias[dia])?.color
+                              ? MATERIAS.find(
+                                  (m) => m.nombre === fila.materias[dia]
+                                )?.color
                               : "white",
                             color: fila.materias[dia] ? "white" : "#333",
                           }}
@@ -424,10 +443,14 @@ const HorarioGrados = () => {
                             <option
                               key={m.nombre}
                               value={m.nombre}
-                              disabled={contadores[m.nombre]?.count >= contadores[m.nombre]?.max}
+                              disabled={
+                                contadores[m.nombre]?.count >=
+                                contadores[m.nombre]?.max
+                              }
                             >
                               {m.nombre}
-                              {contadores[m.nombre]?.count >= contadores[m.nombre]?.max
+                              {contadores[m.nombre]?.count >=
+                              contadores[m.nombre]?.max
                                 ? " (Límite)"
                                 : ""}
                             </option>
@@ -442,10 +465,16 @@ const HorarioGrados = () => {
           </div>
 
           <div className="grades-actions">
-            <button className="grades-btn horario-grados-btn-add" onClick={agregarFila}>
+            <button
+              className="grades-btn horario-grados-btn-add"
+              onClick={agregarFila}
+            >
               <Plus size={20} /> Agregar
             </button>
-            <button className="grades-btn horario-grados-btn-save" onClick={guardarHorario}>
+            <button
+              className="grades-btn horario-grados-btn-save"
+              onClick={guardarHorario}
+            >
               <Save size={20} /> Guardar
             </button>
             <button
@@ -489,7 +518,9 @@ const HorarioGrados = () => {
                   key={materia.nombre}
                   className={materia.isBreak ? "horario-grados-break-row" : ""}
                 >
-                  <td className="horario-grados-subject-name">{materia.nombre}</td>
+                  <td className="horario-grados-subject-name">
+                    {materia.nombre}
+                  </td>
                   <td className="horario-grados-subject-hours">
                     <span className="horario-grados-hours-badge">
                       {contadores[materia.nombre]?.count || 0}/{materia.max}
@@ -498,7 +529,11 @@ const HorarioGrados = () => {
                       <div
                         className="horario-grados-progress-fill"
                         style={{
-                          width: `${((contadores[materia.nombre]?.count || 0) / materia.max) * 100}%`,
+                          width: `${
+                            ((contadores[materia.nombre]?.count || 0) /
+                              materia.max) *
+                            100
+                          }%`,
                         }}
                       />
                     </div>
@@ -601,22 +636,38 @@ const HorarioGrados = () => {
                         <button
                           className="horario-grados-btn horario-grados-btn-delete-small"
                           onClick={async () => {
-                            if (window.confirm(`¿Eliminar todo el horario de ${g.nombre}?`)) {
+                            if (
+                              window.confirm(
+                                `¿Eliminar todo el horario de ${g.nombre}?`
+                              )
+                            ) {
                               try {
                                 const res = await fetch(
-                                  `http://localhost:8000/api/horarios?grado_id=${g.id}`,
+                                  `http://localhost:8000/api/horarios/grado/${g.id}`,
                                   { method: "DELETE" }
                                 );
                                 if (res.ok) {
-                                  showModal("Colegio STEM 360", "Horario eliminado", null, true);
-                                  cargarGradosConHorarios();
+                                  showModal(
+                                    "Colegio STEM 360",
+                                    "Horario eliminado",
+                                    null,
+                                    true
+                                  );
+                                  cargarGradosConHorarios(); // Actualiza la lista
                                 } else {
                                   const err = await res.json();
-                                  throw new Error(err.detail || "Error al eliminar");
+                                  throw new Error(
+                                    err.detail || "Error al eliminar"
+                                  );
                                 }
                               } catch (e) {
                                 console.error(e);
-                                showModal("Colegio STEM 360", e.message || "Error al eliminar", null, true);
+                                showModal(
+                                  "Colegio STEM 360",
+                                  e.message || "Error al eliminar",
+                                  null,
+                                  true
+                                );
                               }
                             }
                           }}
