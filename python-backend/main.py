@@ -75,7 +75,7 @@ def root():
     return {"message": "API funcionando correctamente 🚀"}
 
 
-# Login
+# --- LOGIN --- #
 @app.post("/login")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == data.username).first()
@@ -116,7 +116,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     }
 
 
-# --- MODULO ESTUDIANTE --- #
+# --- MODULO ADMINISTRADOR --- #
 
 #-- Registro estudiante -- #
 @app.post("/register-student", status_code=status.HTTP_201_CREATED)
@@ -478,11 +478,7 @@ def download_matricula_pdf(student_id: int, db: Session = Depends(get_db)):
     )
     
     
- # --- MODULO DOCENTE --- #
- 
-    
-# -- Registrar docente -- #   
-
+# -- Registrar docente -- #  
 @app.post("/api/docentes", status_code=status.HTTP_201_CREATED)
 def registrar_docente(data: DocenteCreate, db: Session = Depends(get_db)):
     
@@ -509,8 +505,7 @@ def registrar_docente(data: DocenteCreate, db: Session = Depends(get_db)):
     )
     db.add(new_user)
     db.commit()
-    db.refresh(new_user)
-    
+    db.refresh(new_user)    
     
     new_docente = Docente(
         registerDate=data.registerDate,
@@ -543,8 +538,7 @@ def registrar_docente(data: DocenteCreate, db: Session = Depends(get_db)):
         "id_docente": new_docente.id
     }    
     
-# -- Editar docente -- #    
-
+# -- Editar docente -- # 
 @app.get("/api/docentes")
 def get_docentes(db: Session = Depends(get_db)):
     docentes = db.query(Docente).all()
@@ -761,26 +755,7 @@ def get_horarios_por_grado_docente(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))   
 
-# -- Eliminar horario --  
-@app.delete("/api/horarios")
-def eliminar_horario(
-    grado_id: int,
-    docente_id: int,
-    db: Session = Depends(get_db)
-):
-    try:
-        db.execute(text("""
-            DELETE FROM horarios 
-            WHERE grade_id = :grado_id AND teacher_id = :docente_id
-        """), {
-            "grado_id": grado_id,
-            "docente_id": docente_id
-        })
-        db.commit()
-        return {"mensaje": "Horario eliminado correctamente"}
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+
     
 @app.get("/api/grados-con-horarios")
 def get_grados_con_horarios(db: Session = Depends(get_db)):
@@ -802,36 +777,31 @@ def get_grados_con_horarios(db: Session = Depends(get_db)):
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))    
-    
+
 @app.get("/api/horarios/grado/{grado_id}")
-def get_horarios_por_grado(grado_id: int, db: Session = Depends(get_db)):
+def ver_horario_por_grado(grado_id: int, db: Session = Depends(get_db)):
     try:
         # Validar grado
-        grado_res = db.execute(text("SELECT nombre FROM grados WHERE id = :id"), {"id": grado_id}).fetchone()
-        if not grado_res:
+        grado_row = db.execute(text("SELECT nombre FROM grados WHERE id = :id"), {"id": grado_id}).fetchone()
+        if not grado_row:
             raise HTTPException(status_code=404, detail="Grado no encontrado")
-        grado_nombre = grado_res[0]
+        grado_nombre = grado_row[0]
 
-        # Obtener horarios + el docente (asumimos que un grado tiene un solo horario/docente)
+        # Obtener horarios
         rows = db.execute(text("""
-            SELECT h.day_of_week, h.start_time, h.end_time, a.name, h.teacher_id
+            SELECT h.day_of_week, h.start_time, h.end_time, a.name
             FROM horarios h
             JOIN asignaturas a ON h.subject_id = a.subject_id
             WHERE h.grade_id = :grado_id
             ORDER BY h.start_time, h.day_of_week
-        """), {
-            "grado_id": grado_id
-        }).fetchall()
+        """), {"grado_id": grado_id}).fetchall()
 
         if not rows:
-            raise HTTPException(status_code=404, detail="No se encontró horario para este grado")
+            return {"grado_nombre": grado_nombre, "filas": []}
 
-        # Tomar el primer teacher_id (asumiendo 1 horario por grado)
-        teacher_id = rows[0][4]  # Índice 4 = teacher_id
-
-        # Agrupar por bloques de hora
+        # Agrupar por bloques
         bloques = {}
-        for dia, inicio, fin, materia, _ in rows:
+        for dia, inicio, fin, materia in rows:
             key = f"{inicio}_{fin}"
             if key not in bloques:
                 bloques[key] = {
@@ -843,14 +813,12 @@ def get_horarios_por_grado(grado_id: int, db: Session = Depends(get_db)):
 
         return {
             "grado_nombre": grado_nombre,
-            "teacher_id": teacher_id,  # 👈 esto es nuevo
             "filas": list(bloques.values())
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))    
- 
 
-
+# -- Eliminar horarios de la base de datos --
 @app.delete("/api/horarios/grado/{grado_id}")
 def eliminar_horario_por_grado(grado_id: int, db: Session = Depends(get_db)):
     try:

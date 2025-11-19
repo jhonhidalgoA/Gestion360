@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import NavbarModulo from "../../../components/layout/Navbar/NavbarModulo";
-import "./HorarioVer.css";
+
 
 const subjectColors = {
   Matemáticas: { bg: "#FF6347" },

@@ -3,6 +3,7 @@ import { Save, Plus, Edit, Trash2, Eye, X, Check } from "lucide-react";
 import NavbarSection from "../../../components/layout/Navbar/NavbarSection";
 import { MATERIAS, MATERIAS_CONFIG } from "../../../data/MateriasData";
 import "./HorarioGrados.css";
+import { useNavigate } from "react-router-dom";
 
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
@@ -13,6 +14,7 @@ const HorarioGrados = () => {
   const [contadores, setContadores] = useState({});
   const [totalHoras, setTotalHoras] = useState(0);
   const [gradosConHorarios, setGradosConHorarios] = useState([]);
+  const navigate = useNavigate();
   const [modal, setModal] = useState({
     show: false,
     title: "",
@@ -87,49 +89,55 @@ const HorarioGrados = () => {
 
   // Función para cargar un horario existente por grado
   const cargarHorarioExistente = async (gradoId) => {
-  try {
-    const res = await fetch(`http://localhost:8000/api/horarios/grado/${gradoId}`);
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.detail || "No se encontró horario");
-    }
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/horarios/grado/${gradoId}`
+      );
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.detail || "No se encontró horario");
+      }
+      const data = await res.json();
 
-    const nuevasFilas = data.filas.map(fila => ({
-      id: Date.now() + Math.random(),
-      inicio: fila.inicio.slice(0, 5),
-      fin: fila.fin.slice(0, 5),
-      materias: fila.dias
-    }));
+      const nuevasFilas = data.filas.map((fila) => ({
+        id: Date.now() + Math.random(),
+        inicio: fila.inicio.slice(0, 5),
+        fin: fila.fin.slice(0, 5),
+        materias: fila.dias,
+      }));
 
-    setFilas(nuevasFilas);
-    setGrado(gradoId);
-    setDirector(data.teacher_id); // 👈 ¡esto era lo que faltaba!
+      setFilas(nuevasFilas);
+      setGrado(gradoId);
+      setDirector(data.teacher_id); // 👈 ¡esto era lo que faltaba!
 
-    // ... resto del recálculo de contadores
-    const nuevosContadores = {};
-    MATERIAS_CONFIG.forEach(m => {
-      nuevosContadores[m.nombre] = { count: 0, max: m.max };
-    });
-
-    let total = 0;
-    nuevasFilas.forEach(fila => {
-      Object.values(fila.materias).forEach(materia => {
-        if (materia) {
-          nuevosContadores[materia].count += 1;
-          total += 1;
-        }
+      // ... resto del recálculo de contadores
+      const nuevosContadores = {};
+      MATERIAS_CONFIG.forEach((m) => {
+        nuevosContadores[m.nombre] = { count: 0, max: m.max };
       });
-    });
 
-    setContadores(nuevosContadores);
-    setTotalHoras(total);
+      let total = 0;
+      nuevasFilas.forEach((fila) => {
+        Object.values(fila.materias).forEach((materia) => {
+          if (materia) {
+            nuevosContadores[materia].count += 1;
+            total += 1;
+          }
+        });
+      });
 
-  } catch (err) {
-    console.error("Error al cargar horario:", err);
-    showModal("Colegio STEM 360", err.message || "Error al cargar horario", null, true);
-  }
-};
+      setContadores(nuevosContadores);
+      setTotalHoras(total);
+    } catch (err) {
+      console.error("Error al cargar horario:", err);
+      showModal(
+        "Colegio STEM 360",
+        err.message || "Error al cargar horario",
+        null,
+        true
+      );
+    }
+  };
 
   const agregarFila = () => {
     let inicio = "07:00";
@@ -495,7 +503,16 @@ const HorarioGrados = () => {
             >
               <Trash2 size={20} /> Borrar
             </button>
-            <button className="grades-btn horario-grados-btn-view">
+            <button
+              className="grades-btn horario-grados-btn-view"
+              onClick={() => {
+                if (grado) {
+                  navigate(`/horario-ver?gradoId=${grado}`);
+                } else {
+                  alert("Seleccione un grado primero");
+                }
+              }}
+            >
               <Eye size={20} /> Ver
             </button>
           </div>

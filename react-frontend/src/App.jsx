@@ -1,7 +1,7 @@
 import { BrowserRouter } from "react-router-dom";
 import { useRoutes, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import AuthProvider from "./context/AuthContext"; // ← CAMBIO AQUÍ
+import AuthProvider from "./context/AuthContext"; 
 
 // Páginas públicas
 import HomePage from "./pages/HomePage";
