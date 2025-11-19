@@ -11,7 +11,7 @@ const VerHorarios = () => {
 
   return (
     <div className="schedules-container">
-      <NavbarSection title="Ver Horario" color="#0c0c0cff" />
+      <NavbarSection title="Ver Horario" color="#2563eb" />
       <div className="page-content">
         {gradoId ? (
           <VerHorario gradoId={gradoId} titulo="Horario del Grado" />

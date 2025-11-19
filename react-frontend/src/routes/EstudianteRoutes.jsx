@@ -1,5 +1,5 @@
 import PrivateRoute from "./PrivateRoute";
-import HorarioVer from "../pages/PadreFamilia/HorarioVer/HorarioVer";
+import HorarioEstudiante from "../pages/Estudiante/Horario/HorarioEstudiante";
 import Estudiante from "../pages/Estudiante/Estudiante";
 import TareasHacer from "../pages/Estudiante/TareasHacer/Tareashacer";
 import CalificacionesEstudiante from "../pages/Estudiante/MisCalificaciones/MisCalificaciones";
@@ -39,10 +39,10 @@ const estudianteRoutes = [
     ),
   },
   {
-    path: "/horario-ver",
+    path: "/estudiante/horario",
     element: (
-      <PrivateRoute roles={["estudiante", "padre"]}>
-        <HorarioVer />
+      <PrivateRoute roles={["estudiante"]}>
+        <HorarioEstudiante />
       </PrivateRoute>
     ),
   },

@@ -87,6 +87,13 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     role_name = "sin_rol"
     if user.role:
         role_name = str(user.role.name).lower()
+        
+    grado_id = None   
+    
+    if role_name == "estudiante":
+        estudiante = db.query(Estudiante).filter(Estudiante.user_id == user.id).first()
+        if estudiante:
+            grado_id = estudiante.grado_id 
 
     # Crear token
     token_data = {"sub": user.username, "role": role_name}
@@ -112,7 +119,8 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
         "full_name": user.full_name,
         "rol": role_name,
         "redirect": redirect,
-        "access_token": access_token
+        "access_token": access_token,
+        "grado_id": grado_id 
     }
 
 

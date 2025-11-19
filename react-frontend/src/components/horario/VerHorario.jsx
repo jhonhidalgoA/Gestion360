@@ -39,6 +39,7 @@ const VerHorario = ({ gradoId, titulo = "Horario Semanal" }) => {
   const [currentTime, setCurrentTime] = useState("");
   const [loading, setLoading] = useState(true);
   const [diasConClases, setDiasConClases] = useState([]);
+   const [gradoNombre, setGradoNombre] = useState("");
 
   // Actualizar hora y día actual
   useEffect(() => {
@@ -65,6 +66,7 @@ const VerHorario = ({ gradoId, titulo = "Horario Semanal" }) => {
       try {
         const res = await fetch(`http://localhost:8000/api/horarios/grado/${gradoId}`);
         const data = await res.json();
+        setGradoNombre(data.grado_nombre || "Grado");
         const bloques = data.filas || [];
 
         // Convertir a formato por día
@@ -112,7 +114,7 @@ const VerHorario = ({ gradoId, titulo = "Horario Semanal" }) => {
 
   return (
     <div className="schedule-containers">
-      <h1 className="page-title">{titulo}</h1>
+      <h1 className="page-title">{titulo} - {gradoNombre}</h1>
       <div className="schedule-grid">
         {diasConClases.map((diaData, idx) => (
           <div

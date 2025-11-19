@@ -509,7 +509,12 @@ const HorarioGrados = () => {
                 if (grado) {
                   navigate(`/horario-ver?gradoId=${grado}`);
                 } else {
-                  alert("Seleccione un grado primero");
+                  showModal(
+                    "Colegio STEM 360",
+                    "Por favor seleccione un grado primero.",
+                    null,
+                    true
+                  );
                 }
               }}
             >
