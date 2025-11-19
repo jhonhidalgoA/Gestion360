@@ -16,10 +16,14 @@ from backend.schemas import MatriculaCreate, DocenteCreate, HorarioRequest
 from fastapi.responses import StreamingResponse
 from backend.pdf_generator import generate_matricula_pdf, generate_docente_pdf
 
+from backend.event_routes import router as event_router
+
 
 # Configuración General
 
 app = FastAPI(title="Gestión 360 API")
+
+app.include_router(event_router)
 
 # Habilitar CORS para el frontend
 app.add_middleware(

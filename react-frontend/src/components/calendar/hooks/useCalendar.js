@@ -1,114 +1,148 @@
-// src/hooks/useCalendar.js
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 
-export const useCalendar = () => {
+const useCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedColor, setSelectedColor] = useState('red');
+  const [selectedColor, setSelectedColor] = useState("#3498db");
   const [editingEventId, setEditingEventId] = useState(null);
 
-  // Navegación del calendario
+  // Cargar eventos al iniciar
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  const loadEvents = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/events/");
+      if (res.ok) {
+        const data = await res.json();
+        setEvents(data);
+      }
+    } catch (err) {
+      console.error("Error al cargar eventos:", err);
+    }
+  };
+
   const previousMonth = () => {
-    setCurrentDate(prev => {
-      const newDate = new Date(prev);
-      newDate.setMonth(prev.getMonth() - 1);
-      return newDate;
-    });
+    setCurrentDate(
+      (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1)
+    );
   };
 
   const nextMonth = () => {
-    setCurrentDate(prev => {
-      const newDate = new Date(prev);
-      newDate.setMonth(prev.getMonth() + 1);
-      return newDate;
-    });
+    setCurrentDate(
+      (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1)
+    );
   };
 
-  // Modal
   const openModal = (date) => {
-    setEditingEventId(null);
     setSelectedDate(date);
-    setSelectedColor('red');
     setIsModalOpen(true);
+    setEditingEventId(null);
+    setSelectedColor("#3498db");
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setEditingEventId(null);
     setSelectedDate(null);
-    setSelectedColor('red');
+    setEditingEventId(null);
   };
 
-  // Gestión de eventos
-  const addEvent = (eventData) => {
-    const newEvent = {
-      id: Date.now(),
-      ...eventData
-    };
-    setEvents(prev => [...prev, newEvent]);
-    closeModal();
-  };
-
-  const updateEvent = (eventData) => {
-    setEvents(prev =>
-      prev.map(event =>
-        event.id === editingEventId ? { ...event, ...eventData } : event
-      )
-    );
-    closeModal();
-  };
-
-  const deleteEvent = (id) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar este evento?')) {
-      return;
+  const addEvent = async (eventData) => {
+    try {
+      const res = await fetch("http://localhost:8000/events/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(eventData),
+      });
+      if (res.ok) {
+        const newEvent = await res.json();
+        setEvents((prev) => [...prev, newEvent]);
+        closeModal();
+      }
+    } catch (err) {
+      console.error("Error al crear evento:", err);
     }
-    setEvents(prev => prev.filter(event => event.id !== id));
   };
 
-  const editEvent = (id) => {
-    const event = events.find(e => e.id === id);
-    if (!event) return;
-
-    setEditingEventId(id);
-    setSelectedDate(new Date(event.startDate));
-    setSelectedColor(event.color);
-    setIsModalOpen(true);
+  const updateEvent = async (eventData) => {
+    try {
+      const res = await fetch(
+        `http://localhost:8000/events/${editingEventId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(eventData),
+        }
+      );
+      if (res.ok) {
+        const updatedEvent = await res.json();
+        setEvents((prev) =>
+          prev.map((e) => (e.id === editingEventId ? updatedEvent : e))
+        );
+        closeModal();
+      }
+    } catch (err) {
+      console.error("Error al actualizar evento:", err);
+    }
   };
 
-  // Obtener evento por ID
+  const deleteEvent = async (eventId) => {
+    try {
+      await fetch(`http://localhost:8000/events/${eventId}`, {
+        method: "DELETE",
+      });
+      setEvents((prev) => prev.filter((e) => e.id !== eventId));
+    } catch (err) {
+      console.error("Error al eliminar evento:", err);
+    }
+  };
+
+  const editEvent = (eventId) => {
+    const event = events.find((e) => e.id === eventId);
+    if (event) {
+      setSelectedDate(new Date(event.start_date));
+      setSelectedColor(event.color);
+      setEditingEventId(eventId);
+      setIsModalOpen(true);
+    }
+  };
+
   const getEventById = (id) => {
-    return events.find(e => e.id === id);
+    return events.find((e) => e.id === id) || null;
   };
 
-  // Obtener eventos del mes actual
   const getCurrentMonthEvents = () => {
     const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const monthStart = new Date(year, month, 1);
-    const monthEnd = new Date(year, month + 1, 0);
+    const month = currentDate.getMonth() + 1;
+    return events.filter((event) => {
+      // Convertir strings a Date solo si son strings
+      const start =
+        typeof event.start_date === "string"
+          ? new Date(event.start_date)
+          : event.start_date;
+      const end =
+        typeof event.end_date === "string"
+          ? new Date(event.end_date)
+          : event.end_date;
 
-    return events.filter(event => {
-      const startDate = new Date(event.startDate);
-      const endDate = new Date(event.endDate);
-      return startDate <= monthEnd && endDate >= monthStart;
+      return (
+        (start.getFullYear() === year && start.getMonth() + 1 === month) ||
+        (end.getFullYear() === year && end.getMonth() + 1 === month)
+      );
     });
   };
 
   return {
-    // Estado
     currentDate,
     events,
     isModalOpen,
     selectedDate,
     selectedColor,
     editingEventId,
-    
-    // Setters
     setSelectedColor,
-    
-    // Funciones
     previousMonth,
     nextMonth,
     openModal,
@@ -118,6 +152,8 @@ export const useCalendar = () => {
     deleteEvent,
     editEvent,
     getEventById,
-    getCurrentMonthEvents
+    getCurrentMonthEvents,
   };
 };
+
+export { useCalendar };

@@ -21,7 +21,7 @@ const EventsList = ({ events, onEdit, onDelete }) => {
       <h3>Eventos del Mes</h3>
       <div id="eventsList">
         {events.map(event => {
-          const dateRange = getDateRangeString(event.startDate, event.endDate);
+          const dateRange = getDateRangeString(event.start_date, event.end_date);
 
           return (
             <div key={event.id} className="event-item">

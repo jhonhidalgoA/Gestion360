@@ -1,8 +1,17 @@
 // src/components/Calendar/EventModal.jsx
-import React, { useState, useEffect } from 'react';
-import { formatDateForInput } from './utils/dateHelpers';
+import React, { useState, useEffect } from "react";
+import { formatDateForInput } from "./utils/dateHelpers";
 
-const COLORS = ['red', 'blue', 'green', 'purple', 'orange', 'teal', 'indigo', 'pink'];
+const COLORS = [
+  "red",
+  "blue",
+  "green",
+  "purple",
+  "orange",
+  "teal",
+  "indigo",
+  "pink",
+];
 
 const EventModal = ({
   isOpen,
@@ -11,12 +20,12 @@ const EventModal = ({
   selectedDate,
   selectedColor,
   setSelectedColor,
-  editingEvent
+  editingEvent,
 }) => {
   const [formData, setFormData] = useState({
-    title: '',
-    startDate: '',
-    endDate: ''
+    title: "",
+    startDate: "",
+    endDate: "",
   });
 
   useEffect(() => {
@@ -25,17 +34,17 @@ const EventModal = ({
         setFormData({
           title: editingEvent.title,
           startDate: editingEvent.startDate,
-          endDate: editingEvent.endDate
+          endDate: editingEvent.endDate,
         });
         setSelectedColor(editingEvent.color);
       } else if (selectedDate) {
         const dateStr = formatDateForInput(selectedDate);
         setFormData({
-          title: '',
+          title: "",
           startDate: dateStr,
-          endDate: dateStr
+          endDate: dateStr,
         });
-        setSelectedColor('red');
+        setSelectedColor("red");
       }
     }
   }, [isOpen, selectedDate, editingEvent, setSelectedColor]);
@@ -46,30 +55,30 @@ const EventModal = ({
     const { title, startDate, endDate } = formData;
 
     if (!title.trim() || !startDate || !endDate || !selectedColor) {
-      alert('⚠️ Todos los campos son obligatorios');
+      alert("⚠️ Todos los campos son obligatorios");
       return;
     }
 
     if (new Date(startDate) > new Date(endDate)) {
-      alert('❌ La fecha de inicio no puede ser posterior a la fecha de fin');
+      alert("❌ La fecha de inicio no puede ser posterior a la fecha de fin");
       return;
     }
 
     onSave({
       title: title.trim(),
-      startDate,
-      endDate,
-      color: selectedColor
+      start_date: startDate,
+      end_date: endDate,
+      color: selectedColor,
     });
 
-    setFormData({ title: '', startDate: '', endDate: '' });
+    setFormData({ title: "", startDate: "", endDate: "" });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -78,7 +87,7 @@ const EventModal = ({
   };
 
   const handleModalClick = (e) => {
-    if (e.target.className === 'modal') {
+    if (e.target.className === "modal") {
       onClose();
     }
   };
@@ -90,7 +99,7 @@ const EventModal = ({
       <div className="modals-content">
         <div className="modals-header">
           <h3 id="modalTitle">
-            {editingEvent ? '✏️ Editar Evento' : 'Agregar Evento'}
+            {editingEvent ? "✏️ Editar Evento" : "Agregar Evento"}
           </h3>
           <span className="close" onClick={onClose}>
             &times;
@@ -136,11 +145,11 @@ const EventModal = ({
             <div className="form-group">
               <label>Color del Evento:</label>
               <div className="color-selector">
-                {COLORS.map(color => (
+                {COLORS.map((color) => (
                   <div
                     key={color}
                     className={`color-option color-${color} ${
-                      selectedColor === color ? 'selected' : ''
+                      selectedColor === color ? "selected" : ""
                     }`}
                     data-color={color}
                     onClick={() => handleColorClick(color)}
@@ -160,10 +169,10 @@ const EventModal = ({
           </button>
           <button
             type="submit"
-            form="eventForm"            
+            form="eventForm"
             className="btn-calendar btn-calendar-primary"
           >
-            {editingEvent ? 'Actualizar Evento' : 'Agregar Evento'}
+            {editingEvent ? "Actualizar Evento" : "Agregar Evento"}
           </button>
         </div>
       </div>

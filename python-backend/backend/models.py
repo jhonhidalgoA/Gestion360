@@ -1,10 +1,11 @@
 from __future__ import annotations
 import uuid
-from datetime import datetime
+from datetime import datetime, date
 from typing import List, Optional
-from sqlalchemy import String, Text, ForeignKey, Boolean, BigInteger, TIMESTAMP, Column, Integer, String, Date, ForeignKey, Text
+from sqlalchemy import String, Text, ForeignKey, Boolean, BigInteger, TIMESTAMP, Column, Integer, String, Date, DateTime, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .database import Base
+
 
 
 class Role(Base):
@@ -88,7 +89,7 @@ class Padre(Base):
     correo = Column(String(100))
     profesion = Column(String(100))
     ocupacion = Column(String(100))
-    parentesco = Column(String(20))  # Ej: "Madre", "Padre", "Acudiente"
+    parentesco = Column(String(20)) 
 
     # 🔗 Relación con estudiante
     estudiante_id = Column(ForeignKey("estudiantes.id", ondelete="CASCADE"))
@@ -101,7 +102,7 @@ class Docente(Base):
     __tablename__ = "docentes"
 
     id = Column(Integer, primary_key=True, index=True)
-    registerDate = Column(String(10))       # "YYYY-MM-DD"
+    registerDate = Column(String(10))      
     codigo = Column(String(50), unique=True, nullable=False)
     teacherName = Column(String(100))
     teacherLastname = Column(String(100))
@@ -122,5 +123,19 @@ class Docente(Base):
     # Relación con usuario
     user_id = Column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
     user = relationship("User", backref="docente")    
-    
-    
+class Event(Base):
+    __tablename__ = "events"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text, default=None)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[date] = mapped_column(Date, nullable=False)
+    color: Mapped[str] = mapped_column(String(7), default="#3498db")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    def __repr__(self) -> str:
+        return f"Event(id={self.id!r}, title={self.title!r}, start_date={self.start_date!r})"

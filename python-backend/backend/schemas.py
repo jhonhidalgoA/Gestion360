@@ -1,6 +1,6 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_serializer
 from typing import Optional, List
-from datetime import date
+from datetime import date, datetime
 
 
 # --- MODELO: Padre o acudiente ---
@@ -118,4 +118,28 @@ class HorarioRequest(BaseModel):
     docente_id: int
     filas: List[FilaHorario]       
     
-        
+# --- MODELO: Evento del calendario ---
+class EventBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    start_date: date
+    end_date: date
+    color: str = "#3498db"
+
+class EventCreate(EventBase):
+    pass
+
+class EventUpdate(EventBase):
+    pass
+
+class EventResponse(EventBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    @field_serializer('created_at', 'updated_at')
+    def serialize_dt(self, dt: datetime, _info):
+        return dt.isoformat()
+
+    class Config:
+        from_attributes = True   

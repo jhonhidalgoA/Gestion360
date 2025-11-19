@@ -3,6 +3,8 @@ import { useAuth } from "../../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import NavbarModulo from "../../../components/layout/Navbar/NavbarModulo";
 import VerHorario from "../../../components/horario/VerHorario";
+import "./HorarioEstudiante.css"
+
 
 const HorarioEstudiante = () => {
   const { user, loading } = useAuth();
@@ -33,18 +35,20 @@ const HorarioEstudiante = () => {
     <div className="schedules-container">
       <NavbarModulo />
       <div className="page-container">
-        <div className="page-content">
+        <div className="page-content" >
           <div className="header-section">
             <button onClick={() => window.history.back()} className="back-button">
               <span className="back-icon">←</span>
               Volver al inicio
             </button>
           </div>
+          <div className="ensayo">
           {user.grado_id ? (
             <VerHorario gradoId={user.grado_id} titulo="Mi Horario" />
           ) : (
             <p className="error-message">No tienes un grado asignado.</p>
           )}
+          </div>
         </div>
       </div>
     </div>
