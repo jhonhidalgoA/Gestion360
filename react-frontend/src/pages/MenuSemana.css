@@ -1,0 +1,23 @@
+.menu-semana {  
+  background: linear-gradient(rgba(8,0,58,0.1),rgba(8,0,25,0.1)),url('../assets/images/comida.jpg') center/cover no-repeat fixed;    
+  padding-top: 60px; 
+  
+}
+
+
+.menu .card__subtitle span {
+  background-color: #e74c3c; /* Rojo */
+}
+
+.complementos .card__subtitle span {
+  background-color: #9b59b6; /* Morado */
+}
+
+.menu-alternativo .card__subtitle span {
+  background-color: #3498db; /* Azul */
+}
+
+.menu-vegetariano .card__subtitle span {
+  background-color: #2ecc71; /* Verde */
+}
+

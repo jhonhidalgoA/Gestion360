@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import AuthProvider from "./context/AuthContext"; 
 import PrivateRoute from "./routes/PrivateRoute";
 import CalendarioUnificado from "./pages/CalendarioUnificado";
+import MenuSemana from "./pages/MenuSemana";
 
 // Páginas públicas
 import HomePage from "./pages/HomePage";
@@ -63,6 +64,7 @@ function AppContent() {
     { path: "/manual-convivencia", element: <VerManual /> },
     { path: "/pei", element: <VerPEI /> },
     { path: "/atencion-padres", element: <AtencionPadres /> },
+    { path: "/restaurante", element: <MenuSemana /> },
   ];
 
   const allRoutes = [
