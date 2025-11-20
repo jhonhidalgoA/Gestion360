@@ -309,3 +309,40 @@
     transform: translateY(0);
   }
 }
+
+#editarSemanaForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#editarSemanaForm label {
+  font-size: 1.1rem;
+  margin-top: 10px;
+}
+
+#editarSemanaForm input {
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+#editarSemanaForm button {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #28a745; 
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+#editarSemanaForm button:hover {
+  transform: scale(1.05);
+  background-color: #218838;
+}

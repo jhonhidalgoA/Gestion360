@@ -9,14 +9,14 @@ import uuid
 from sqlalchemy import text
 from datetime import time
 from sqlalchemy import select
-from backend.models import MenuDia
+from backend.models import MenuDia, MenuSemana
 
 
 
 # Importaciones locales
 from backend.database import SessionLocal, Base, engine
 from backend.models import User, Role, Estudiante, Padre, Docente
-from backend.schemas import MatriculaCreate, DocenteCreate, HorarioRequest, GuardarCambiosRequest  
+from backend.schemas import MatriculaCreate, DocenteCreate, HorarioRequest, GuardarCambiosRequest, SemanaUpdate  
 from fastapi.responses import StreamingResponse
 from backend.pdf_generator import generate_matricula_pdf, generate_docente_pdf
 
@@ -80,7 +80,7 @@ class LoginRequest(BaseModel):
 # Rutas
 @app.get("/")
 def root():
-    return {"message": "API funcionando correctamente 🚀"}
+    return {"message": "API funcionando correctamente "}
 
 
 # --- LOGIN --- #
@@ -905,4 +905,25 @@ def get_menu(db: Session = Depends(get_db)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error al cargar el menú")
-  
+ 
+
+@app.get("/api/semana")
+def get_semana(db: Session = Depends(get_db)):
+    semana = db.execute(select(MenuSemana)).scalar_one_or_none()
+    if not semana:
+        # Si no existe, crea un valor por defecto
+        semana = MenuSemana(descripcion="Semana no configurada")
+        db.add(semana)
+        db.commit()
+    return {"descripcion": semana.descripcion}
+
+@app.put("/api/semana")
+def update_semana(request: SemanaUpdate, db: Session = Depends(get_db)):
+    semana = db.execute(select(MenuSemana)).scalar_one_or_none()
+    if not semana:
+        semana = MenuSemana(descripcion=request.descripcion)
+        db.add(semana)
+    else:
+        semana.descripcion = request.descripcion
+    db.commit()
+    return {"success": True}

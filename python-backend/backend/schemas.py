@@ -157,3 +157,6 @@ class GuardarCambiosRequest(BaseModel):
     categoria: str
     platoOriginal: PlatoOriginal
     platoNuevo: PlatoNuevo        
+    
+class SemanaUpdate(BaseModel):
+    descripcion: str    

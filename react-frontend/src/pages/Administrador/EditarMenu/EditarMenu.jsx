@@ -60,7 +60,9 @@ const EditarMenu = () => {
     originalImg: "",
   });
 
-  const semana = "Semana del 4 al 8 de Octubre 2025";
+  const [semanaDescripcion, setSemanaDescripcion] = useState("Cargando...");
+  const [editingSemana, setEditingSemana] = useState(false);
+  const [nuevaDescripcion, setNuevaDescripcion] = useState("");
 
   const normalizeClassName = (text) => {
     return text
@@ -90,6 +92,22 @@ const EditarMenu = () => {
     };
 
     fetchMenu();
+  }, []);
+
+  useEffect(() => {
+    const cargarSemana = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/semana");
+        const data = await res.json();
+        setSemanaDescripcion(data.descripcion);
+        setNuevaDescripcion(data.descripcion);
+      } catch (err) {
+        console.error("Error al cargar la semana:", err);
+        setSemanaDescripcion("Semana no disponible");
+      }
+    };
+
+    cargarSemana();
   }, []);
 
   const handlePlatoClick = (item, dia, categoria) => {
@@ -229,7 +247,13 @@ const EditarMenu = () => {
           <div className="left">
             <div className="left__title">
               <h1>Menú Escolar</h1>
-              <p id="semana">{semana}</p>
+              <p
+                id="semana"
+                onClick={() => setEditingSemana(true)}
+                style={{ cursor: "pointer", textDecoration: "underline" }}
+              >
+                {semanaDescripcion}
+              </p>
             </div>
           </div>
           <div className="right">
@@ -251,7 +275,13 @@ const EditarMenu = () => {
           <div className="left">
             <div className="left__title">
               <h1>Menú Escolar</h1>
-              <p id="semana">{semana}</p>
+              <p
+                id="semana"
+                onClick={() => setEditingSemana(true)}
+                style={{ cursor: "pointer", textDecoration: "underline" }}
+              >
+                {semanaDescripcion}
+              </p>
             </div>
           </div>
           <div className="right">
@@ -271,7 +301,13 @@ const EditarMenu = () => {
         <div className="left">
           <div className="left__title">
             <h1>Menú Escolar</h1>
-            <p id="semana">{semana}</p>
+            <p
+              id="semana"
+              onClick={() => setEditingSemana(true)}
+              style={{ cursor: "pointer", textDecoration: "underline" }}
+            >
+              {semanaDescripcion}
+            </p>
           </div>
         </div>
 
@@ -399,6 +435,46 @@ const EditarMenu = () => {
                 </button>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {editingSemana && (
+        <div className="modal" onClick={() => setEditingSemana(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close">
+              <X size={24} />
+            </button>
+            <h2>Editar semana</h2>
+            <form
+              id="editarSemanaForm"
+              onSubmit={(e) => {
+                e.preventDefault();
+                fetch("http://localhost:8000/api/semana", {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ descripcion: nuevaDescripcion }),
+                })
+                  .then((res) => (res.ok ? res.json() : Promise.reject()))
+                  .then(() => {
+                    setSemanaDescripcion(nuevaDescripcion);
+                    setEditingSemana(false);
+                  })
+                  .catch((err) => {
+                    console.error("Error al guardar:", err);
+                    alert("Error al guardar la semana");
+                  });
+              }}
+            >
+              <label htmlFor="semana-input">Descripción:</label>
+              <input
+                id="semana-input"
+                type="text"
+                value={nuevaDescripcion}
+                onChange={(e) => setNuevaDescripcion(e.target.value)}
+              />
+              <button type="submit">Guardar</button>
+            </form>
           </div>
         </div>
       )}

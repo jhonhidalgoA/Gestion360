@@ -154,3 +154,7 @@ class MenuDia(Base):
     nombre: Mapped[str] = mapped_column(String(100), nullable=False)
     img: Mapped[str] = mapped_column(String(100), nullable=False)    
    
+class MenuSemana(Base):
+    __tablename__ = "menu_semana"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    descripcion: Mapped[str] = mapped_column(Text, nullable=False)
