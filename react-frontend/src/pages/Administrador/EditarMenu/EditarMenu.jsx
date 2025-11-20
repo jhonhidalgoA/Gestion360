@@ -1,91 +1,7 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
 import NavbarSection from "../../../components/layout/Navbar/NavbarSection";
-import './EditarMenu.css';
-
-
-const menuData = {
-  "Lunes": {
-    "Menú": [
-      { nombre: "Arroz", img: "arroz.png" },
-      { nombre: "Pollo", img: "pollo.png" }
-    ],
-    "Menú Vegetariano": [
-      { nombre: "Ensalada", img: "ensalada.png" }
-    ],
-    "Menú Alternativo": [
-      { nombre: "Pasta", img: "pasta.png" }
-    ],
-    "Complementos": [
-      { nombre: "Jugo", img: "jugo.png" },
-      { nombre: "Frutas", img: "frutas.png" }
-    ]
-  },
-  "Martes": {
-    "Menú": [
-      { nombre: "Bistec", img: "bistec.png" },
-      { nombre: "Platano", img: "platano.png" }
-    ],
-    "Menú Vegetariano": [
-      { nombre: "Vegetales", img: "vegetales.png" }
-    ],
-    "Menú Alternativo": [
-      { nombre: "Pescado", img: "pescado.png" }
-    ],
-    "Complementos": [
-      { nombre: "Pan", img: "pan.png" },
-      { nombre: "Yogurt", img: "yogurt.png" }
-    ]
-  },
-  "Miércoles": {
-    "Menú": [
-      { nombre: "Carne", img: "carne_res.png" },
-      { nombre: "Papa", img: "papa.png" }
-    ],
-    "Menú Vegetariano": [
-      { nombre: "Sopa", img: "sopa.png" }
-    ],
-    "Menú Alternativo": [
-      { nombre: "Huevos", img: "huevos.png" }
-    ],
-    "Complementos": [
-      { nombre: "Jugo", img: "jugo.png" },
-      { nombre: "Pan", img: "pan.png" }
-    ]
-  },
-  "Jueves": {
-    "Menú": [
-      { nombre: "Cerdo", img: "cerdo.png" },
-      { nombre: "Arroz", img: "arroz.png" }
-    ],
-    "Menú Vegetariano": [
-      { nombre: "Lasaña", img: "lasana.png" }
-    ],
-    "Menú Alternativo": [
-      { nombre: "Pollo Teriyaki", img: "pollo_teriyaki.png" }
-    ],
-    "Complementos": [
-      { nombre: "Frutas", img: "frutas.png" },
-      { nombre: "Yogurt", img: "yogurt.png" }
-    ]
-  },
-  "Viernes": {
-    "Menú": [
-      { nombre: "Pescado", img: "pescado.png" },
-      { nombre: "Vegetales", img: "vegetales.png" }
-    ],
-    "Menú Vegetariano": [
-      { nombre: "Tortilla", img: "tortilla.png" }
-    ],
-    "Menú Alternativo": [
-      { nombre: "Salchicha", img: "salchicha.png" }
-    ],
-    "Complementos": [
-      { nombre: "Jugo", img: "jugo.png" },
-      { nombre: "Postre", img: "postre.png" }
-    ]
-  }
-};
+import "./EditarMenu.css";
 
 const imageOptions = [
   { value: "", label: "-- Selecciona una imagen --" },
@@ -102,10 +18,12 @@ const imageOptions = [
   { value: "frutas.png", label: "Frutas" },
   { value: "huevos.png", label: "Huevos" },
   { value: "jugo.png", label: "Jugos" },
-  { value: "lasana.png", label: "Lasaña" },
+  { value: "lasagna.png", label: "Lasaña" },
   { value: "lechuga.png", label: "Lechuga" },
   { value: "pan.png", label: "Pan Artesanal" },
   { value: "pasta.png", label: "Pasta" },
+  { value: "papas.png", label: "Papa" },
+  { value: "pollo.png", label: "Pollo" },
   { value: "pescado.png", label: "Pescado" },
   { value: "platano.png", label: "Platano" },
   { value: "pollo_teriyaki.png", label: "Pollo Teriyaki" },
@@ -118,23 +36,28 @@ const imageOptions = [
   { value: "vegetales.png", label: "Vegetales" },
   { value: "vegetales_2.png", label: "Vegetales 2" },
   { value: "yogurt.png", label: "Yogurt" },
-  { value: "zanahoria.png", label: "Zanahoria" }
+  { value: "zanahoria.png", label: "Zanahoria" },
 ];
 
 const EditarMenu = () => {
-  const [menus, setMenus] = useState(menuData);
+  const [menus, setMenus] = useState({});
+  const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [confirmData, setConfirmData] = useState({ title: '', message: '', action: null });
+  const [confirmData, setConfirmData] = useState({
+    title: "",
+    message: "",
+    action: null,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const [editData, setEditData] = useState({
-    nombre: '',
-    imagen: '',
-    dia: '',
-    categoria: '',
-    originalNombre: '',
-    originalImg: ''
+    nombre: "",
+    imagen: "",
+    dia: "",
+    categoria: "",
+    originalNombre: "",
+    originalImg: "",
   });
 
   const semana = "Semana del 4 al 8 de Octubre 2025";
@@ -142,14 +65,32 @@ const EditarMenu = () => {
   const normalizeClassName = (text) => {
     return text
       .toLowerCase()
-      .replace(/ú/g, 'u')
-      .replace(/í/g, 'i')
-      .replace(/é/g, 'e')
-      .replace(/ó/g, 'o')
-      .replace(/á/g, 'a')
-      .replace(/ñ/g, 'n')
-      .replace(/ /g, '-');
+      .replace(/ú/g, "u")
+      .replace(/í/g, "i")
+      .replace(/é/g, "e")
+      .replace(/ó/g, "o")
+      .replace(/á/g, "a")
+      .replace(/ñ/g, "n")
+      .replace(/ /g, "-");
   };
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/menu");
+        if (!response.ok) throw new Error("Error al cargar el menú");
+        const data = await response.json();
+        setMenus(data);
+      } catch (err) {
+        console.error("Error al cargar menú:", err);
+        setMenus({}); // Fallback seguro
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMenu();
+  }, []);
 
   const handlePlatoClick = (item, dia, categoria) => {
     setEditData({
@@ -158,7 +99,7 @@ const EditarMenu = () => {
       dia: dia,
       categoria: categoria,
       originalNombre: item.nombre,
-      originalImg: item.img
+      originalImg: item.img,
     });
     setShowEditModal(true);
   };
@@ -170,7 +111,7 @@ const EditarMenu = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!editData.nombre.trim() || !editData.imagen.trim()) {
       showModal("Advertencia", "Por favor completa todos los campos", null);
       return;
@@ -184,19 +125,24 @@ const EditarMenu = () => {
     setIsSubmitting(true);
 
     try {
-      // Simular llamada a la API
-      const response = await fetch('/api/guardar_cambios', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          dia: editData.dia,
-          categoria: editData.categoria,
-          platoOriginal: { nombre: editData.originalNombre, img: editData.originalImg },
-          platoNuevo: { nombre: editData.nombre, img: editData.imagen }
-        })
-      });
+      const response = await fetch(
+        "http://localhost:8000/api/guardar_cambios",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            dia: editData.dia,
+            categoria: editData.categoria,
+            platoOriginal: {
+              nombre: editData.originalNombre,
+              img: editData.originalImg,
+            },
+            platoNuevo: { nombre: editData.nombre, img: editData.imagen },
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status}`);
@@ -205,34 +151,42 @@ const EditarMenu = () => {
       const data = await response.json();
 
       if (data.success) {
-        // Actualizar el estado local
-        setMenus(prevMenus => {
+        // Actualizar estado local
+        setMenus((prevMenus) => {
           const newMenus = { ...prevMenus };
           const categoryItems = newMenus[editData.dia][editData.categoria];
           const itemIndex = categoryItems.findIndex(
-            item => item.nombre === editData.originalNombre && item.img === editData.originalImg
+            (item) =>
+              item.nombre === editData.originalNombre &&
+              item.img === editData.originalImg
           );
-          
+
           if (itemIndex !== -1) {
             categoryItems[itemIndex] = {
               nombre: editData.nombre,
-              img: editData.imagen
+              img: editData.imagen,
             };
           }
-          
+
           return newMenus;
         });
 
         setShowEditModal(false);
-        showModal("Éxito", "Plato actualizado correctamente", () => {
-          window.location.reload();
-        });
+        showModal("Éxito", "Plato actualizado correctamente", () => {});
       } else {
-        showModal("Error", data.message || "No se pudo actualizar el plato", null);
+        showModal(
+          "Error",
+          data.message || "No se pudo actualizar el plato",
+          null
+        );
       }
     } catch (err) {
       console.error("Error:", err);
-      showModal("Error", "Hubo un problema al guardar los cambios: " + err.message, null);
+      showModal(
+        "Error",
+        "Hubo un problema al guardar los cambios: " + err.message,
+        null
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -243,7 +197,7 @@ const EditarMenu = () => {
   };
 
   const handleModalClick = (e) => {
-    if (e.target.className === 'modal') {
+    if (e.target.className === "modal") {
       cerrarModal();
     }
   };
@@ -255,20 +209,64 @@ const EditarMenu = () => {
     setShowConfirmModal(false);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && showEditModal) {
+      if (e.key === "Escape" && showEditModal) {
         cerrarModal();
       }
     };
-    
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [showEditModal]);
+
+  // Mostrar carga mientras se obtienen los datos
+  if (loading) {
+    return (
+      <div className="edit-menu">
+        <NavbarSection title="Editar Menú Escolar" color="#7B1FA2" />
+        <div className="menu-container">
+          <div className="left">
+            <div className="left__title">
+              <h1>Menú Escolar</h1>
+              <p id="semana">{semana}</p>
+            </div>
+          </div>
+          <div className="right">
+            <div className="right__menu">
+              <p>Cargando menú...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Si no hay menú cargado, mostrar mensaje
+  if (Object.keys(menus).length === 0) {
+    return (
+      <div className="edit-menu">
+        <NavbarSection title="Editar Menú Escolar" color="#7B1FA2" />
+        <div className="menu-container">
+          <div className="left">
+            <div className="left__title">
+              <h1>Menú Escolar</h1>
+              <p id="semana">{semana}</p>
+            </div>
+          </div>
+          <div className="right">
+            <div className="right__menu">
+              <p>No se encontró menú para esta semana.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="edit-menu">
-      <NavbarSection title="Editar Menú Escolar" color="#7B1FA2" />    
+      <NavbarSection title="Editar Menú Escolar" color="#7B1FA2" />
       <div className="menu-container">
         <div className="left">
           <div className="left__title">
@@ -279,40 +277,61 @@ const EditarMenu = () => {
 
         <div className="right">
           <div className="right__menu">
-            {Object.entries(menus).map(([dia, categorias]) => (
-              <div key={dia} className="right__card">
-                <div className="card__day">
-                  <h1>{dia}</h1>
-                  <div className="menu-grid">
-                    {Object.entries(categorias).map(([tipo, items]) => {
-                      const clase = normalizeClassName(tipo);
-                      return (
-                        <div key={tipo} className={`menu-card ${clase}`}>
-                          <div className="card__subtitle">
-                            <span className="sub__title">{tipo}</span>
-                          </div>
-                          <div className="menu-items">
-                            {items.map((item, idx) => (
-                              <div
-                                key={idx}
-                                className="menu-item"
-                                onClick={() => handlePlatoClick(item, dia, tipo)}
-                              >
-                                <img
-                                  src={`/static/img/${item.img}`}
-                                  alt={item.nombre}
-                                />
-                                <span>{item.nombre}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
+            {["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
+              .filter((dia) => menus[dia])
+              .map((dia) => {
+                const categorias = menus[dia];
+                return (
+                  <div key={dia} className="right__card">
+                    <div className="card__day">
+                      <h1>{dia}</h1>
+                      <div className="menu-grid">
+                        {(() => {
+                          const order = [
+                            "Menú",
+                            "Complementos",
+                            "Menú Alternativo",
+                            "Menú Vegetariano",
+                          ];
+                          return order
+                            .filter((tipo) => categorias[tipo]) // Solo los que existen
+                            .map((tipo) => {
+                              const items = categorias[tipo];
+                              const clase = normalizeClassName(tipo);
+                              return (
+                                <div
+                                  key={tipo}
+                                  className={`menu-card ${clase}`}
+                                >
+                                  <div className="card__subtitle">
+                                    <span className="sub__title">{tipo}</span>
+                                  </div>
+                                  <div className="menu-items">
+                                    {items.map((item, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="menu-item"
+                                        onClick={() =>
+                                          handlePlatoClick(item, dia, tipo)
+                                        }
+                                      >
+                                        <img
+                                          src={`/img/${item.img}`}
+                                          alt={item.nombre}
+                                        />
+                                        <span>{item.nombre}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            });
+                        })()}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                );
+              })}
           </div>
         </div>
       </div>
@@ -331,7 +350,9 @@ const EditarMenu = () => {
                 id="nombre"
                 name="nombre"
                 value={editData.nombre}
-                onChange={(e) => setEditData({ ...editData, nombre: e.target.value })}
+                onChange={(e) =>
+                  setEditData({ ...editData, nombre: e.target.value })
+                }
                 required
               />
 
@@ -340,7 +361,9 @@ const EditarMenu = () => {
                 id="imagen"
                 name="imagen"
                 value={editData.imagen}
-                onChange={(e) => setEditData({ ...editData, imagen: e.target.value })}
+                onChange={(e) =>
+                  setEditData({ ...editData, imagen: e.target.value })
+                }
                 required
               >
                 {imageOptions.map((option) => (
@@ -351,7 +374,7 @@ const EditarMenu = () => {
               </select>
 
               <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+                {isSubmitting ? "Guardando..." : "Guardar Cambios"}
               </button>
             </form>
           </div>
@@ -368,7 +391,10 @@ const EditarMenu = () => {
                 Aceptar
               </button>
               {confirmData.action && (
-                <button className="btn-cancel" onClick={() => setShowConfirmModal(false)}>
+                <button
+                  className="btn-cancel"
+                  onClick={() => setShowConfirmModal(false)}
+                >
                   Cancelar
                 </button>
               )}

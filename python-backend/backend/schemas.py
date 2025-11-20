@@ -143,3 +143,17 @@ class EventResponse(EventBase):
 
     class Config:
         from_attributes = True   
+        
+class PlatoOriginal(BaseModel):
+    nombre: str
+    img: str
+
+class PlatoNuevo(BaseModel):
+    nombre: str
+    img: str
+
+class GuardarCambiosRequest(BaseModel):
+    dia: str
+    categoria: str
+    platoOriginal: PlatoOriginal
+    platoNuevo: PlatoNuevo        

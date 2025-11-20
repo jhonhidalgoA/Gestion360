@@ -8,11 +8,15 @@ import jwt
 import uuid
 from sqlalchemy import text
 from datetime import time
+from sqlalchemy import select
+from backend.models import MenuDia
+
+
 
 # Importaciones locales
 from backend.database import SessionLocal, Base, engine
 from backend.models import User, Role, Estudiante, Padre, Docente
-from backend.schemas import MatriculaCreate, DocenteCreate, HorarioRequest  
+from backend.schemas import MatriculaCreate, DocenteCreate, HorarioRequest, GuardarCambiosRequest  
 from fastapi.responses import StreamingResponse
 from backend.pdf_generator import generate_matricula_pdf, generate_docente_pdf
 
@@ -845,5 +849,60 @@ def eliminar_horario_por_grado(grado_id: int, db: Session = Depends(get_db)):
         return {"mensaje": f"Horario del grado {grado_id} eliminado correctamente"}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))    
+        raise HTTPException(status_code=500, detail=str(e)) 
     
+       
+
+# -- Editar menú --  
+@app.post("/api/guardar_cambios")
+def guardar_cambios_menu(request: GuardarCambiosRequest, db: Session = Depends(get_db)):
+    try:
+        # Buscar el plato exacto usando select() y ORM
+        stmt = select(MenuDia).where(
+            MenuDia.dia == request.dia,
+            MenuDia.categoria == request.categoria,
+            MenuDia.nombre == request.platoOriginal.nombre,
+            MenuDia.img == request.platoOriginal.img
+        )
+        plato = db.execute(stmt).scalar_one_or_none()
+
+        if not plato:
+            raise HTTPException(status_code=404, detail="Plato no encontrado")
+
+        # Actualizar campos
+        plato.nombre = request.platoNuevo.nombre
+        plato.img = request.platoNuevo.img
+
+        db.commit()
+        return {"success": True}
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Error al guardar cambios")
+
+
+@app.get("/api/menu")
+def get_menu(db: Session = Depends(get_db)):
+    try:
+        # Obtener todos los platos ordenados por día y categoría
+        stmt = select(MenuDia).order_by(MenuDia.dia, MenuDia.categoria)
+        result = db.execute(stmt)
+        platos = result.scalars().all()
+
+        # Estructurar los datos como menuData
+        menu = {}
+        for plato in platos:
+            if plato.dia not in menu:
+                menu[plato.dia] = {}
+            if plato.categoria not in menu[plato.dia]:
+                menu[plato.dia][plato.categoria] = []
+            menu[plato.dia][plato.categoria].append({
+                "nombre": plato.nombre,
+                "img": plato.img
+            })
+
+        return menu
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al cargar el menú")
+  

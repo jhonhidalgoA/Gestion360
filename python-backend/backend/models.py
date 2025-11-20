@@ -1,5 +1,6 @@
 from __future__ import annotations
 import uuid
+from sqlalchemy import String, UUID as PG_UUID
 from datetime import datetime, date
 from typing import List, Optional
 from sqlalchemy import String, Text, ForeignKey, Boolean, BigInteger, TIMESTAMP, Column, Integer, String, Date, DateTime, ForeignKey, Text
@@ -139,3 +140,17 @@ class Event(Base):
 
     def __repr__(self) -> str:
         return f"Event(id={self.id!r}, title={self.title!r}, start_date={self.start_date!r})"
+
+class MenuDia(Base):
+    __tablename__ = "menu_dia"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+    )
+    dia: Mapped[str] = mapped_column(String(20), nullable=False)
+    categoria: Mapped[str] = mapped_column(String(50), nullable=False)
+    nombre: Mapped[str] = mapped_column(String(100), nullable=False)
+    img: Mapped[str] = mapped_column(String(100), nullable=False)    
+   
