@@ -37,15 +37,15 @@ function AuthProvider({ children }) {
       const userData = {
         username: data.username,
         fullName: data.full_name,
-        role: data.rol, 
+        role: data.rol ? data.rol.toLowerCase() : '', 
         accessToken: data.access_token,
         redirect: data.redirect,
         correo: data.correo || data.email || data.username,
-        grado_id: data.grado_id || null, // 👈 asegúrate de que sea null si no existe
+        grado_id: data.grado_id || null, 
       };
 
       setUser(userData);
-      sessionStorage.setItem("user_session", JSON.stringify(userData)); // 👈 Guarda en sessionStorage
+      sessionStorage.setItem("user_session", JSON.stringify(userData)); 
       console.log("Usuario guardado en contexto:", userData);
 
       return { success: true, redirect: data.redirect };
@@ -59,7 +59,7 @@ function AuthProvider({ children }) {
 
   const logout = () => {
     setUser(null);
-    sessionStorage.removeItem("user_session"); // 👈 Limpia al salir
+    sessionStorage.removeItem("user_session"); 
   };
 
   return (

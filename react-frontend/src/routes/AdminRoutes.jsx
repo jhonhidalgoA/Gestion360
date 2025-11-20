@@ -57,14 +57,7 @@ const adminRoutes = [
       </PrivateRoute>
     ),
   },
-  {
-    path: "/calendario",
-    element: (
-      <PrivateRoute roles={["administrador"]}>
-        <Calendario />
-      </PrivateRoute>
-    ),
-  },
+  
 ];
 
 export default adminRoutes;

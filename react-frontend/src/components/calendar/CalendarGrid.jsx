@@ -1,5 +1,4 @@
-// src/components/Calendar/CalendarGrid.jsx
-import React from 'react';
+
 import DayCell from './DayCell';
 import { generateCalendarDays } from './utils/dateHelpers';
 

@@ -1,4 +1,5 @@
 import PrivateRoute from "./PrivateRoute";
+import Calendario from "../pages/Docente/Calendario/CalendarioVer"
 import Calificaciones from "../pages/Docente/Calificaciones/Calificaciones";
 import Asistencia from "../pages/Docente/Asistencia/Asistencia";
 import Planeacion from "../pages/Docente/Planeacion/Planeacion";
@@ -64,6 +65,7 @@ const docenteRoutes = [
       </PrivateRoute>
     ),
   },
+  
 ];
 
 export default docenteRoutes;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const useCalendar = () => {
+const useCalendar = (readOnly = false) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,6 +38,7 @@ const useCalendar = () => {
   };
 
   const openModal = (date) => {
+    if (readOnly) return;
     setSelectedDate(date);
     setIsModalOpen(true);
     setEditingEventId(null);
@@ -51,6 +52,7 @@ const useCalendar = () => {
   };
 
   const addEvent = async (eventData) => {
+    if (readOnly) return;
     try {
       const res = await fetch("http://localhost:8000/events/", {
         method: "POST",
@@ -68,6 +70,7 @@ const useCalendar = () => {
   };
 
   const updateEvent = async (eventData) => {
+    if (readOnly) return;
     try {
       const res = await fetch(
         `http://localhost:8000/events/${editingEventId}`,
@@ -90,6 +93,7 @@ const useCalendar = () => {
   };
 
   const deleteEvent = async (eventId) => {
+    if (readOnly) return;
     try {
       await fetch(`http://localhost:8000/events/${eventId}`, {
         method: "DELETE",

@@ -1,13 +1,13 @@
 // src/components/Calendar/Calendar.jsx
-import { useCalendar } from './hooks/useCalendar';
-import CalendarHeader from './CalendarHeader';
-import CalendarGrid from './CalendarGrid';
-import EventsList from './EventsList';
-import EventModal from './EventModal';
+import { useCalendar } from "./hooks/useCalendar";
+import CalendarHeader from "./CalendarHeader";
+import CalendarGrid from "./CalendarGrid";
+import EventsList from "./EventsList";
+import EventModal from "./EventModal";
 import NavbarSection from "../layout/Navbar/NavbarSection";
-import './Calendar.css';
+import "./Calendar.css";
 
-const Calendar = () => {
+const Calendar = ({ readOnly = false }) => {
   const {
     currentDate,
     events,
@@ -25,8 +25,8 @@ const Calendar = () => {
     deleteEvent,
     editEvent,
     getEventById,
-    getCurrentMonthEvents
-  } = useCalendar();
+    getCurrentMonthEvents,
+  } = useCalendar(readOnly);
 
   const handleSaveEvent = (eventData) => {
     if (editingEventId) {
@@ -41,7 +41,7 @@ const Calendar = () => {
 
   return (
     <div className="calendar-container">
-     <NavbarSection title="Calendario Escolar Administrador" color="#0D47A1" />
+      <NavbarSection title="Calendario Escolar Administrador" color="#0D47A1" />
       <div className="container-header">
         <CalendarHeader
           currentDate={currentDate}
@@ -53,29 +53,30 @@ const Calendar = () => {
           <CalendarGrid
             currentDate={currentDate}
             events={events}
-            onDayClick={openModal}
-            onEditEvent={editEvent}
+            onDayClick={readOnly ? undefined : openModal}
+            onEditEvent={readOnly ? undefined : editEvent}
           />
           <div className="calendar-event">
             <EventsList
-            events={monthEvents}
-            onEdit={editEvent}
-            onDelete={deleteEvent}
-          />
+              events={monthEvents}
+              onEdit={editEvent}
+              onDelete={deleteEvent}
+            />
           </div>
-          
         </div>
       </div>
 
-      <EventModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onSave={handleSaveEvent}
-        selectedDate={selectedDate}
-        selectedColor={selectedColor}
-        setSelectedColor={setSelectedColor}
-        editingEvent={editingEvent}
-      />
+      {!readOnly && (
+        <EventModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onSave={handleSaveEvent}
+          selectedDate={selectedDate}
+          selectedColor={selectedColor}
+          setSelectedColor={setSelectedColor}
+          editingEvent={editingEvent}
+        />
+      )}
     </div>
   );
 };

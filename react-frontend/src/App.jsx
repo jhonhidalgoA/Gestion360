@@ -2,6 +2,8 @@ import { BrowserRouter } from "react-router-dom";
 import { useRoutes, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import AuthProvider from "./context/AuthContext"; 
+import PrivateRoute from "./routes/PrivateRoute";
+import CalendarioUnificado from "./pages/CalendarioUnificado";
 
 // Páginas públicas
 import HomePage from "./pages/HomePage";
@@ -69,6 +71,14 @@ function AppContent() {
     ...docenteRoutes,
     ...estudianteRoutes,
     ...padresRoutes,
+    {
+    path: "/calendario",
+    element: (
+      <PrivateRoute roles={["administrador", "docente"]}>
+        <CalendarioUnificado />
+      </PrivateRoute>
+    ),
+  },
     { path: "*", element: <Login /> },
   ];
 
