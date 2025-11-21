@@ -1,13 +1,11 @@
-
 import "./Botones.css";
 
 const ActionButtons = ({
- 
   onLoad,
   loadLabel = "Cargar",
   loadLoading = false,
   loadDisabled = false,
- 
+
   onSave,
   saveLabel = "Guardar",
   saveLoading = false,
@@ -23,30 +21,26 @@ const ActionButtons = ({
   sendLoading = false,
   sendDisabled = false,
 
-
   onDelete,
   deleteLabel = "Borrar",
   deleteLoading = false,
   deleteDisabled = false,
 
-  // Ver
   onView,
   viewLabel = "Ver",
   viewLoading = false,
   viewDisabled = false,
 
-  // Generar PDF
   onLoadPDF,
   pdfLabel = "Generar PDF",
   pdfLoading = false,
   pdfDisabled = false,
 
-
- 
-
-
+  onAddColumn,
+  columnLabel = "Agregar Columna",
+  columnLoading = false,
+  columnDisabled = false,
 }) => {
-  
   const getButtonText = (isLoading, label, loadingText) => {
     return isLoading ? loadingText : label;
   };
@@ -95,7 +89,7 @@ const ActionButtons = ({
         </button>
       )}
 
-       {onSend && (
+      {onSend && (
         <button
           type="button"
           className="btn btn-send"
@@ -151,7 +145,19 @@ const ActionButtons = ({
         </button>
       )}
 
-      
+      {onAddColumn && (
+        <button
+          type="button"
+          className="btn btn-add-column"
+          onClick={onAddColumn}
+          disabled={columnLoading || columnDisabled}
+        >
+          <span className="material-symbols-outlined icon-btn">
+            {columnLoading ? "hourglass_empty" : "view_column"}
+          </span>
+          {getButtonText(columnLoading, columnLabel, "Agregando...")}
+        </button>
+      )}
     </div>
   );
 };

@@ -77,6 +77,7 @@ class Estudiante(Base):
     # Relación con usuario
     user_id = Column(ForeignKey("users.id", ondelete="CASCADE"))
     user = relationship("User", backref="estudiante")
+    calificaciones = relationship("Calificacion", back_populates="estudiante", cascade="all, delete-orphan")
     
 class Padre(Base):
     __tablename__ = "padres"
@@ -176,4 +177,18 @@ class Periodo(Base):
     nombre: Mapped[str] = mapped_column(String(50), nullable=False)    
     
 
+class Calificacion(Base):
+    __tablename__ = "calificaciones"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        primary_key=True,
+        default=uuid.uuid4
+    )
+    estudiante_id: Mapped[int] = mapped_column(ForeignKey("estudiantes.id"), nullable=False)
+    asignatura: Mapped[str] = mapped_column(String(100), nullable=False)
+    periodo: Mapped[int] = mapped_column(ForeignKey("periodos.id"), nullable=False)
+    nota: Mapped[float] = mapped_column(nullable=False)
+    columna: Mapped[int] = mapped_column(nullable=False)
+
+    estudiante: Mapped["Estudiante"] = relationship("Estudiante", back_populates="calificaciones")
     

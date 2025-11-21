@@ -17,8 +17,12 @@ const Calificaciones = () => {
   });
 
   const [grupos, setGrupos] = useState([{ value: "", label: "Cargando..." }]);
-  const [asignaturas, setAsignaturas] = useState([{ value: "", label: "Cargando..." }]);
-  const [periodos, setPeriodos] = useState([{ value: "", label: "Cargando..." }]);
+  const [asignaturas, setAsignaturas] = useState([
+    { value: "", label: "Cargando..." },
+  ]);
+  const [periodos, setPeriodos] = useState([
+    { value: "", label: "Cargando..." },
+  ]);
 
   const [loading, setLoading] = useState({
     cargar: false,
@@ -31,49 +35,53 @@ const Calificaciones = () => {
   const [numeroNotas, setNumeroNotas] = useState(10);
   const [estudiantes, setEstudiantes] = useState([]);
 
-  const cargarEstudiantes = async () => {
-    const values = getValues();
-    if (!values.grupo) {
-      setMensaje({
-        tipo: "error",
-        texto: "Por favor selecciona un grado primero.",
-      });
-      return;
+ const cargarEstudiantes = async () => {
+  const values = getValues();
+  if (!values.grupo || !values.asignatura || !values.periodo) {
+    setMensaje({
+      tipo: "error",
+      texto: "Debes seleccionar Grupo, Asignatura y Período.",
+    });
+    return;
+  }
+
+  setLoading((prev) => ({ ...prev, cargar: true }));
+  setMensaje({ tipo: "", texto: "" });
+
+  try {
+    // Construir la URL con los 3 parámetros
+    const url = new URL(`http://localhost:8000/api/estudiantes-por-grado/${values.grupo}`);
+    url.searchParams.append('asignatura', values.asignatura);
+    url.searchParams.append('periodo', values.periodo);
+
+    const res = await fetch(url.toString());
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.detail || "Error al cargar estudiantes");
+    }
+    const data = await res.json();
+
+    // Actualizar el estado de número de notas según lo que venga del backend
+    if (data.length > 0) {
+      const maxNotas = Math.max(...data.map(est => est.notas.length));
+      setNumeroNotas(maxNotas);
     }
 
-    setLoading((prev) => ({ ...prev, cargar: true }));
-    setMensaje({ tipo: "", texto: "" });
-
-    try {
-      const res = await fetch(
-        `http://localhost:8000/api/estudiantes-por-grado/${values.grupo}`
-      );
-      if (!res.ok) throw new Error("Error al cargar estudiantes");
-      const data = await res.json();
-
-      const estudiantesFormateados = data.map((est) => ({
-        id: est.id,
-        apellidos: est.apellidos,
-        nombres: est.nombres,
-        notas: Array(numeroNotas).fill(""),
-        retroalimentacion: "",
-      }));
-
-      setEstudiantes(estudiantesFormateados);
-      setMensaje({
-        tipo: "exito",
-        texto: `Se cargaron ${estudiantesFormateados.length} estudiantes.`,
-      });
-    } catch (err) {
-      console.error("Error:", err);
-      setMensaje({
-        tipo: "error",
-        texto: "No se pudieron cargar los estudiantes.",
-      });
-    } finally {
-      setLoading((prev) => ({ ...prev, cargar: false }));
-    }
-  };
+    setEstudiantes(data);
+    setMensaje({
+      tipo: "exito",
+      texto: `Se cargaron ${data.length} estudiantes.`,
+    });
+  } catch (err) {
+    console.error("Error:", err);
+    setMensaje({
+      tipo: "error",
+      texto: "No se pudieron cargar los estudiantes. " + (err.message || ""),
+    });
+  } finally {
+    setLoading((prev) => ({ ...prev, cargar: false }));
+  }
+};
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [estudianteSeleccionado, setEstudianteSeleccionado] = useState(null);
@@ -93,8 +101,11 @@ const Calificaciones = () => {
           label: grado.nombre,
         }));
 
-        const resAsignaturas = await fetch("http://localhost:8000/api/asignaturas");
-        if (!resAsignaturas.ok) throw new Error("Error al cargar las asignaturas");
+        const resAsignaturas = await fetch(
+          "http://localhost:8000/api/asignaturas"
+        );
+        if (!resAsignaturas.ok)
+          throw new Error("Error al cargar las asignaturas");
         const dataAsignaturas = await resAsignaturas.json();
         const opcionesAsignaturas = dataAsignaturas.map((asig) => ({
           value: asig.nombre.toLowerCase().replace(/\s+/g, "_"),
@@ -110,7 +121,10 @@ const Calificaciones = () => {
         }));
 
         setGrupos([{ value: "", label: "Seleccionar" }, ...opcionesGrados]);
-        setAsignaturas([{ value: "", label: "Seleccionar" }, ...opcionesAsignaturas]);
+        setAsignaturas([
+          { value: "", label: "Seleccionar" },
+          ...opcionesAsignaturas,
+        ]);
         setPeriodos([{ value: "", label: "Seleccionar" }, ...opcionesPeriodos]);
       } catch (err) {
         console.error("Error al cargar datos:", err);
@@ -221,18 +235,61 @@ const Calificaciones = () => {
   const manejarAccion = async (data, action) => {
     setMensaje({ tipo: "", texto: "" });
     setLoading((prev) => ({ ...prev, [action]: true }));
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setMensaje({
-        tipo: "exito",
-        texto: `Acción "${action}" procesada correctamente.`,
-      });
+      const values = getValues();
+      if (!values.grupo || !values.asignatura || !values.periodo) {
+        throw new Error("Debes seleccionar Grupo, Asignatura y Período.");
+      }
+
+      if (action === "guardar") {
+        const payload = {
+          grupo: values.grupo,
+          asignatura: values.asignatura,
+          periodo: values.periodo,
+          estudiantes: estudiantes.map((est) => ({
+            id: est.id,
+            notas: est.notas,
+          })),
+        };
+
+        const res = await fetch(
+          "http://localhost:8000/api/guardar-calificaciones",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        if (!res.ok) throw new Error("Error al guardar las calificaciones");
+
+        setMensaje({
+          tipo: "exito",
+          texto: "Calificaciones guardadas correctamente.",
+        });
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        setMensaje({
+          tipo: "exito",
+          texto: `Acción "${action}" procesada correctamente.`,
+        });
+      }
+
+      setTimeout(() => {
+        setMensaje({ tipo: "", texto: "" });
+      }, 3000);
     } catch (error) {
       console.error("Error:", error);
       setMensaje({
         tipo: "error",
-        texto: "Error al procesar la solicitud. Inténtalo más tarde.",
+        texto: error.message || "Error al procesar la solicitud.",
       });
+      setTimeout(() => {
+        setMensaje({ tipo: "", texto: "" });
+      }, 5000);
     } finally {
       setLoading((prev) => ({ ...prev, [action]: false }));
     }
@@ -307,36 +364,11 @@ const Calificaciones = () => {
               onView={handleVer}
               viewLoading={loading.ver}
               viewLabel="Ver"
+              onAddColumn={agregarNota}
+              columnLabel="Nueva Columna"
+              columnLoading={false}
+              columnDisabled={false}
             />
-            <button
-              onClick={agregarNota}
-              style={{
-                padding: "10px 20px",
-                borderRadius: "6px",
-                border: "none",
-                background: "#48bb78",
-                color: "white",
-                cursor: "pointer",
-                fontSize: "14px",
-                fontWeight: "600",
-                transition: "all 0.2s ease",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                minWidth: "120px",
-              }}
-              onMouseOver={(e) => {
-                e.target.style.transform = "translateY(-2px)";
-                e.target.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
-              }}
-              onMouseOut={(e) => {
-                e.target.style.transform = "translateY(0)";
-                e.target.style.boxShadow = "none";
-              }}
-            >
-              <span style={{ fontSize: "18px" }}>+</span>
-              Nueva Columna
-            </button>
           </div>
 
           {mensaje.texto && (
@@ -348,9 +380,8 @@ const Calificaciones = () => {
 
         <div
           style={{
-            padding: "20px",
             fontFamily: "Arial, sans-serif",
-            marginTop: "20px",
+            marginTop: "30px",
             marginLeft: "0px",
           }}
         >
