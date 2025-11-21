@@ -11,6 +11,8 @@
     "server": "json-server --watch db/db.json --port 3001"
   },
   "dependencies": {
+    "ag-grid-community": "^34.3.1",
+    "ag-grid-react": "^34.3.1",
     "axios": "^1.13.2",
     "lucide-react": "^0.544.0",
     "react": "^19.1.1",

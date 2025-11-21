@@ -22,12 +22,18 @@ from backend.pdf_generator import generate_matricula_pdf, generate_docente_pdf
 
 from backend.event_routes import router as event_router
 
+from backend.routes.docente import router as docente_router
+
+
+
 
 # Configuración General
 
 app = FastAPI(title="Gestión 360 API")
 
 app.include_router(event_router)
+
+app.include_router(docente_router)
 
 # Habilitar CORS para el frontend
 app.add_middleware(
