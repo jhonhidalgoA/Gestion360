@@ -3,35 +3,22 @@ import SelectField from "../../../components/ui/SelectField";
 import ActionButtons from "../../../components/ui/Botones";
 import "./Calificaciones.css";
 import { useForm } from "react-hook-form";
-import { useState, useRef, useEffect } from "react"; // ← Añadido useEffect
-
-// ✅ Eliminamos grupoOptions estático
-
-
-
-const periodoOptions = [
-  { value: "", label: "Seleccionar" },
-  { value: "1", label: "Periodo 1" },
-  { value: "2", label: "Periodo 2" },
-  { value: "3", label: "Periodo 3" },
-  { value: "4", label: "Periodo 4" },
-];
+import { useState, useRef, useEffect } from "react";
 
 const Calificaciones = () => {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: { grupo: "", asignatura: "", periodo: "" },
-    mode: "onBlur",
+    mode: "onChange",
   });
 
-  // ✅ Nuevo estado para los grados
   const [grupos, setGrupos] = useState([{ value: "", label: "Cargando..." }]);
-  const [asignaturas, setAsignaturas] = useState([
-    { value: "", label: "Cargando..." },
-  ]);
+  const [asignaturas, setAsignaturas] = useState([{ value: "", label: "Cargando..." }]);
+  const [periodos, setPeriodos] = useState([{ value: "", label: "Cargando..." }]);
 
   const [loading, setLoading] = useState({
     cargar: false,
@@ -41,45 +28,52 @@ const Calificaciones = () => {
   });
 
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
-
   const [numeroNotas, setNumeroNotas] = useState(10);
-  const [estudiantes, setEstudiantes] = useState([
-    {
-      id: 1,
-      apellidos: "Pérez Cardona",
-      nombres: "Ana Maria",
-      notas: Array(10).fill(""),
-      retroalimentacion: "",
-    },
-    {
-      id: 2,
-      apellidos: "Gómez Arango",
-      nombres: "Carlos Eduardo",
-      notas: Array(10).fill(""),
-      retroalimentacion: "",
-    },
-    {
-      id: 3,
-      apellidos: "López Gonzalez",
-      nombres: "Maria de los Angeles",
-      notas: Array(10).fill(""),
-      retroalimentacion: "",
-    },
-    {
-      id: 4,
-      apellidos: "Fernández Ramírez",
-      nombres: "Luis Alberto",
-      notas: Array(10).fill(""),
-      retroalimentacion: "",
-    },
-    {
-      id: 5,
-      apellidos: "Martínez Giraldo",
-      nombres: "Sofía",
-      notas: Array(10).fill(""),
-      retroalimentacion: "",
-    },
-  ]);
+  const [estudiantes, setEstudiantes] = useState([]);
+
+  const cargarEstudiantes = async () => {
+    const values = getValues();
+    if (!values.grupo) {
+      setMensaje({
+        tipo: "error",
+        texto: "Por favor selecciona un grado primero.",
+      });
+      return;
+    }
+
+    setLoading((prev) => ({ ...prev, cargar: true }));
+    setMensaje({ tipo: "", texto: "" });
+
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/estudiantes-por-grado/${values.grupo}`
+      );
+      if (!res.ok) throw new Error("Error al cargar estudiantes");
+      const data = await res.json();
+
+      const estudiantesFormateados = data.map((est) => ({
+        id: est.id,
+        apellidos: est.apellidos,
+        nombres: est.nombres,
+        notas: Array(numeroNotas).fill(""),
+        retroalimentacion: "",
+      }));
+
+      setEstudiantes(estudiantesFormateados);
+      setMensaje({
+        tipo: "exito",
+        texto: `Se cargaron ${estudiantesFormateados.length} estudiantes.`,
+      });
+    } catch (err) {
+      console.error("Error:", err);
+      setMensaje({
+        tipo: "error",
+        texto: "No se pudieron cargar los estudiantes.",
+      });
+    } finally {
+      setLoading((prev) => ({ ...prev, cargar: false }));
+    }
+  };
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [estudianteSeleccionado, setEstudianteSeleccionado] = useState(null);
@@ -88,40 +82,46 @@ const Calificaciones = () => {
 
   const inputsRef = useRef({});
 
-  // ✅ Cargar grados al montar el componente
   useEffect(() => {
-  const cargarDatos = async () => {
-    try {
-      // 1. Cargar grados
-      const resGrados = await fetch('http://localhost:8000/api/grados');
-      if (!resGrados.ok) throw new Error("Error al cargar los grados");
-      const dataGrados = await resGrados.json();
-      const opcionesGrados = dataGrados.map(grado => ({
-        value: String(grado.id),
-        label: grado.nombre
-      }));
+    const cargarDatos = async () => {
+      try {
+        const resGrados = await fetch("http://localhost:8000/api/grados");
+        if (!resGrados.ok) throw new Error("Error al cargar los grados");
+        const dataGrados = await resGrados.json();
+        const opcionesGrados = dataGrados.map((grado) => ({
+          value: String(grado.id),
+          label: grado.nombre,
+        }));
 
-      // 2. Cargar asignaturas
-      const resAsignaturas = await fetch('http://localhost:8000/api/asignaturas');
-      if (!resAsignaturas.ok) throw new Error("Error al cargar las asignaturas");
-      const dataAsignaturas = await resAsignaturas.json();
-      const opcionesAsignaturas = dataAsignaturas.map(asig => ({
-        value: asig.nombre.toLowerCase().replace(/\s+/g, '_'), // ej: "matematicas"
-        label: asig.nombre
-      }));
+        const resAsignaturas = await fetch("http://localhost:8000/api/asignaturas");
+        if (!resAsignaturas.ok) throw new Error("Error al cargar las asignaturas");
+        const dataAsignaturas = await resAsignaturas.json();
+        const opcionesAsignaturas = dataAsignaturas.map((asig) => ({
+          value: asig.nombre.toLowerCase().replace(/\s+/g, "_"),
+          label: asig.nombre,
+        }));
 
-      // 3. Actualizar estados
-      setGrupos([{ value: "", label: "Seleccionar" }, ...opcionesGrados]);
-      setAsignaturas([{ value: "", label: "Seleccionar" }, ...opcionesAsignaturas]);
-    } catch (err) {
-      console.error("Error al cargar datos:", err);
-      setGrupos([{ value: "", label: "Error al cargar grados" }]);
-      setAsignaturas([{ value: "", label: "Error al cargar asignaturas" }]);
-    }
-  };
+        const resPeriodos = await fetch("http://localhost:8000/api/periodos");
+        if (!resPeriodos.ok) throw new Error("Error al cargar los períodos");
+        const dataPeriodos = await resPeriodos.json();
+        const opcionesPeriodos = dataPeriodos.map((periodo) => ({
+          value: String(periodo.id),
+          label: periodo.nombre,
+        }));
 
-  cargarDatos();
-}, []);
+        setGrupos([{ value: "", label: "Seleccionar" }, ...opcionesGrados]);
+        setAsignaturas([{ value: "", label: "Seleccionar" }, ...opcionesAsignaturas]);
+        setPeriodos([{ value: "", label: "Seleccionar" }, ...opcionesPeriodos]);
+      } catch (err) {
+        console.error("Error al cargar datos:", err);
+        setGrupos([{ value: "", label: "Error al cargar grados" }]);
+        setAsignaturas([{ value: "", label: "Error al cargar asignaturas" }]);
+        setPeriodos([{ value: "", label: "Error al cargar períodos" }]);
+      }
+    };
+
+    cargarDatos();
+  }, []);
 
   const agregarNota = () => {
     setNumeroNotas((prev) => prev + 1);
@@ -238,7 +238,13 @@ const Calificaciones = () => {
     }
   };
 
-  const handleCargar = handleSubmit((data) => manejarAccion(data, "cargar"));
+  const handleCargarEstudiantes = (e) => {
+    e.preventDefault();
+    handleSubmit(() => {
+      cargarEstudiantes();
+    })();
+  };
+
   const handleGuardar = handleSubmit((data) => manejarAccion(data, "guardar"));
   const handleVer = handleSubmit((data) => manejarAccion(data, "ver"));
 
@@ -261,7 +267,7 @@ const Calificaciones = () => {
               register={register}
               errors={errors}
               required
-              options={grupos} // ✅ Usamos los grados dinámicos
+              options={grupos}
             />
             <SelectField
               label="Asignatura:"
@@ -277,7 +283,7 @@ const Calificaciones = () => {
               register={register}
               errors={errors}
               required
-              options={periodoOptions}
+              options={periodos}
             />
           </div>
 
@@ -292,9 +298,9 @@ const Calificaciones = () => {
             }}
           >
             <ActionButtons
-              onLoad={handleCargar}
+              onLoad={handleCargarEstudiantes}
               loadLoading={loading.cargar}
-              loadLabel="Cargar"
+              loadLabel="Estudiantes"
               onSave={handleGuardar}
               saveLoading={loading.guardar}
               saveLabel="Guardar"
@@ -329,7 +335,7 @@ const Calificaciones = () => {
               }}
             >
               <span style={{ fontSize: "18px" }}>+</span>
-              Notas
+              Nueva Columna
             </button>
           </div>
 

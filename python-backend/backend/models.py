@@ -158,3 +158,22 @@ class MenuSemana(Base):
     __tablename__ = "menu_semana"
     id: Mapped[int] = mapped_column(primary_key=True)
     descripcion: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class Grado(Base):
+    __tablename__ = "grados"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    nombre: Mapped[str] = mapped_column(String(100), nullable=False)
+
+class Asignatura(Base):
+    __tablename__ = "asignaturas"
+    subject_id: Mapped[int] = mapped_column("subject_id", primary_key=True)
+    name: Mapped[str] = mapped_column("name", String(100), nullable=False)
+
+class Periodo(Base):
+    __tablename__ = "periodos"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    nombre: Mapped[str] = mapped_column(String(50), nullable=False)    
+    
+
+    
