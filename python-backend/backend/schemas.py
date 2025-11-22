@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, field_serializer
 from typing import Optional, List
 from datetime import date, datetime
+from uuid import UUID
 
 
 # --- MODELO: Padre o acudiente ---
@@ -159,4 +160,14 @@ class GuardarCambiosRequest(BaseModel):
     platoNuevo: PlatoNuevo        
     
 class SemanaUpdate(BaseModel):
-    descripcion: str    
+    descripcion: str  
+    
+class DuracionClaseBase(BaseModel):
+    valor: int
+    etiqueta: str
+
+class DuracionClaseResponse(DuracionClaseBase):
+    id: UUID
+
+    class Config:
+        from_attributes = True      

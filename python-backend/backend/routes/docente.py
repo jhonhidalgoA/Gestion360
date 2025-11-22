@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import select, text
+from sqlalchemy import select
 from backend.database import get_db
-from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion
+from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase
 
 router = APIRouter(prefix="/api", tags=["docente"])
 
@@ -90,9 +90,7 @@ def get_estudiantes_por_grado(
         return resultado
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))    
-
-    
+        raise HTTPException(status_code=500, detail=str(e))      
     
      
     
@@ -138,4 +136,12 @@ def guardar_calificaciones(
 
     except Exception as e:
         db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/duracion-clase")
+def get_duracion_clase(db: Session = Depends(get_db)):
+    try:
+        duraciones = db.execute(select(DuracionClase).order_by(DuracionClase.valor)).scalars().all()
+        return [{"id": str(d.id), "valor": d.valor, "etiqueta": d.etiqueta} for d in duraciones]
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

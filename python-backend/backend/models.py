@@ -192,3 +192,14 @@ class Calificacion(Base):
 
     estudiante: Mapped["Estudiante"] = relationship("Estudiante", back_populates="calificaciones")
     
+class DuracionClase(Base):
+    __tablename__ = "duracion_clase"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+    )
+    valor: Mapped[int] = mapped_column(nullable=False)
+    etiqueta: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
+    
