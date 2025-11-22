@@ -9,7 +9,7 @@ const Modal = ({ isOpen, onClose, title, message, buttons = [] }) => {
       <div className="modal-content-teacher" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">
-           {title}
+            {title}
           </h2>
           <button className="modal-close" onClick={onClose}>
             <IoClose />

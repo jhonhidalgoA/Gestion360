@@ -163,3 +163,14 @@
   background-color: #218838;
   transform:scale(1.05);
 }
+
+
+.modal-btn.success {
+  background-color: #48bb78;
+  color: white;
+}
+
+.modal-btn.error {
+  background-color: #e53e3e;
+  color: white;
+}

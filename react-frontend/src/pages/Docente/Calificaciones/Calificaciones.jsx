@@ -1,6 +1,7 @@
 import NavbarDocente from "../../../components/layout/Navbar/NavbarDocente";
 import SelectField from "../../../components/ui/SelectField";
 import ActionButtons from "../../../components/ui/Botones";
+import Modal from "../../../components/ui/Modal";
 import "./Calificaciones.css";
 import { useForm } from "react-hook-form";
 import { useState, useRef, useEffect } from "react";
@@ -20,6 +21,7 @@ const Calificaciones = () => {
   const [asignaturas, setAsignaturas] = useState([
     { value: "", label: "Cargando..." },
   ]);
+
   const [periodos, setPeriodos] = useState([
     { value: "", label: "Cargando..." },
   ]);
@@ -31,57 +33,70 @@ const Calificaciones = () => {
     pdf: false,
   });
 
+  const [mensajeModal, setMensajeModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    tipo: "",
+  });
+
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
   const [numeroNotas, setNumeroNotas] = useState(10);
   const [estudiantes, setEstudiantes] = useState([]);
 
- const cargarEstudiantes = async () => {
-  const values = getValues();
-  if (!values.grupo || !values.asignatura || !values.periodo) {
-    setMensaje({
-      tipo: "error",
-      texto: "Debes seleccionar Grupo, Asignatura y Período.",
-    });
-    return;
-  }
-
-  setLoading((prev) => ({ ...prev, cargar: true }));
-  setMensaje({ tipo: "", texto: "" });
-
-  try {
-    // Construir la URL con los 3 parámetros
-    const url = new URL(`http://localhost:8000/api/estudiantes-por-grado/${values.grupo}`);
-    url.searchParams.append('asignatura', values.asignatura);
-    url.searchParams.append('periodo', values.periodo);
-
-    const res = await fetch(url.toString());
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(errorData.detail || "Error al cargar estudiantes");
-    }
-    const data = await res.json();
-
-    // Actualizar el estado de número de notas según lo que venga del backend
-    if (data.length > 0) {
-      const maxNotas = Math.max(...data.map(est => est.notas.length));
-      setNumeroNotas(maxNotas);
+  const cargarEstudiantes = async () => {
+    const values = getValues();
+    if (!values.grupo || !values.asignatura || !values.periodo) {
+      setMensajeModal({
+        isOpen: true,
+        title: (
+          <>
+            Colegio STEM <span className="modal-title-360">360</span>
+          </>
+        ),
+        message: "Debes seleccionar Grupo, Asignatura y Período.",
+        tipo: "error",
+      });
+      return;
     }
 
-    setEstudiantes(data);
-    setMensaje({
-      tipo: "exito",
-      texto: `Se cargaron ${data.length} estudiantes.`,
-    });
-  } catch (err) {
-    console.error("Error:", err);
-    setMensaje({
-      tipo: "error",
-      texto: "No se pudieron cargar los estudiantes. " + (err.message || ""),
-    });
-  } finally {
-    setLoading((prev) => ({ ...prev, cargar: false }));
-  }
-};
+    setLoading((prev) => ({ ...prev, cargar: true }));
+    setMensaje({ tipo: "", texto: "" });
+
+    try {
+      const url = new URL(
+        `http://localhost:8000/api/estudiantes-por-grado/${values.grupo}`
+      );
+      url.searchParams.append("asignatura", values.asignatura);
+      url.searchParams.append("periodo", values.periodo);
+
+      const res = await fetch(url.toString());
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.detail || "Error al cargar estudiantes");
+      }
+      const data = await res.json();
+
+      // Actualizar el estado de número de notas según lo que venga del backend
+      if (data.length > 0) {
+        const maxNotas = Math.max(...data.map((est) => est.notas.length));
+        setNumeroNotas(maxNotas);
+      }
+
+      setEstudiantes(data);
+    } catch (err) {
+      console.error("Error:", err);
+      setMensajeModal({
+        isOpen: true,
+        title: "Colegio STEM 360",
+        message:
+          "No se pudieron cargar los estudiantes. " + (err.message || ""),
+        tipo: "error",
+      });
+    } finally {
+      setLoading((prev) => ({ ...prev, cargar: false }));
+    }
+  };
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [estudianteSeleccionado, setEstudianteSeleccionado] = useState(null);
@@ -266,9 +281,11 @@ const Calificaciones = () => {
 
         if (!res.ok) throw new Error("Error al guardar las calificaciones");
 
-        setMensaje({
+        setMensajeModal({
+          isOpen: true,
+          title: "Colegio STEM 360",
+          message: "Calificaciones guardadas correctamente.",
           tipo: "exito",
-          texto: "Calificaciones guardadas correctamente.",
         });
       } else {
         await new Promise((resolve) => setTimeout(resolve, 800));
@@ -283,9 +300,11 @@ const Calificaciones = () => {
       }, 3000);
     } catch (error) {
       console.error("Error:", error);
-      setMensaje({
+      setMensajeModal({
+        isOpen: true,
+        title: "Colegio STEM 360",
+        message: error.message || "Error al procesar la solicitud.",
         tipo: "error",
-        texto: error.message || "Error al procesar la solicitud.",
       });
       setTimeout(() => {
         setMensaje({ tipo: "", texto: "" });
@@ -303,7 +322,6 @@ const Calificaciones = () => {
   };
 
   const handleGuardar = handleSubmit((data) => manejarAccion(data, "guardar"));
-  const handleVer = handleSubmit((data) => manejarAccion(data, "ver"));
 
   return (
     <div className="qualification">
@@ -361,9 +379,6 @@ const Calificaciones = () => {
               onSave={handleGuardar}
               saveLoading={loading.guardar}
               saveLabel="Guardar"
-              onView={handleVer}
-              viewLoading={loading.ver}
-              viewLabel="Ver"
               onAddColumn={agregarNota}
               columnLabel="Nueva Columna"
               columnLoading={false}
@@ -729,6 +744,33 @@ const Calificaciones = () => {
               </div>
             </div>
           )}
+
+          <Modal
+            isOpen={mensajeModal.isOpen}
+            onClose={() =>
+              setMensajeModal({
+                isOpen: false,
+                title: "",
+                message: "",
+                tipo: "",
+              })
+            }
+            title={mensajeModal.title}
+            message={mensajeModal.message}
+            buttons={[
+              {
+                text: "Cerrar",
+                variant: mensajeModal.tipo === "exito" ? "success" : "error",
+                onClick: () =>
+                  setMensajeModal({
+                    isOpen: false,
+                    title: "",
+                    message: "",
+                    tipo: "",
+                  }),
+              },
+            ]}
+          />
         </div>
       </div>
     </div>
