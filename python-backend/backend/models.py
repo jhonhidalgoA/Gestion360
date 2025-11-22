@@ -203,3 +203,22 @@ class DuracionClase(Base):
     valor: Mapped[int] = mapped_column(nullable=False)
     etiqueta: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
     
+class Asistencia(Base):
+    __tablename__ = "asistencia"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+    )
+    estudiante_id: Mapped[int] = mapped_column(
+        ForeignKey("estudiantes.id", ondelete="CASCADE"),
+        nullable=False
+    )
+    grupo_id: Mapped[int] = mapped_column(nullable=False)
+    asignatura: Mapped[str] = mapped_column(String(100), nullable=False)
+    periodo_id: Mapped[int] = mapped_column(nullable=False)
+    duracion: Mapped[int] = mapped_column(nullable=False)
+    dia_semana: Mapped[int] = mapped_column(nullable=False)  
+    estado: Mapped[str] = mapped_column(String(20), nullable=False)  
+    

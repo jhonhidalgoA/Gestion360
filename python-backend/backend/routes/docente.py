@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from backend.database import get_db
-from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase
+from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia
+
 
 router = APIRouter(prefix="/api", tags=["docente"])
 
@@ -145,3 +146,72 @@ def get_duracion_clase(db: Session = Depends(get_db)):
         return [{"id": str(d.id), "valor": d.valor, "etiqueta": d.etiqueta} for d in duraciones]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/guardar-asistencia")
+def guardar_asistencia(request: dict, db: Session = Depends(get_db)):
+    try:
+        grupo_id = int(request["grupo"])
+        periodo_id = int(request["periodo"])
+        duracion = int(request["duracion"])
+
+        db.execute(
+            delete(Asistencia).where(
+                Asistencia.grupo_id == grupo_id,
+                Asistencia.asignatura == request["asignatura"],
+                Asistencia.periodo_id == periodo_id
+            )
+        )
+
+        for est in request["estudiantes"]:
+            for dia_semana, estado in enumerate(est["asistencia"]):
+                if estado in {"P", "A", "R", "PARCIAL", "PARCIAL1", "PARCIAL2"}:
+                    asistencia_registro = Asistencia(
+                        estudiante_id=int(est["id"]),
+                        grupo_id=grupo_id,
+                        asignatura=request["asignatura"],
+                        periodo_id=periodo_id,
+                        duracion=duracion,
+                        dia_semana=dia_semana,
+                        estado=estado
+                    )
+                    db.add(asistencia_registro)
+
+        db.commit()
+        return {"message": "Asistencia guardada correctamente."}
+    except ValueError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Valores inválidos en la solicitud.")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al guardar: {str(e)}") 
+
+
+@router.get("/asistencia-por-grupo/{grupo_id}")
+def get_asistencia_por_grupo(
+    grupo_id: int,
+    asignatura: str,
+    periodo: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        asistencias = db.execute(
+            select(Asistencia)
+            .where(
+                Asistencia.grupo_id == grupo_id,
+                Asistencia.asignatura == asignatura,
+                Asistencia.periodo_id == periodo
+            )
+        ).scalars().all()
+
+        # Agrupar por estudiante_id
+        asistencia_map = {}
+        for asist in asistencias:
+            if asist.estudiante_id not in asistencia_map:
+                asistencia_map[asist.estudiante_id] = [""] * 7  # 7 días vacíos
+            if 0 <= asist.dia_semana < 7:
+                asistencia_map[asist.estudiante_id][asist.dia_semana] = asist.estado
+
+        return {"asistencia": asistencia_map}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))    
+    

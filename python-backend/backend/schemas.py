@@ -171,3 +171,14 @@ class DuracionClaseResponse(DuracionClaseBase):
 
     class Config:
         from_attributes = True      
+        
+class AsistenciaEstudiante(BaseModel):
+    id: int
+    asistencia: List[str]  # 7 estados: ["P", "A", "R", ...]
+
+class AsistenciaGuardarRequest(BaseModel):
+    grupo: str
+    asignatura: str
+    periodo: str
+    duracion: str
+    estudiantes: List[AsistenciaEstudiante]

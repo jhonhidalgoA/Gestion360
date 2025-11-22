@@ -24,7 +24,6 @@ const Asistencia = () => {
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
   const [estudiantes, setEstudiantes] = useState([]);
 
-
   const [asignaturas, setAsignaturas] = useState([
     { value: "", label: "Cargando..." },
   ]);
@@ -51,7 +50,6 @@ const Asistencia = () => {
     tipo: "",
   });
 
- 
   const cargarEstudiantes = async () => {
     const values = getValues();
     if (
@@ -74,30 +72,52 @@ const Asistencia = () => {
     }
 
     setDuracionSeleccionada(parseInt(values.duracion) || 1);
-
     setLoading((prev) => ({ ...prev, cargar: true }));
     setMensaje({ tipo: "", texto: "" });
 
     try {
-      const url = new URL(
+      // Cargar estudiantes
+      const urlEstudiantes = new URL(
         `http://localhost:8000/api/estudiantes-por-grado/${values.grupo}`
       );
-      url.searchParams.append("asignatura", values.asignatura);
-      url.searchParams.append("periodo", values.periodo);
+      urlEstudiantes.searchParams.append("asignatura", values.asignatura);
+      urlEstudiantes.searchParams.append("periodo", values.periodo);
+      const resEstudiantes = await fetch(urlEstudiantes.toString());
+      if (!resEstudiantes.ok) throw new Error("Error al cargar estudiantes");
+      const estudiantesData = await resEstudiantes.json();
 
-      const res = await fetch(url.toString());
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.detail || "Error al cargar estudiantes");
+      // Cargar asistencia guardada
+      const urlAsistencia = new URL(
+        `http://localhost:8000/api/asistencia-por-grupo/${values.grupo}`
+      );
+      urlAsistencia.searchParams.append("asignatura", values.asignatura);
+      urlAsistencia.searchParams.append("periodo", values.periodo);
+      const resAsistencia = await fetch(urlAsistencia.toString());
+      let asistenciaMap = {};
+      if (resAsistencia.ok) {
+        const asistenciaData = await resAsistencia.json();
+        asistenciaMap = asistenciaData.asistencia || {};
       }
-      const data = await res.json();
 
-      // Estado real: "P", pero marcamos como no confirmado visualmente
-      const estudiantesConAsistencia = data.map((est) => ({
-        ...est,
-        asistencia: Array(7).fill("P"),
-        confirmado: Array(7).fill(false), // ← bandera para UI
-      }));
+      // Combinar
+      const estudiantesConAsistencia = estudiantesData.map((est) => {
+        const guardada = asistenciaMap[est.id];
+        if (guardada && Array.isArray(guardada)) {
+          // Si hay asistencia guardada, usarla y marcar todos los no vacíos como confirmados
+          const asistencia = guardada.map((estado) =>
+            estado === "" ? "P" : estado
+          );
+          const confirmado = guardada.map((estado) => estado !== "");
+          return { ...est, asistencia, confirmado };
+        } else {
+          // Si no hay asistencia guardada, iniciar vacío
+          return {
+            ...est,
+            asistencia: Array(7).fill("P"),
+            confirmado: Array(7).fill(false),
+          };
+        }
+      });
 
       setEstudiantes(estudiantesConAsistencia);
     } catch (err) {
@@ -226,66 +246,76 @@ const Asistencia = () => {
   };
 
   const calcularResumen = (asistencia, confirmado) => {
-  let presentes = 0;
-  let ausentes = 0;
-  let retardos = 0; // en horas
-  let diasConfirmados = 0;
+    let presentes = 0;
+    let ausentes = 0;
+    let retardos = 0; // en horas
+    let diasConfirmados = 0;
 
-  asistencia.forEach((estado, i) => {
-    if (!confirmado[i]) return;
-    diasConfirmados++;
-
-    if (estado === "P") {
-      presentes += 1;
-    } else if (estado === "A") {
-      ausentes += 1;
-    } else if (estado === "R") {
-      retardos += 0.25; // ← 15 minutos = 0.25 horas
-    } else if (estado === "PARCIAL") {
-      presentes += 0.5;
-      ausentes += 0.5;
-    } else if (estado === "PARCIAL1") {
-      presentes += 2;
-      ausentes += 1;
-    } else if (estado === "PARCIAL2") {
-      presentes += 1;
-      ausentes += 2;
-    }
-  });
-
-  const horasPresentes = presentes * duracionSeleccionada;
-  const horasAusentes = ausentes * duracionSeleccionada;
-  const horasRetardos = retardos; // ya está en horas
-
-  // Porcentajes: basados en días confirmados (no en horas)
-  const totalDias = diasConfirmados;
-  let porcentajePresentes = 0;
-  let porcentajeAusentes = 0;
-  let porcentajeRetardos = 0;
-
-  if (totalDias > 0) {
-    // Contamos 1 día por cada clic (independiente del valor horario)
-    let diasP = 0, diasA = 0, diasR = 0;
     asistencia.forEach((estado, i) => {
       if (!confirmado[i]) return;
-      if (estado === "P") diasP++;
-      else if (estado === "A") diasA++;
-      else if (estado === "R") diasR++;
-      else if (estado === "PARCIAL") { diasP += 0.5; diasA += 0.5; }
-      else if (estado === "PARCIAL1") { diasP += 1; diasA += 0.5; } // aprox
-      else if (estado === "PARCIAL2") { diasP += 0.5; diasA += 1; }
-    });
-    porcentajePresentes = ((diasP / totalDias) * 100).toFixed(0);
-    porcentajeAusentes = ((diasA / totalDias) * 100).toFixed(0);
-    porcentajeRetardos = ((diasR / totalDias) * 100).toFixed(0);
-  }
+      diasConfirmados++;
 
-  return {
-    horasPresentes: `${horasPresentes.toFixed(1)}h (${porcentajePresentes}%)`,
-    horasAusentes: `${horasAusentes.toFixed(1)}h (${porcentajeAusentes}%)`,
-    horasRetardos: `${horasRetardos.toFixed(1)}h (${porcentajeRetardos}%)`,
+      if (estado === "P") {
+        presentes += 1;
+      } else if (estado === "A") {
+        ausentes += 1;
+      } else if (estado === "R") {
+        retardos += 0.25; // ← 15 minutos = 0.25 horas
+      } else if (estado === "PARCIAL") {
+        presentes += 0.5;
+        ausentes += 0.5;
+      } else if (estado === "PARCIAL1") {
+        presentes += 2;
+        ausentes += 1;
+      } else if (estado === "PARCIAL2") {
+        presentes += 1;
+        ausentes += 2;
+      }
+    });
+
+    const horasPresentes = presentes * duracionSeleccionada;
+    const horasAusentes = ausentes * duracionSeleccionada;
+    const horasRetardos = retardos; // ya está en horas
+
+    // Porcentajes: basados en días confirmados (no en horas)
+    const totalDias = diasConfirmados;
+    let porcentajePresentes = 0;
+    let porcentajeAusentes = 0;
+    let porcentajeRetardos = 0;
+
+    if (totalDias > 0) {
+      // Contamos 1 día por cada clic (independiente del valor horario)
+      let diasP = 0,
+        diasA = 0,
+        diasR = 0;
+      asistencia.forEach((estado, i) => {
+        if (!confirmado[i]) return;
+        if (estado === "P") diasP++;
+        else if (estado === "A") diasA++;
+        else if (estado === "R") diasR++;
+        else if (estado === "PARCIAL") {
+          diasP += 0.5;
+          diasA += 0.5;
+        } else if (estado === "PARCIAL1") {
+          diasP += 1;
+          diasA += 0.5;
+        } // aprox
+        else if (estado === "PARCIAL2") {
+          diasP += 0.5;
+          diasA += 1;
+        }
+      });
+      porcentajePresentes = ((diasP / totalDias) * 100).toFixed(0);
+      porcentajeAusentes = ((diasA / totalDias) * 100).toFixed(0);
+      porcentajeRetardos = ((diasR / totalDias) * 100).toFixed(0);
+    }
+
+    return {
+      horasPresentes: `${horasPresentes.toFixed(1)}h (${porcentajePresentes}%)`,
+      horasAusentes: `${horasAusentes.toFixed(1)}h (${porcentajeAusentes}%)`,
+      horasRetardos: `${horasRetardos.toFixed(1)}h (${porcentajeRetardos}%)`,
+    };
   };
-};
 
   const manejarAccion = async (data, action) => {
     setMensaje({ tipo: "", texto: "" });
@@ -430,7 +460,6 @@ const Asistencia = () => {
               columnLabel="Nueva Columna"
               columnLoading={false}
               columnDisabled={true}
-              
             />
           </div>
 
