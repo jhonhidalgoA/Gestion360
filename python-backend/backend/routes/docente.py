@@ -5,7 +5,8 @@ from backend.database import get_db
 from pathlib import Path
 import uuid
 import shutil
-from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea
+import json
+from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante
 
 
 router = APIRouter(prefix="/api", tags=["docente"])
@@ -252,10 +253,17 @@ async def enviar_tarea(
     tema: str = Form(...),
     descripcion: str = Form(...),
     url: str = Form(""),
+    estudiantes: str = Form(...),
     archivo: UploadFile = File(None),
     db: Session = Depends(get_db)
 ):
     try:
+        # Parsear lista de estudiantes
+        lista_estudiantes = json.loads(estudiantes)
+        if not isinstance(lista_estudiantes, list) or not all(isinstance(i, int) for i in lista_estudiantes):
+            raise HTTPException(status_code=400, detail="Formato inválido para estudiantes")
+
+        # Guardar archivo si existe
         archivo_path = None
         if archivo:
             uploads_dir = Path("uploads/tareas")
@@ -266,6 +274,7 @@ async def enviar_tarea(
                 shutil.copyfileobj(archivo.file, buffer)
             archivo_path = str(file_path)
 
+        # Crear tarea
         nueva_tarea = Tarea(
             grupo_id=int(grupo),
             asignatura=asignatura,
@@ -277,10 +286,17 @@ async def enviar_tarea(
             fecha_fin=fecha_fin
         )
         db.add(nueva_tarea)
+        db.flush()  # para obtener el id
+
+        # Crear relaciones con estudiantes
+        for est_id in lista_estudiantes:
+            db.add(TareaEstudiante(tarea_id=nueva_tarea.id, estudiante_id=est_id))
+
         db.commit()
         db.refresh(nueva_tarea)
 
-        return {"success": True, "message": "Tarea guardada correctamente."}
+        return {"success": True, "message": "Tarea enviada correctamente."}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error al guardar la tarea: {str(e)}")    
+        raise HTTPException(status_code=500, detail=f"Error al guardar la tarea: {str(e)}")  
+    

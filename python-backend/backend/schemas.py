@@ -188,8 +188,22 @@ class TareaBase(BaseModel):
     asignatura: str
     tema: str
     descripcion: str
-    url: str | None = None
+    url: Optional[str] = None
     archivo: str | None = None
     fecha_inicio: date
     fecha_fin: date
-    
+class TareaCreate(TareaBase):
+    pass
+
+class TareaResponse(TareaBase):
+    id: str
+    archivo: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class TareaEstudianteCreate(BaseModel):
+    estudiante_id: int
+
+class TareaConEstudiantesCreate(TareaBase):
+    estudiantes: List[int]    

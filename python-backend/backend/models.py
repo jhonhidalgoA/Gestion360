@@ -241,3 +241,18 @@ class Tarea(Base):
     fecha_inicio: Mapped[date] = mapped_column(Date, nullable=False)
     fecha_fin: Mapped[date] = mapped_column(Date, nullable=False)
     creado_en: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    
+class TareaEstudiante(Base):
+    __tablename__ = "tareas_estudiantes"
+
+    tarea_id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("tareas.id", ondelete="CASCADE"),
+        primary_key=True
+    )
+    estudiante_id: Mapped[int] = mapped_column(
+        ForeignKey("estudiantes.id", ondelete="CASCADE"),
+        primary_key=True
+    )
+    visto: Mapped[bool] = mapped_column(default=False)
+    entregado: Mapped[bool] = mapped_column(default=False)
