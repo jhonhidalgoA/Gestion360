@@ -1,8 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Form, File, UploadFile
 from sqlalchemy.orm import Session
 from sqlalchemy import select, delete
 from backend.database import get_db
-from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia
+from pathlib import Path
+import uuid
+import shutil
+from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea
 
 
 router = APIRouter(prefix="/api", tags=["docente"])
@@ -213,5 +216,71 @@ def get_asistencia_por_grupo(
 
         return {"asistencia": asistencia_map}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))    
+        raise HTTPException(status_code=500, detail=str(e))   
     
+@router.get("/estudiantes-por-grupo-asignatura/{grupo_id}")
+def get_estudiantes_por_grupo_asignatura(
+    grupo_id: int,
+    asignatura: str,
+    db: Session = Depends(get_db)
+):
+    try:
+        estudiantes = db.execute(
+            select(Estudiante)
+            .where(Estudiante.grado_id == grupo_id)
+            .order_by(Estudiante.apellidos, Estudiante.nombres)
+        ).scalars().all()
+
+        return [
+            {
+                "id": est.id,
+                "nombres": est.nombres,
+                "apellidos": est.apellidos,
+            }
+            for est in estudiantes
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    
+@router.post("/enviar-tarea")
+async def enviar_tarea(
+    grupo: str = Form(...),
+    asignatura: str = Form(...),
+    fecha_inicio: str = Form(...),
+    fecha_fin: str = Form(...),
+    tema: str = Form(...),
+    descripcion: str = Form(...),
+    url: str = Form(""),
+    archivo: UploadFile = File(None),
+    db: Session = Depends(get_db)
+):
+    try:
+        archivo_path = None
+        if archivo:
+            uploads_dir = Path("uploads/tareas")
+            uploads_dir.mkdir(parents=True, exist_ok=True)
+            filename = f"{uuid.uuid4()}_{archivo.filename}"
+            file_path = uploads_dir / filename
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(archivo.file, buffer)
+            archivo_path = str(file_path)
+
+        nueva_tarea = Tarea(
+            grupo_id=int(grupo),
+            asignatura=asignatura,
+            tema=tema,
+            descripcion=descripcion,
+            url=url,
+            archivo=archivo_path,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin
+        )
+        db.add(nueva_tarea)
+        db.commit()
+        db.refresh(nueva_tarea)
+
+        return {"success": True, "message": "Tarea guardada correctamente."}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al guardar la tarea: {str(e)}")    

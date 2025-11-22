@@ -6,6 +6,8 @@ from typing import List, Optional
 from sqlalchemy import String, Text, ForeignKey, Boolean, BigInteger, TIMESTAMP, Column, Integer, String, Date, DateTime, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .database import Base
+from datetime import date, datetime, timezone
+
 
 
 
@@ -221,4 +223,21 @@ class Asistencia(Base):
     duracion: Mapped[int] = mapped_column(nullable=False)
     dia_semana: Mapped[int] = mapped_column(nullable=False)  
     estado: Mapped[str] = mapped_column(String(20), nullable=False)  
-    
+
+class Tarea(Base):
+    __tablename__ = "tareas"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+    )
+    grupo_id: Mapped[int] = mapped_column(nullable=False)
+    asignatura: Mapped[str] = mapped_column(String(100), nullable=False)
+    tema: Mapped[str] = mapped_column(String(255), nullable=False)
+    descripcion: Mapped[str] = mapped_column(Text, nullable=False)
+    url: Mapped[str] = mapped_column(String(500), nullable=True)
+    archivo: Mapped[str] = mapped_column(String(500), nullable=True)
+    fecha_inicio: Mapped[date] = mapped_column(Date, nullable=False)
+    fecha_fin: Mapped[date] = mapped_column(Date, nullable=False)
+    creado_en: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))

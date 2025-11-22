@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useForm } from "react-hook-form"; // ✅ Asegúrate de que está importado
 import NavbarDocente from "../../../components/layout/Navbar/NavbarDocente";
 import SelectField from "../../../components/ui/SelectField";
 import ActionButtons from "../../../components/ui/Botones";
@@ -10,7 +10,7 @@ const Tareas = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
+    watch, // ✅ Importado desde react-hook-form
     reset,
   } = useForm({
     defaultValues: {
@@ -25,6 +25,12 @@ const Tareas = () => {
     mode: "onBlur",
   });
 
+  const grupoValue = watch("grupo"); // ✅ Ahora funciona
+
+  const [grupos, setGrupos] = useState([{ value: "", label: "Cargando..." }]);
+  const [asignaturas, setAsignaturas] = useState([
+    { value: "", label: "Cargando..." },
+  ]);
   const [estudiantes, setEstudiantes] = useState([]);
   const [estudiantesSeleccionados, setEstudiantesSeleccionados] = useState([]);
   const [todosSeleccionados, setTodosSeleccionados] = useState(false);
@@ -32,67 +38,79 @@ const Tareas = () => {
     cargar: false,
     guardar: false,
     ver: false,
-    borrar: false, // Cambiado de 'delete' a 'borrar' para consistencia
+    borrar: false,
   });
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
   const fileInputRef = useRef(null);
 
-  // Observar cambios en el campo grupo
-  const grupoValue = watch("grupo");
-
-  const grupoOptions = [
-    { value: "", label: "Seleccionar" },
-    { value: "6", label: "Grado Sexto" },
-    { value: "7", label: "Grado Séptimo" },
-    { value: "8", label: "Grado Octavo" },
-    { value: "9", label: "Grado Noveno" },
-    { value: "10", label: "Grado Décimo" },
-    { value: "11", label: "Grado Undécimo" },
-  ];
-
-  const asignaturaOptions = [
-    { value: "", label: "Seleccionar" },
-    { value: "matematicas", label: "Matemáticas" },
-    { value: "castellano", label: "Castellano" },
-    { value: "sociales", label: "Sociales" },
-    { value: "ciencia_naturales", label: "Ciencias Naturales" },
-    { value: "tecnologia", label: "Tecnología" },
-    { value: "artistica", label: "Artística" },
-    { value: "educacion_fisica", label: "Educación Física" },
-  ];
-
-  // Cargar estudiantes cuando cambia el grupo
+  // Cargar opciones de grupo y asignatura desde la API
   useEffect(() => {
-    if (!grupoValue) {
-      setEstudiantes([]);
-      setEstudiantesSeleccionados([]);
-      setTodosSeleccionados(false);
-      return;
-    }
-
-    const cargarEstudiantes = async () => {
+    const cargarOpciones = async () => {
       try {
-        setLoading(prev => ({ ...prev, cargar: true }));
-        const response = await fetch(
-          `/secciones/api/estudiantes/${encodeURIComponent(grupoValue)}`
+        const resGrados = await fetch("http://localhost:8000/api/grados");
+        const dataGrados = await resGrados.json();
+        const opcionesGrados = dataGrados.map((grado) => ({
+          value: String(grado.id),
+          label: grado.nombre,
+        }));
+
+        const resAsignaturas = await fetch(
+          "http://localhost:8000/api/asignaturas"
         );
-        if (!response.ok)
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        const data = await response.json();
-        setEstudiantes(data.data || []);
-        setEstudiantesSeleccionados([]);
-        setTodosSeleccionados(false);
-      } catch (error) {
-        console.error("Error al cargar estudiantes:", error);
-        setEstudiantes([]);
-        setMensaje({ tipo: "error", texto: "Error al cargar los estudiantes" });
-      } finally {
-        setLoading(prev => ({ ...prev, cargar: false }));
+        const dataAsignaturas = await resAsignaturas.json();
+        const opcionesAsignaturas = dataAsignaturas.map((asig) => ({
+          value: asig.nombre.toLowerCase().replace(/\s+/g, "_"),
+          label: asig.nombre,
+        }));
+
+        setGrupos([{ value: "", label: "Seleccionar" }, ...opcionesGrados]);
+        setAsignaturas([
+          { value: "", label: "Seleccionar" },
+          ...opcionesAsignaturas,
+        ]);
+      } catch (err) {
+        console.error("Error al cargar datos:", err);
+        setGrupos([{ value: "", label: "Error al cargar grados" }]);
+        setAsignaturas([{ value: "", label: "Error al cargar asignaturas" }]);
       }
     };
 
-    cargarEstudiantes();
-  }, [grupoValue]);
+    cargarOpciones();
+  }, []);
+
+  const grupo = watch("grupo");
+const asignatura = watch("asignatura");
+
+useEffect(() => {
+  if (!grupo || !asignatura) {
+    setEstudiantes([]);
+    setEstudiantesSeleccionados([]);
+    setTodosSeleccionados(false);
+    return;
+  }
+
+  const cargarEstudiantes = async () => {
+    try {
+      setLoading(prev => ({ ...prev, cargar: true }));
+      const url = new URL(`http://localhost:8000/api/estudiantes-por-grupo-asignatura/${grupo}`);
+      url.searchParams.append("asignatura", asignatura);
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error("Error al cargar estudiantes");
+      const data = await res.json();
+      setEstudiantes(data);
+      setEstudiantesSeleccionados([]);
+      setTodosSeleccionados(false);
+    } catch (error) {
+      console.error("Error al cargar estudiantes:", error);
+      setEstudiantes([]);
+      setMensaje({ tipo: "error", texto: "Error al cargar los estudiantes" });
+    } finally {
+      setLoading(prev => ({ ...prev, cargar: false }));
+    }
+  };
+
+  cargarEstudiantes();
+}, [grupo, asignatura]);
 
   // Sincronizar checkbox "Todos"
   useEffect(() => {
@@ -106,7 +124,7 @@ const Tareas = () => {
   const manejarSeleccionTodos = () => {
     const nuevosSeleccionados = todosSeleccionados
       ? []
-      : estudiantes.map((e) => e.student_id);
+      : estudiantes.map((e) => e.id);
     setEstudiantesSeleccionados(nuevosSeleccionados);
   };
 
@@ -116,30 +134,6 @@ const Tareas = () => {
         ? prev.filter((id) => id !== studentId)
         : [...prev, studentId]
     );
-  };
-
-  // Función manejarAccion agregada
-  const manejarAccion = async (data, action) => {
-    setMensaje({ tipo: "", texto: "" });
-    setLoading((prev) => ({ ...prev, [action]: true }));
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      console.log("✅ Datos enviados:", { ...data, action });
-
-      setMensaje({
-        tipo: "exito",
-        texto: `Acción "${action}" procesada correctamente.`,
-      });
-    } catch (error) {
-      console.error("❌ Error:", error);
-      setMensaje({
-        tipo: "error",
-        texto: "Error al procesar la solicitud. Inténtalo más tarde.",
-      });
-    } finally {
-      setLoading((prev) => ({ ...prev, [action]: false }));
-    }
   };
 
   const validarCampos = (data) => {
@@ -184,7 +178,7 @@ const Tareas = () => {
       return;
     }
 
-    setLoading(prev => ({ ...prev, guardar: true }));
+    setLoading((prev) => ({ ...prev, guardar: true }));
     const formData = new FormData();
     formData.append("grupo", data.grupo);
     formData.append("asignatura", data.asignatura);
@@ -201,7 +195,7 @@ const Tareas = () => {
     }
 
     try {
-      const response = await fetch("/secciones/api/enviar-tarea", {
+      const response = await fetch("http://localhost:8000/api/enviar-tarea", {
         method: "POST",
         body: formData,
       });
@@ -224,7 +218,7 @@ const Tareas = () => {
         texto: "Error al enviar la tarea: " + error.message,
       });
     } finally {
-      setLoading(prev => ({ ...prev, guardar: false }));
+      setLoading((prev) => ({ ...prev, guardar: false }));
     }
   };
 
@@ -237,10 +231,14 @@ const Tareas = () => {
     setMensaje({ tipo: "", texto: "" });
   };
 
-  
-   
-  const handleDelete = handleSubmit((data) => manejarAccion(data, "borrar"));
-  const handleSend = handleSubmit((data) => manejarAccion(data, "enviarr"));
+  const handleDelete = () => {
+    setMensaje({ tipo: "", texto: "" });
+    setLoading((prev) => ({ ...prev, borrar: true }));
+    setTimeout(() => {
+      limpiarFormulario();
+      setLoading((prev) => ({ ...prev, borrar: false }));
+    }, 500);
+  };
 
   return (
     <>
@@ -264,7 +262,7 @@ const Tareas = () => {
                 errors={errors}
                 required={true}
                 validation={{ required: "Este campo es obligatorio" }}
-                options={grupoOptions}
+                options={grupos}
               />
               <SelectField
                 label="Asignatura:"
@@ -273,7 +271,7 @@ const Tareas = () => {
                 errors={errors}
                 required={true}
                 validation={{ required: "Este campo es obligatorio" }}
-                options={asignaturaOptions}
+                options={asignaturas}
               />
             </div>
             <div className="form-row">
@@ -368,10 +366,12 @@ const Tareas = () => {
               </div>
             </div>
             <ActionButtons
-              onSend={handleSend}
-              sendLoading={loading.send}                      
+              onSave={handleSubmit(onSubmit)}
+              saveLoading={loading.guardar}
+              saveLabel="Enviar Tarea"
               onDelete={handleDelete}
-              deleteLoading={loading.borrar}              
+              deleteLoading={loading.borrar}
+              deleteLabel="Limpiar"
             />
           </form>
 
@@ -414,19 +414,15 @@ const Tareas = () => {
               </p>
             ) : (
               estudiantes.map((estudiante) => (
-                <div key={estudiante.student_id} className="student-item">
-                  <label htmlFor={`student-${estudiante.student_id}`}>
+                <div key={estudiante.id} className="student-item">
+                  <label htmlFor={`student-${estudiante.id}`}>
                     {estudiante.nombres} {estudiante.apellidos}
                   </label>
                   <input
                     type="checkbox"
-                    id={`student-${estudiante.student_id}`}
-                    checked={estudiantesSeleccionados.includes(
-                      estudiante.student_id
-                    )}
-                    onChange={() =>
-                      manejarSeleccionEstudiante(estudiante.student_id)
-                    }
+                    id={`student-${estudiante.id}`}
+                    checked={estudiantesSeleccionados.includes(estudiante.id)}
+                    onChange={() => manejarSeleccionEstudiante(estudiante.id)}
                     className="student-checkbox"
                   />
                 </div>

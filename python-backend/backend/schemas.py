@@ -182,3 +182,14 @@ class AsistenciaGuardarRequest(BaseModel):
     periodo: str
     duracion: str
     estudiantes: List[AsistenciaEstudiante]
+    
+class TareaBase(BaseModel):
+    grupo_id: int
+    asignatura: str
+    tema: str
+    descripcion: str
+    url: str | None = None
+    archivo: str | None = None
+    fecha_inicio: date
+    fecha_fin: date
+    
