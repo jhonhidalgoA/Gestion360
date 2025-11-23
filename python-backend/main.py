@@ -19,9 +19,7 @@ from backend.models import User, Role, Estudiante, Padre, Docente
 from backend.schemas import MatriculaCreate, DocenteCreate, HorarioRequest, GuardarCambiosRequest, SemanaUpdate  
 from fastapi.responses import StreamingResponse
 from backend.pdf_generator import generate_matricula_pdf, generate_docente_pdf
-
 from backend.event_routes import router as event_router
-
 from backend.routes.docente import router as docente_router
 
 
