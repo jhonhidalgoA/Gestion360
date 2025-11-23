@@ -1,6 +1,7 @@
 import NavbarDocente from "../../../components/layout/Navbar/NavbarDocente";
 import SelectField from "../../../components/ui/SelectField";
 import ActionButtons from "../../../components/ui/Botones";
+import ReporteCard from "../../../components/ui/ReporteCard";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 
@@ -45,7 +46,10 @@ const Reportes = () => {
   });
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
 
-  // 🚀 Manejador de acciones
+  const handleReportClick = (type) => {
+    console.log("Generando reporte:", type);
+  };
+
   const manejarAccion = async (data, action) => {
     setMensaje({ tipo: "", texto: "" });
     setLoading((prev) => ({ ...prev, [action]: true }));
@@ -54,7 +58,6 @@ const Reportes = () => {
       // 🔜 Aquí irá la llamada real al backend
       // await enviarACalificacionesAPI(data, action);
 
-      // ✅ Simulación
       await new Promise((resolve) => setTimeout(resolve, 800));
       console.log("✅ Datos enviados:", { ...data, action });
 
@@ -63,7 +66,7 @@ const Reportes = () => {
         texto: `Acción "${action}" procesada correctamente.`,
       });
     } catch (error) {
-      console.error("❌ Error:", error);
+      console.error("Error:", error);
       setMensaje({
         tipo: "error",
         texto: "Error al procesar la solicitud. Inténtalo más tarde.",
@@ -73,10 +76,7 @@ const Reportes = () => {
     }
   };
 
-  // Handlers para los botones
-  const handleCargar = handleSubmit((data) => manejarAccion(data, "cargar"));
-  const handleGuardar = handleSubmit((data) => manejarAccion(data, "guardar"));
-  const handleVer = handleSubmit((data) => manejarAccion(data, "ver"));
+ 
   const handleDelete = handleSubmit((data) => manejarAccion(data, "borrar"));
 
   return (
@@ -119,18 +119,63 @@ const Reportes = () => {
             />
           </div>
 
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: "16px",
+            }}
+          >
+            <ReporteCard
+              icon="menu_book"
+              title="Calificaciones"
+              subtitle="Reporte notas por materia del periodo"
+              onClick={() => handleReportClick("calificaciones")}
+              bgColor="#3b82f6"
+            />
+            <ReporteCard
+              icon="calendar_today"
+              title="Asistencia"
+              subtitle="Control de asistencia e inasistencias"
+              onClick={() => handleReportClick("asistencia")}
+              bgColor="#10b981"
+            />
+            <ReporteCard
+              icon="assignment_turned_in"
+              title="Certificado Escolar PDF"
+              subtitle="Certificado escolar de estudio"
+              onClick={() => handleReportClick("certificado")}
+              bgColor="#9333ea"
+            />
+            <ReporteCard
+              icon="description"
+              title="Boletín de Calificaciones PDF"
+              subtitle="Boletín completo con todas las materias"
+              onClick={() => handleReportClick("boletin")}
+              bgColor="#f59e0b"
+            />
+            <ReporteCard
+              icon="assignment"
+              title="Observador Escolar"
+              subtitle="Comportamiento y observaciones"
+              onClick={() => handleReportClick("conducta")}
+              bgColor="#ec4899"
+            />
+            <ReporteCard
+              icon="school"
+              title="Historial Académico"
+              subtitle="Registro completo de todos los periodos"
+              onClick={() => handleReportClick("historial")}
+              bgColor="#4f46e5"
+            />
+          </div>
+
           <ActionButtons
-            onLoad={handleCargar}
-            loadLoading={loading.cargar}
-            loadLabel="Cargar"
-            onSave={handleGuardar}
-            saveLoading={loading.guardar}
-            saveLabel="Guardar"
+            
             onDelete={handleDelete}
             deleteLoading={loading.delete}
-            onView={handleVer}
-            viewLoading={loading.ver}
-            viewLabel="Ver"
+            deleteLabel="Borrar"
+            
           />
 
           {mensaje.texto && (
