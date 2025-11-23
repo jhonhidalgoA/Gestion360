@@ -42,6 +42,13 @@ const Reportes = () => {
     pdf: false,
   });
 
+  /** Estado para modal de boletín */
+  const [boletinModalOpen, setBoletinModalOpen] = useState(false);
+  const [boletinData, setBoletinData] = useState(null);
+
+  /** Datos completos del estudiante (de la API) */
+  const [datosEstudianteCompleto, setDatosEstudianteCompleto] = useState(null);
+
   /** Observadores */
   const grupo = watch("grupo");
   const asignatura = watch("asignatura");
@@ -83,6 +90,7 @@ const Reportes = () => {
         estudiantes: [{ value: "", label: "Seleccionar Grupo" }],
       }));
       setValue("estudiante", "");
+      setDatosEstudianteCompleto(null);
       return;
     }
 
@@ -91,8 +99,12 @@ const Reportes = () => {
         const url = new URL(
           `http://localhost:8000/api/estudiantes-por-grado/${grupo}`
         );
-        url.searchParams.append("asignatura", "matematicas");
-        url.searchParams.append("periodo", "1");
+        // Usa los valores reales del formulario
+        const asignaturaActual = watch("asignatura") || "matematicas";
+        const periodoActual = watch("periodo") || "1";
+
+        url.searchParams.append("asignatura", asignaturaActual);
+        url.searchParams.append("periodo", periodoActual);
 
         const res = await fetch(url);
         const data = await res.json();
@@ -107,13 +119,17 @@ const Reportes = () => {
             })),
           ],
         }));
+
+        // Guardar los datos completos del endpoint
+        setDatosEstudianteCompleto(data);
       } catch (error) {
         console.error("Error cargando estudiantes:", error);
+        setDatosEstudianteCompleto(null);
       }
     };
 
     cargar();
-  }, [grupo, setValue]);
+  }, [grupo, setValue, watch]);
 
   /** Cargar asignaturas según grupo */
   useEffect(() => {
@@ -204,11 +220,90 @@ const Reportes = () => {
     manejarAccion(data, "borrar");
   };
 
-  /** Validación automática con React Hook Form */
-  const handleReportClick = (type) => {
-    handleSubmit(() => {
-      console.log("Generando reporte:", type, watch());
-    })();
+  /** Generar PDF de calificaciones */
+  const generarPDFCalificaciones = async (data) => {
+    setLoading((prev) => ({ ...prev, pdf: true }));
+    try {
+      const res = await fetch("http://localhost:8000/api/pdf/calificaciones", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          grupo: data.grupo,
+          estudiante: data.estudiante,
+          asignatura: data.asignatura,
+          periodo: data.periodo,
+        }),
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "calificaciones.pdf";
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.error("Error:", err.detail || "No se pudo generar el PDF");
+      }
+    } catch (e) {
+      console.error("Error de red:", e);
+    } finally {
+      setLoading((prev) => ({ ...prev, pdf: false }));
+    }
+  };
+
+  /** Abrir modal de Boletín con datos reales */
+  const abrirModalBoletin = () => {
+    const data = watch();
+
+    // Validar que los campos estén completos
+    if (!data.grupo || !data.estudiante || !data.periodo) {
+      console.warn("Completa todos los campos para ver el boletín.");
+      return;
+    }
+
+    // Buscar al estudiante seleccionado en los datos completos
+    const estudianteSeleccionado = datosEstudianteCompleto?.find(
+      (e) => String(e.id) === data.estudiante
+    );
+
+    if (!estudianteSeleccionado) {
+      console.warn("Estudiante no encontrado en los datos cargados.");
+      return;
+    }
+
+    // Obtener el nombre del grupo (grado)
+    const grupoSeleccionado = selectOptions.grupos.find(
+      (g) => g.value === data.grupo
+    );
+
+    // Obtener el nombre del periodo
+    const periodoSeleccionado = selectOptions.periodos.find(
+      (p) => p.value === data.periodo
+    );
+
+    // Preparar datos para el modal
+    setBoletinData({
+      estudiante: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
+      grupo: grupoSeleccionado?.label || "N/A",
+      periodo: periodoSeleccionado?.label || "N/A",
+      notas: [
+        {
+          materia: "Matemáticas",
+          p1: estudianteSeleccionado.notas[0] || 0,
+          p2: estudianteSeleccionado.notas[1] || 0,
+          p3: estudianteSeleccionado.notas[2] || 0,
+          promedio: estudianteSeleccionado.notas.slice(0, 3).reduce((a, b) => Number(a) + Number(b), 0) / 3 || 0,
+        },
+        // Aquí deberíamos tener todas las asignaturas, pero por ahora solo Matemáticas
+      ],
+      promedioGeneral: estudianteSeleccionado.notas.slice(0, 3).reduce((a, b) => Number(a) + Number(b), 0) / 3 || 0,
+    });
+
+    setBoletinModalOpen(true);
   };
 
   return (
@@ -276,57 +371,9 @@ const Reportes = () => {
               icon="menu_book"
               title="Calificaciones"
               subtitle="Reporte notas por materia del periodo"
-              onClick={async () => {
-                const data = watch();
-                if (
-                  !data.grupo ||
-                  !data.estudiante ||
-                  !data.asignatura ||
-                  !data.periodo
-                ) {
-                  console.warn(
-                    "Completa todos los campos para generar el PDF."
-                  );
-                  return;
-                }
-                setLoading((prev) => ({ ...prev, pdf: true }));
-                try {
-                  const res = await fetch(
-                    "http://localhost:8000/api/pdf/calificaciones",
-                    {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        grupo: data.grupo,
-                        estudiante: data.estudiante,
-                        asignatura: data.asignatura,
-                        periodo: data.periodo,
-                      }),
-                    }
-                  );
-                  if (res.ok) {
-                    const blob = await res.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = "calificaciones.pdf";
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                  } else {
-                    const err = await res.json().catch(() => ({}));
-                    console.error(
-                      "Error:",
-                      err.detail || "No se pudo generar el PDF"
-                    );
-                  }
-                } catch (e) {
-                  console.error("Error de red:", e);
-                } finally {
-                  setLoading((prev) => ({ ...prev, pdf: false }));
-                }
-              }}
+              onClick={handleSubmit(async (data) => {
+                await generarPDFCalificaciones(data);
+              })}
               bgColor="#3b82f6"
             />
 
@@ -334,7 +381,10 @@ const Reportes = () => {
               icon="calendar_today"
               title="Asistencia"
               subtitle="Control de asistencia e inasistencias"
-              onClick={() => handleReportClick("asistencia")}
+              onClick={() => {
+                // Por ahora, solo muestra mensaje
+                alert("Funcionalidad no implementada aún.");
+              }}
               bgColor="#10b981"
             />
 
@@ -342,7 +392,9 @@ const Reportes = () => {
               icon="assignment_turned_in"
               title="Certificado Escolar PDF"
               subtitle="Certificado escolar de estudio"
-              onClick={() => handleReportClick("certificado")}
+              onClick={() => {
+                alert("Funcionalidad no implementada aún.");
+              }}
               bgColor="#9333ea"
             />
 
@@ -350,7 +402,7 @@ const Reportes = () => {
               icon="description"
               title="Boletín de Calificaciones PDF"
               subtitle="Boletín completo con todas las materias"
-              onClick={() => handleReportClick("boletin")}
+              onClick={abrirModalBoletin}
               bgColor="#f59e0b"
             />
 
@@ -358,7 +410,9 @@ const Reportes = () => {
               icon="assignment"
               title="Observador Escolar"
               subtitle="Comportamiento y observaciones"
-              onClick={() => handleReportClick("conducta")}
+              onClick={() => {
+                alert("Funcionalidad no implementada aún.");
+              }}
               bgColor="#ec4899"
             />
 
@@ -366,7 +420,9 @@ const Reportes = () => {
               icon="school"
               title="Historial Académico"
               subtitle="Registro completo de todos los periodos"
-              onClick={() => handleReportClick("historial")}
+              onClick={() => {
+                alert("Funcionalidad no implementada aún.");
+              }}
               bgColor="#4f46e5"
             />
           </div>
@@ -379,6 +435,86 @@ const Reportes = () => {
           />
         </form>
       </div>
+
+      {/* MODAL DE BOLETÍN */}
+      {boletinModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>
+                <span className="material-symbols-outlined">description</span>
+                Boletín de Calificaciones PDF
+              </h3>
+              <p>{boletinData?.estudiante} - {boletinData?.periodo}</p>
+              <button onClick={() => setBoletinModalOpen(false)} className="modal-close">×</button>
+            </div>
+
+            <div className="modal-body">
+              <h4>Boletín de Calificaciones</h4>
+              <p><strong>Periodo:</strong> {boletinData?.periodo} - Ciclo Escolar 2024-2025</p>
+              <p><strong>Estudiante:</strong> {boletinData?.estudiante}</p>
+              <p><strong>Grupo:</strong> {boletinData?.grupo}</p>
+
+              <table className="boletin-table">
+                <thead>
+                  <tr>
+                    <th>Materia</th>
+                    <th>P1</th>
+                    <th>P2</th>
+                    <th>P3</th>
+                    <th>Promedio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {boletinData?.notas.map((n, i) => (
+                    <tr key={i}>
+                      <td>{n.materia}</td>
+                      <td>{n.p1}</td>
+                      <td>{n.p2}</td>
+                      <td>{n.p3}</td>
+                      <td><strong>{n.promedio.toFixed(1)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="promedio-general">
+                <strong>Promedio General: {boletinData?.promedioGeneral.toFixed(1)}</strong>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button 
+                onClick={() => alert("Enviar por Email (no implementado)")}
+                className="btn-email"
+              >
+                <span className="material-symbols-outlined">email</span> Enviar por Email
+              </button>
+              <button 
+                onClick={() => window.print()}
+                className="btn-print"
+              >
+                <span className="material-symbols-outlined">print</span> Imprimir
+              </button>
+              <button 
+                onClick={() => {
+                  // Aquí llamas a tu función de descargar PDF
+                  generarPDFCalificaciones({
+                    grupo: watch("grupo"),
+                    estudiante: watch("estudiante"),
+                    asignatura: watch("asignatura"),
+                    periodo: watch("periodo"),
+                  });
+                  setBoletinModalOpen(false);
+                }}
+                className="btn-download"
+              >
+                <span className="material-symbols-outlined">download</span> Descargar PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
