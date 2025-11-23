@@ -108,8 +108,8 @@
   gap: 8px;
   padding: 12px 28px;
   border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  border-radius: 5px;
+  font-size: 1.0rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;

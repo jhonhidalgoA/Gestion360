@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form"; // ✅ Asegúrate de que está importado
+import { useForm } from "react-hook-form";
 import NavbarDocente from "../../../components/layout/Navbar/NavbarDocente";
 import SelectField from "../../../components/ui/SelectField";
 import ActionButtons from "../../../components/ui/Botones";
+import Modal from "../../../components/ui/Modal";
 import "./Tareas.css";
 
 const Tareas = () => {
@@ -10,7 +11,7 @@ const Tareas = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch, // ✅ Importado desde react-hook-form
+    watch,
     reset,
   } = useForm({
     defaultValues: {
@@ -25,8 +26,6 @@ const Tareas = () => {
     mode: "onBlur",
   });
 
-  const grupoValue = watch("grupo"); // ✅ Ahora funciona
-
   const [grupos, setGrupos] = useState([{ value: "", label: "Cargando..." }]);
   const [asignaturas, setAsignaturas] = useState([
     { value: "", label: "Cargando..." },
@@ -34,14 +33,29 @@ const Tareas = () => {
   const [estudiantes, setEstudiantes] = useState([]);
   const [estudiantesSeleccionados, setEstudiantesSeleccionados] = useState([]);
   const [todosSeleccionados, setTodosSeleccionados] = useState(false);
+
   const [loading, setLoading] = useState({
     cargar: false,
     guardar: false,
     ver: false,
     borrar: false,
   });
-  const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
+
+  // Estado para manejar el modal de mensajes (error o éxito)
+  const [mensajeModal, setMensajeModal] = useState({
+    isOpen: false,
+    tipo: "", // 'error' o 'exito'
+    texto: "",
+  });
+
   const fileInputRef = useRef(null);
+
+  const [confirmarModal, setConfirmarModal] = useState({
+    isOpen: false,
+    onConfirm: null,
+    title: "",
+    message: "",
+  });
 
   // Cargar opciones de grupo y asignatura desde la API
   useEffect(() => {
@@ -79,38 +93,45 @@ const Tareas = () => {
   }, []);
 
   const grupo = watch("grupo");
-const asignatura = watch("asignatura");
+  const asignatura = watch("asignatura");
 
-useEffect(() => {
-  if (!grupo || !asignatura) {
-    setEstudiantes([]);
-    setEstudiantesSeleccionados([]);
-    setTodosSeleccionados(false);
-    return;
-  }
-
-  const cargarEstudiantes = async () => {
-    try {
-      setLoading(prev => ({ ...prev, cargar: true }));
-      const url = new URL(`http://localhost:8000/api/estudiantes-por-grupo-asignatura/${grupo}`);
-      url.searchParams.append("asignatura", asignatura);
-      const res = await fetch(url.toString());
-      if (!res.ok) throw new Error("Error al cargar estudiantes");
-      const data = await res.json();
-      setEstudiantes(data);
+  useEffect(() => {
+    if (!grupo || !asignatura) {
+      setEstudiantes([]);
       setEstudiantesSeleccionados([]);
       setTodosSeleccionados(false);
-    } catch (error) {
-      console.error("Error al cargar estudiantes:", error);
-      setEstudiantes([]);
-      setMensaje({ tipo: "error", texto: "Error al cargar los estudiantes" });
-    } finally {
-      setLoading(prev => ({ ...prev, cargar: false }));
+      return;
     }
-  };
 
-  cargarEstudiantes();
-}, [grupo, asignatura]);
+    const cargarEstudiantes = async () => {
+      try {
+        setLoading((prev) => ({ ...prev, cargar: true }));
+        const url = new URL(
+          `http://localhost:8000/api/estudiantes-por-grupo-asignatura/${grupo}`
+        );
+        url.searchParams.append("asignatura", asignatura);
+        const res = await fetch(url.toString());
+        if (!res.ok) throw new Error("Error al cargar estudiantes");
+        const data = await res.json();
+        setEstudiantes(data);
+        setEstudiantesSeleccionados([]);
+        setTodosSeleccionados(false);
+      } catch (error) {
+        console.error("Error al cargar estudiantes:", error);
+        setEstudiantes([]);
+        // Mostrar error en modal
+        setMensajeModal({
+          isOpen: true,
+          tipo: "error",
+          texto: "Error al cargar los estudiantes.",
+        });
+      } finally {
+        setLoading((prev) => ({ ...prev, cargar: false }));
+      }
+    };
+
+    cargarEstudiantes();
+  }, [grupo, asignatura]);
 
   // Sincronizar checkbox "Todos"
   useEffect(() => {
@@ -155,7 +176,9 @@ useEffect(() => {
     }
 
     if (errores.length > 0) {
-      setMensaje({
+      // Mostrar error en modal
+      setMensajeModal({
+        isOpen: true,
         tipo: "error",
         texto: `Por favor complete los siguientes campos obligatorios:\n\n• ${errores.join(
           "\n• "
@@ -167,18 +190,35 @@ useEffect(() => {
     return true;
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data) => {
     if (!validarCampos(data)) return;
-
     if (estudiantesSeleccionados.length === 0) {
-      setMensaje({
+      // Mostrar error en modal
+      setMensajeModal({
+        isOpen: true,
         tipo: "error",
         texto: "Debe seleccionar al menos un estudiante para asignar la tarea.",
       });
       return;
     }
 
+    setConfirmarModal({
+      isOpen: true,
+      title: "Colegio STEM 360",
+      message: "¿Estás seguro de que deseas enviar esta tarea?",
+      onConfirm: () => enviarTarea(data),
+    });
+  };
+
+  const enviarTarea = async (data) => {
+    setConfirmarModal({
+      isOpen: false,
+      onConfirm: null,
+      title: "",
+      message: "",
+    });
     setLoading((prev) => ({ ...prev, guardar: true }));
+
     const formData = new FormData();
     formData.append("grupo", data.grupo);
     formData.append("asignatura", data.asignatura);
@@ -190,9 +230,7 @@ useEffect(() => {
     formData.append("estudiantes", JSON.stringify(estudiantesSeleccionados));
 
     const archivo = fileInputRef.current?.files[0];
-    if (archivo) {
-      formData.append("archivo", archivo);
-    }
+    if (archivo) formData.append("archivo", archivo);
 
     try {
       const response = await fetch("http://localhost:8000/api/enviar-tarea", {
@@ -201,19 +239,22 @@ useEffect(() => {
       });
 
       const result = await response.json();
-
       if (response.ok && result.success) {
-        setMensaje({
+        // Mostrar éxito en modal
+        setMensajeModal({
+          isOpen: true,
           tipo: "exito",
-          texto: `Tarea enviada correctamente a ${estudiantesSeleccionados.length} estudiante(s)`,
+          texto: `Tarea enviada correctamente a ${estudiantesSeleccionados.length} estudiante(s).`,
         });
         limpiarFormulario();
       } else {
         throw new Error(result.message || "Error al enviar la tarea");
       }
     } catch (error) {
-      console.error("Error al enviar tarea:", error);
-      setMensaje({
+      console.error("Error:", error);
+      // Mostrar error en modal
+      setMensajeModal({
+        isOpen: true,
         tipo: "error",
         texto: "Error al enviar la tarea: " + error.message,
       });
@@ -228,11 +269,10 @@ useEffect(() => {
     setEstudiantes([]);
     setEstudiantesSeleccionados([]);
     setTodosSeleccionados(false);
-    setMensaje({ tipo: "", texto: "" });
+    // No necesitamos limpiar mensajeModal aquí, se cierra manualmente
   };
 
   const handleDelete = () => {
-    setMensaje({ tipo: "", texto: "" });
     setLoading((prev) => ({ ...prev, borrar: true }));
     setTimeout(() => {
       limpiarFormulario();
@@ -375,11 +415,12 @@ useEffect(() => {
             />
           </form>
 
-          {mensaje.texto && (
+          {/* Eliminamos la barra de mensajes original */}
+          {/* {mensaje.texto && (
             <div className={`mensaje-feedback mensaje-${mensaje.tipo}`}>
               {mensaje.texto}
             </div>
-          )}
+          )} */}
         </div>
         <div className="task-right">
           <div className="task__students">
@@ -408,7 +449,7 @@ useEffect(() => {
               </p>
             ) : estudiantes.length === 0 ? (
               <p style={{ textAlign: "center", color: "#666" }}>
-                {grupoValue
+                {grupo
                   ? "No hay estudiantes en este grupo"
                   : "Selecciona un grupo para ver los estudiantes"}
               </p>
@@ -431,6 +472,65 @@ useEffect(() => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Confirmación */}
+      <Modal
+        isOpen={confirmarModal.isOpen}
+        onClose={() =>
+          setConfirmarModal({
+            isOpen: false,
+            onConfirm: null,
+            title: "",
+            message: "",
+          })
+        }
+        title="Colegio STEM 360"
+        message={confirmarModal.message}
+        buttons={[
+          {
+            text: "Cancelar",
+            variant: "danger",
+            onClick: () =>
+              setConfirmarModal({
+                isOpen: false,
+                onConfirm: null,
+                title: "",
+                message: "",
+              }),
+          },
+          {
+            text: "Enviar",
+            variant: "success",
+            onClick: confirmarModal.onConfirm,
+          },
+        ]}
+      />
+
+      {/* Modal para Mensajes (Error o Éxito) */}
+      <Modal
+        isOpen={mensajeModal.isOpen}
+        onClose={() =>
+          setMensajeModal({
+            isOpen: false,
+            tipo: "",
+            texto: "",
+          })
+        }
+        title="Colegio STEM 360"
+        message={mensajeModal.texto}
+        buttons={[
+          {
+            text: "Aceptar",
+            variant: "success",              
+            onClick: () =>
+              setMensajeModal({
+                isOpen: false,
+                tipo: "",
+                texto: "",
+              }),
+          },
+        ]}
+      />
     </>
   );
 };
