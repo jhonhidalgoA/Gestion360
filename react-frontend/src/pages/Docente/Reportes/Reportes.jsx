@@ -10,14 +10,13 @@ import ActionButtons from "../../../components/ui/Botones";
 import ReporteCard from "../../../components/ui/ReporteCard";
 
 const Reportes = () => {
-  /** React Hook Form */
   const {
     register,
-    handleSubmit,
     watch,
     setValue,
     reset,
     formState: { errors },
+    trigger,
   } = useForm({
     defaultValues: {
       grupo: "",
@@ -27,7 +26,6 @@ const Reportes = () => {
     },
   });
 
-  /** Estado unificado para selects */
   const [selectOptions, setSelectOptions] = useState({
     grupos: [{ value: "", label: "Cargando..." }],
     estudiantes: [{ value: "", label: "Seleccionar Grupo" }],
@@ -35,30 +33,20 @@ const Reportes = () => {
     periodos: [{ value: "", label: "Cargando..." }],
   });
 
-  /** Estado para botones */
   const [loading, setLoading] = useState({
-    cargar: false,
     borrar: false,
-    pdf: false,
   });
 
-  /** Estado para modal de boletín */
-  const [boletinModalOpen, setBoletinModalOpen] = useState(false);
-  const [boletinData, setBoletinData] = useState(null);
+  const [modalData, setModalData] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  /** Datos completos del estudiante (de la API) */
-  const [datosEstudianteCompleto, setDatosEstudianteCompleto] = useState(null);
-
-  /** Observadores */
   const grupo = watch("grupo");
   const asignatura = watch("asignatura");
 
-  /** Función genérica para cargar opciones */
   const cargarOpciones = async (endpoint, campo, mapFn, placeholder) => {
     try {
       const res = await fetch(endpoint);
       const data = await res.json();
-
       setSelectOptions((prev) => ({
         ...prev,
         [campo]: [{ value: "", label: placeholder }, ...data.map(mapFn)],
@@ -72,7 +60,6 @@ const Reportes = () => {
     }
   };
 
-  /** Cargar grupos al inicio */
   useEffect(() => {
     cargarOpciones(
       "http://localhost:8000/api/grados",
@@ -82,7 +69,6 @@ const Reportes = () => {
     );
   }, []);
 
-  /** Cargar estudiantes según grupo */
   useEffect(() => {
     if (!grupo) {
       setSelectOptions((prev) => ({
@@ -90,19 +76,14 @@ const Reportes = () => {
         estudiantes: [{ value: "", label: "Seleccionar Grupo" }],
       }));
       setValue("estudiante", "");
-      setDatosEstudianteCompleto(null);
       return;
     }
 
     const cargar = async () => {
       try {
-        const url = new URL(
-          `http://localhost:8000/api/estudiantes-por-grado/${grupo}`
-        );
-        // Usa los valores reales del formulario
+        const url = new URL(`http://localhost:8000/api/estudiantes-por-grado/${grupo}`);
         const asignaturaActual = watch("asignatura") || "matematicas";
         const periodoActual = watch("periodo") || "1";
-
         url.searchParams.append("asignatura", asignaturaActual);
         url.searchParams.append("periodo", periodoActual);
 
@@ -119,19 +100,14 @@ const Reportes = () => {
             })),
           ],
         }));
-
-        // Guardar los datos completos del endpoint
-        setDatosEstudianteCompleto(data);
       } catch (error) {
         console.error("Error cargando estudiantes:", error);
-        setDatosEstudianteCompleto(null);
       }
     };
 
     cargar();
   }, [grupo, setValue, watch]);
 
-  /** Cargar asignaturas según grupo */
   useEffect(() => {
     if (!grupo) {
       setSelectOptions((prev) => ({
@@ -142,15 +118,33 @@ const Reportes = () => {
       return;
     }
 
-    cargarOpciones(
-      "http://localhost:8000/api/asignaturas",
-      "asignaturas",
-      (a) => ({ value: a.nombre, label: a.nombre }),
-      "Seleccionar"
-    );
+    const cargar = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/asignaturas");
+        const data = await res.json();
+
+        setSelectOptions((prev) => ({
+          ...prev,
+          asignaturas: [
+            { value: "", label: "Seleccionar" },
+            ...data.map((a) => ({
+              value: a.nombre,
+              label: a.nombre,
+            })),
+          ],
+        }));
+      } catch (error) {
+        console.error("Error cargando asignaturas:", error);
+        setSelectOptions((prev) => ({
+          ...prev,
+          asignaturas: [{ value: "", label: "Error al cargar" }],
+        }));
+      }
+    };
+
+    cargar();
   }, [grupo, setValue]);
 
-  /** Cargar periodos según asignatura */
   useEffect(() => {
     if (!asignatura) {
       setSelectOptions((prev) => ({
@@ -169,7 +163,6 @@ const Reportes = () => {
     );
   }, [asignatura, setValue]);
 
-  /** Limpiar formulario */
   const limpiarFormulario = () => {
     reset({
       grupo: "",
@@ -177,7 +170,6 @@ const Reportes = () => {
       asignatura: "",
       periodo: "",
     });
-
     setSelectOptions((prev) => ({
       ...prev,
       estudiantes: [{ value: "", label: "Seleccionar Grupo" }],
@@ -186,124 +178,71 @@ const Reportes = () => {
     }));
   };
 
-  /** Acción unificada (borrar) */
-  const manejarAccion = async (data, action) => {
-    if (action === "borrar") {
-      const { grupo, estudiante, asignatura, periodo } = data;
-
-      // Verificar si todos los campos están vacíos
-      const todosVacios = [grupo, estudiante, asignatura, periodo].every(
-        (val) => val === ""
-      );
-
-      if (todosVacios) {
-        return; // ⬅️ NO hace nada si todos los campos están vacíos
-      }
-
-      // Si al menos uno tiene valor, activar loader
-      setLoading((prev) => ({ ...prev, borrar: true }));
-
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        limpiarFormulario();
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading((prev) => ({ ...prev, borrar: false }));
-      }
-    }
-  };
-
-  /** Botón borrar */
   const handleDelete = () => {
     const data = watch();
-    manejarAccion(data, "borrar");
+    const { grupo, estudiante, asignatura, periodo } = data;
+    const todosVacios = [grupo, estudiante, asignatura, periodo].every((val) => val === "");
+    if (todosVacios) return;
+
+    setLoading((prev) => ({ ...prev, borrar: true }));
+    setTimeout(() => {
+      limpiarFormulario();
+      setLoading((prev) => ({ ...prev, borrar: false }));
+    }, 800);
   };
 
-  /** Generar PDF de calificaciones */
-  const generarPDFCalificaciones = async (data) => {
-    setLoading((prev) => ({ ...prev, pdf: true }));
+  const handleValidateOnly = async () => {
+    await trigger(["grupo", "estudiante", "asignatura", "periodo"]);
+  };
+
+  const handleCalificacionesClick = async () => {
+    const isValid = await trigger(["grupo", "estudiante", "asignatura", "periodo"]);
+    if (!isValid) return;
+
+    const data = watch();
+    const { grupo, estudiante, asignatura, periodo } = data;
+
+    // Normalizar SOLO para la petición al backend
+    const asignaturaNormalizada = asignatura
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // quita tildes
+      .replace(/\s+/g, "_"); // espacios → _
+
+    setModalOpen(true);
+
     try {
-      const res = await fetch("http://localhost:8000/api/pdf/calificaciones", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          grupo: data.grupo,
-          estudiante: data.estudiante,
-          asignatura: data.asignatura,
-          periodo: data.periodo,
-        }),
-      });
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "calificaciones.pdf";
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+      const url = new URL(`http://localhost:8000/api/estudiantes-por-grado/${grupo}`);
+      url.searchParams.append("asignatura", asignaturaNormalizada); // ← valor normalizado
+      url.searchParams.append("periodo", periodo);
+
+      const res = await fetch(url.toString());
+      const estudiantesData = await res.json();
+
+      const estudianteSeleccionado = estudiantesData.find(e => String(e.id) === estudiante);
+
+      if (estudianteSeleccionado) {
+        const resEstudiante = await fetch(`http://localhost:8000/api/estudiante/${estudiante}`);
+        const datosEstudiante = await resEstudiante.json();
+
+        const grupoSeleccionado = selectOptions.grupos.find(g => g.value === grupo);
+        const periodoSeleccionado = selectOptions.periodos.find(p => p.value === periodo);
+
+        setModalData({
+          nombre: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
+          documento: datosEstudiante.numero_documento || "N/A",
+          grado: grupoSeleccionado?.label || "N/A",
+          asignatura: selectOptions.asignaturas.find(a => a.value === asignatura)?.label || asignatura,
+          periodo: periodoSeleccionado?.label || "N/A",
+          notas: estudianteSeleccionado.notas || [],
+        });
       } else {
-        const err = await res.json().catch(() => ({}));
-        console.error("Error:", err.detail || "No se pudo generar el PDF");
+        alert("No se encontraron datos para este estudiante.");
       }
     } catch (e) {
-      console.error("Error de red:", e);
-    } finally {
-      setLoading((prev) => ({ ...prev, pdf: false }));
+      console.error("Error al cargar datos:", e);
+      alert("Error al cargar los datos del estudiante.");
     }
-  };
-
-  /** Abrir modal de Boletín con datos reales */
-  const abrirModalBoletin = () => {
-    const data = watch();
-
-    // Validar que los campos estén completos
-    if (!data.grupo || !data.estudiante || !data.periodo) {
-      console.warn("Completa todos los campos para ver el boletín.");
-      return;
-    }
-
-    // Buscar al estudiante seleccionado en los datos completos
-    const estudianteSeleccionado = datosEstudianteCompleto?.find(
-      (e) => String(e.id) === data.estudiante
-    );
-
-    if (!estudianteSeleccionado) {
-      console.warn("Estudiante no encontrado en los datos cargados.");
-      return;
-    }
-
-    // Obtener el nombre del grupo (grado)
-    const grupoSeleccionado = selectOptions.grupos.find(
-      (g) => g.value === data.grupo
-    );
-
-    // Obtener el nombre del periodo
-    const periodoSeleccionado = selectOptions.periodos.find(
-      (p) => p.value === data.periodo
-    );
-
-    // Preparar datos para el modal
-    setBoletinData({
-      estudiante: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
-      grupo: grupoSeleccionado?.label || "N/A",
-      periodo: periodoSeleccionado?.label || "N/A",
-      notas: [
-        {
-          materia: "Matemáticas",
-          p1: estudianteSeleccionado.notas[0] || 0,
-          p2: estudianteSeleccionado.notas[1] || 0,
-          p3: estudianteSeleccionado.notas[2] || 0,
-          promedio: estudianteSeleccionado.notas.slice(0, 3).reduce((a, b) => Number(a) + Number(b), 0) / 3 || 0,
-        },
-        // Aquí deberíamos tener todas las asignaturas, pero por ahora solo Matemáticas
-      ],
-      promedioGeneral: estudianteSeleccionado.notas.slice(0, 3).reduce((a, b) => Number(a) + Number(b), 0) / 3 || 0,
-    });
-
-    setBoletinModalOpen(true);
   };
 
   return (
@@ -320,7 +259,6 @@ const Reportes = () => {
 
       <div className="main-content">
         <form className="form-wrapper" onSubmit={(e) => e.preventDefault()}>
-          {/* FILA DE SELECTS */}
           <div className="form-row">
             <SelectField
               label="Grupo:"
@@ -330,7 +268,6 @@ const Reportes = () => {
               required
               options={selectOptions.grupos}
             />
-
             <SelectField
               label="Estudiante:"
               id="estudiante"
@@ -339,7 +276,6 @@ const Reportes = () => {
               required
               options={selectOptions.estudiantes}
             />
-
             <SelectField
               label="Asignatura:"
               id="asignatura"
@@ -348,7 +284,6 @@ const Reportes = () => {
               required
               options={selectOptions.asignaturas}
             />
-
             <SelectField
               label="Periodo:"
               id="periodo"
@@ -359,7 +294,6 @@ const Reportes = () => {
             />
           </div>
 
-          {/* TARJETAS DE REPORTES */}
           <div
             style={{
               display: "grid",
@@ -371,63 +305,46 @@ const Reportes = () => {
               icon="menu_book"
               title="Calificaciones"
               subtitle="Reporte notas por materia del periodo"
-              onClick={handleSubmit(async (data) => {
-                await generarPDFCalificaciones(data);
-              })}
+              onClick={handleCalificacionesClick}
               bgColor="#3b82f6"
             />
-
             <ReporteCard
               icon="calendar_today"
               title="Asistencia"
               subtitle="Control de asistencia e inasistencias"
-              onClick={() => {
-                // Por ahora, solo muestra mensaje
-                alert("Funcionalidad no implementada aún.");
-              }}
+              onClick={handleValidateOnly}
               bgColor="#10b981"
             />
-
             <ReporteCard
               icon="assignment_turned_in"
               title="Certificado Escolar PDF"
               subtitle="Certificado escolar de estudio"
-              onClick={() => {
-                alert("Funcionalidad no implementada aún.");
-              }}
+              onClick={handleValidateOnly}
               bgColor="#9333ea"
             />
-
             <ReporteCard
               icon="description"
               title="Boletín de Calificaciones PDF"
               subtitle="Boletín completo con todas las materias"
-              onClick={abrirModalBoletin}
+              onClick={handleValidateOnly}
               bgColor="#f59e0b"
             />
-
             <ReporteCard
               icon="assignment"
               title="Observador Escolar"
               subtitle="Comportamiento y observaciones"
-              onClick={() => {
-                alert("Funcionalidad no implementada aún.");
-              }}
+              onClick={handleValidateOnly}
               bgColor="#ec4899"
             />
-
             <ReporteCard
               icon="school"
               title="Historial Académico"
               subtitle="Registro completo de todos los periodos"
-              onClick={() => {
-                alert("Funcionalidad no implementada aún.");
-              }}
+              onClick={handleValidateOnly}
               bgColor="#4f46e5"
             />
           </div>
 
-          {/* BOTONES */}
           <ActionButtons
             onDelete={handleDelete}
             deleteLoading={loading.borrar}
@@ -436,82 +353,69 @@ const Reportes = () => {
         </form>
       </div>
 
-      {/* MODAL DE BOLETÍN */}
-      {boletinModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>
-                <span className="material-symbols-outlined">description</span>
-                Boletín de Calificaciones PDF
-              </h3>
-              <p>{boletinData?.estudiante} - {boletinData?.periodo}</p>
-              <button onClick={() => setBoletinModalOpen(false)} className="modal-close">×</button>
-            </div>
-
-            <div className="modal-body">
-              <h4>Boletín de Calificaciones</h4>
-              <p><strong>Periodo:</strong> {boletinData?.periodo} - Ciclo Escolar 2024-2025</p>
-              <p><strong>Estudiante:</strong> {boletinData?.estudiante}</p>
-              <p><strong>Grupo:</strong> {boletinData?.grupo}</p>
-
-              <table className="boletin-table">
-                <thead>
-                  <tr>
-                    <th>Materia</th>
-                    <th>P1</th>
-                    <th>P2</th>
-                    <th>P3</th>
-                    <th>Promedio</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {boletinData?.notas.map((n, i) => (
-                    <tr key={i}>
-                      <td>{n.materia}</td>
-                      <td>{n.p1}</td>
-                      <td>{n.p2}</td>
-                      <td>{n.p3}</td>
-                      <td><strong>{n.promedio.toFixed(1)}</strong></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              <div className="promedio-general">
-                <strong>Promedio General: {boletinData?.promedioGeneral.toFixed(1)}</strong>
-              </div>
-            </div>
-
-            <div className="modal-footer">
-              <button 
-                onClick={() => alert("Enviar por Email (no implementado)")}
-                className="btn-email"
-              >
-                <span className="material-symbols-outlined">email</span> Enviar por Email
-              </button>
-              <button 
-                onClick={() => window.print()}
-                className="btn-print"
-              >
-                <span className="material-symbols-outlined">print</span> Imprimir
-              </button>
-              <button 
-                onClick={() => {
-                  // Aquí llamas a tu función de descargar PDF
-                  generarPDFCalificaciones({
-                    grupo: watch("grupo"),
-                    estudiante: watch("estudiante"),
-                    asignatura: watch("asignatura"),
-                    periodo: watch("periodo"),
-                  });
-                  setBoletinModalOpen(false);
+      {/* MODAL DE CALIFICACIONES */}
+      {modalOpen && (
+        <div
+          className="modal-overlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setModalOpen(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "24px",
+              borderRadius: "8px",
+              maxWidth: "500px",
+              width: "90%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h3 style={{ margin: 0 }}>Detalles de Calificación</h3>
+              <button
+                onClick={() => setModalOpen(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "24px",
+                  cursor: "pointer",
                 }}
-                className="btn-download"
               >
-                <span className="material-symbols-outlined">download</span> Descargar PDF
+                &times;
               </button>
             </div>
+
+            {modalData ? (
+              <div>
+                <p><strong>Nombre:</strong> {modalData.nombre}</p>
+                <p><strong>Documento:</strong> {modalData.documento}</p>
+                <p><strong>Grado:</strong> {modalData.grado}</p>
+                <p><strong>Asignatura:</strong> {modalData.asignatura}</p>
+                <p><strong>Periodo:</strong> {modalData.periodo}</p>
+                <div><strong>Notas:</strong></div>
+                <ul>
+                  {modalData.notas
+                    .map((nota, i) => (nota !== "" ? <li key={i}>Nota {i + 1}: {nota}</li> : null))
+                    .filter(Boolean)}
+                </ul>
+                {modalData.notas.every(nota => nota === "") && <p>Sin calificaciones registradas.</p>}
+              </div>
+            ) : (
+              <p>No hay datos disponibles.</p>
+            )}
           </div>
         </div>
       )}

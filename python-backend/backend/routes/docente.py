@@ -7,6 +7,7 @@ import uuid
 import shutil
 import json
 from io import BytesIO
+import unicodedata
 from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante
 from backend.pdf_calificaciones import generar_calificaciones_pdf_en_memoria
 
@@ -37,6 +38,16 @@ def get_periodos(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e)) 
 
 
+def normalizar_asignatura(nombre: str) -> str:
+    """Convierte 'Biología' → 'biologia', 'Cátedra de Paz' → 'catedra_de_paz'"""
+    return (
+        unicodedata.normalize('NFD', nombre)
+        .encode('ascii', 'ignore')
+        .decode('utf-8')
+        .lower()
+        .replace(' ', '_')
+    )
+
 @router.get("/estudiantes-por-grado/{grado_id}")
 def get_estudiantes_por_grado(
     grado_id: int,
@@ -45,46 +56,46 @@ def get_estudiantes_por_grado(
     db: Session = Depends(get_db)
 ):
     try:
-        # Cargar estudiantes del grado
+        # Normalizar la asignatura recibida del frontend
+        asignatura_normalizada = normalizar_asignatura(asignatura)
+
+        # Cargar estudiantes
         estudiantes = db.execute(
             select(Estudiante)
             .where(Estudiante.grado_id == grado_id)
             .order_by(Estudiante.apellidos, Estudiante.nombres)
         ).scalars().all()
 
-        # Cargar todas las calificaciones para estos estudiantes, asignatura y periodo
+        # Cargar TODAS las calificaciones de estos estudiantes en ese periodo
         estudiante_ids = [e.id for e in estudiantes]
         calificaciones = db.execute(
             select(Calificacion)
             .where(
                 Calificacion.estudiante_id.in_(estudiante_ids),
-                Calificacion.asignatura == asignatura,
                 Calificacion.periodo == periodo
             )
         ).scalars().all()
 
-        # Crear un mapa: {estudiante_id: {columna: nota}}
+        # Filtrar en Python por asignatura normalizada (seguro y compatible)
+        calificaciones_filtradas = [
+            cal for cal in calificaciones
+            if normalizar_asignatura(cal.asignatura) == asignatura_normalizada
+        ]
+
+        # Mapear notas
         calificaciones_map = {}
-        for cal in calificaciones:
+        for cal in calificaciones_filtradas:
             if cal.estudiante_id not in calificaciones_map:
                 calificaciones_map[cal.estudiante_id] = {}
             calificaciones_map[cal.estudiante_id][cal.columna] = str(cal.nota)
 
-        # Formatear la respuesta
+        # Construir respuesta
         resultado = []
         for est in estudiantes:
-            # Obtener las calificaciones del estudiante
-            calificaciones_est = calificaciones_map.get(est.id, {})
-            
-            # Determinar el número de columnas (al menos 10)
-            numero_notas = 10
-            if calificaciones_est:
-                max_columna = max(calificaciones_est.keys())
-                numero_notas = max(10, max_columna)
-
-            notas = []
-            for i in range(1, numero_notas + 1):
-                notas.append(calificaciones_est.get(i, ""))
+            cal_est = calificaciones_map.get(est.id, {})
+            max_col = max(cal_est.keys()) if cal_est else 0
+            num_notas = max(10, max_col)
+            notas = [cal_est.get(i, "") for i in range(1, num_notas + 1)]
 
             resultado.append({
                 "id": est.id,
@@ -96,8 +107,8 @@ def get_estudiantes_por_grado(
         return resultado
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))      
-    
+        print(f"Error en /estudiantes-por-grado: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error al cargar calificaciones")
      
     
 @router.post("/guardar-calificaciones")
@@ -390,3 +401,43 @@ def generar_pdf_calificaciones(
     except Exception as e:
         print("Error en PDF:", e)
         raise HTTPException(status_code=500, detail="Error al generar el PDF.")
+    
+@router.get("/estudiante/{estudiante_id}")
+def get_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
+    try:
+        estudiante = db.execute(
+            select(Estudiante).where(Estudiante.id == estudiante_id)
+        ).scalar_one_or_none()
+        if not estudiante:
+            raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+        return {
+            "id": estudiante.id,
+            "nombres": estudiante.nombres,
+            "apellidos": estudiante.apellidos,
+            "numero_documento": estudiante.numero_documento,
+            "tipo_documento": estudiante.tipo_documento,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))   
+    
+    
+# Agrega este endpoint temporal para debug
+@router.get("/debug-asignaturas")
+def debug_asignaturas(db: Session = Depends(get_db)):
+    try:
+        # Ver todas las asignaturas en la base de datos
+        asignaturas = db.execute(select(Asignatura)).scalars().all()
+        print("📚 Asignaturas en BD:", [a.name for a in asignaturas])
+        
+        # Ver calificaciones existentes
+        calificaciones = db.execute(select(Calificacion)).scalars().all()
+        print("📊 Calificaciones existentes:")
+        for cal in calificaciones:
+            print(f"  - Estudiante {cal.estudiante_id}, Asignatura: '{cal.asignatura}', Periodo: {cal.periodo}")
+        
+        return {
+            "asignaturas": [a.name for a in asignaturas],
+            "calificaciones_count": len(calificaciones)
+        }
+    except Exception as e:
+        return {"error": str(e)}    
