@@ -247,7 +247,6 @@ const Reportes = () => {
         const periodoSeleccionado = selectOptions.periodos.find(
           (p) => p.value === periodo
         );
-
         setModalData({
           nombre: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
           documento: datosEstudiante.numero_documento || "N/A",
@@ -256,6 +255,10 @@ const Reportes = () => {
             selectOptions.asignaturas.find((a) => a.value === asignatura)
               ?.label || asignatura,
           periodo: periodoSeleccionado?.label || "N/A",
+          // ---- IDs necesarios para el PDF ----
+          estudianteId: parseInt(estudiante),
+          grupoId: parseInt(grupo),
+          periodoId: parseInt(periodo),
           notas: estudianteSeleccionado.notas || [],
         });
       } else {

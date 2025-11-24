@@ -9,7 +9,12 @@ import json
 from io import BytesIO
 import unicodedata
 from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante
-from backend.pdf_calificaciones import generar_calificaciones_pdf_en_memoria
+from weasyprint import HTML
+from datetime import datetime
+from fastapi.responses import StreamingResponse
+from fastapi import Body, HTTPException
+from io import BytesIO
+
 
 router = APIRouter(prefix="/api", tags=["docente"])
 
@@ -311,96 +316,6 @@ async def enviar_tarea(
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al guardar la tarea: {str(e)}")  
-
-
-@router.post("/pdf/calificaciones")
-def generar_pdf_calificaciones(
-    request: dict,
-    db: Session = Depends(get_db)
-):
-    try:
-        estudiante_id = request.get("estudiante")
-        grupo_id = request.get("grupo")
-
-        # Validar y normalizar asignatura
-        asignatura_input = request.get("asignatura")
-        if not asignatura_input:
-            raise HTTPException(status_code=400, detail="El campo 'asignatura' es requerido.")
-        asignatura = asignatura_input.strip().lower()
-
-        # Validar periodo
-        periodo_str = request.get("periodo")
-        if not periodo_str:
-            raise HTTPException(status_code=400, detail="El campo 'periodo' es requerido.")
-        try:
-            periodo = int(periodo_str)
-        except (TypeError, ValueError):
-            raise HTTPException(status_code=400, detail="El periodo debe ser un número.")
-
-        if not all([estudiante_id, grupo_id, asignatura, periodo]):
-            raise HTTPException(status_code=400, detail="Faltan parámetros requeridos.")
-
-        # 1. Obtener datos del estudiante
-        estudiante = db.execute(
-            select(Estudiante).where(Estudiante.id == estudiante_id)
-        ).scalar_one_or_none()
-        if not estudiante:
-            raise HTTPException(status_code=404, detail="Estudiante no encontrado.")
-
-        grado = db.execute(
-            select(Grado).where(Grado.id == grupo_id)
-        ).scalar_one_or_none()
-        if not grado:
-            raise HTTPException(status_code=404, detail="Grado no encontrado.")
-
-        # 2. Obtener calificaciones
-        calificaciones = db.execute(
-            select(Calificacion)
-            .where(
-                Calificacion.estudiante_id == estudiante_id,
-                Calificacion.asignatura == asignatura,
-                Calificacion.periodo == periodo
-            )
-        ).scalars().all()
-
-        # Mapear a dict {columna: nota}
-        cal_map = {cal.columna: str(cal.nota) for cal in calificaciones}
-
-        # Asegurar al menos 10 columnas
-        notas = [cal_map.get(i, "") for i in range(1, 11)]
-
-        # 3. Preparar datos
-        datos_estudiante = {
-            "nombre_completo": f"{estudiante.apellidos} {estudiante.nombres}",
-            "grado": grado.nombre
-        }
-
-        # 4. Generar PDF
-        buffer = BytesIO()
-        from backend.pdf_calificaciones import generar_calificaciones_pdf_en_memoria
-        generar_calificaciones_pdf_en_memoria(
-            buffer, 
-            datos_estudiante, 
-            notas, 
-            asignatura.title(),  # "matemáticas" → "Matemáticas"
-            str(periodo)
-        )
-        buffer.seek(0)
-
-        # 5. Devolver PDF
-        from fastapi.responses import StreamingResponse
-        filename = f"calificaciones_{estudiante.apellidos}_{estudiante.nombres}.pdf"
-        return StreamingResponse(
-            buffer,
-            media_type="application/pdf",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        print("Error en PDF:", e)
-        raise HTTPException(status_code=500, detail="Error al generar el PDF.")
     
 @router.get("/estudiante/{estudiante_id}")
 def get_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
@@ -418,26 +333,307 @@ def get_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
             "tipo_documento": estudiante.tipo_documento,
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))   
+        raise HTTPException(status_code=500, detail=str(e))       
+
+
+# backend/pdf_calificaciones.py
+from weasyprint import HTML
+from datetime import datetime
+
+def generar_calificaciones_pdf_en_memoria(buffer, datos_estudiante, notas, asignatura, periodo):
+    nombre = datos_estudiante["nombre_completo"]
+    grado = datos_estudiante["grado"]
+    documento = datos_estudiante.get("documento", "N/A")
+
+    # Procesar notas
+    filas_notas = ""
+    notas_validas = []
+    for i, nota in enumerate(notas):
+        num = i + 1
+        if nota == "" or nota is None:
+            estado = "Pendiente"
+            nota_mostrar = "—"
+            color = "#95a5a6"
+        else:
+            try:
+                n = float(nota)
+                notas_validas.append(n)
+                if n >= 4.5:
+                    estado = "✓ Aprobado"
+                    color = "#27AE60"
+                elif n >= 4.0:
+                    estado = "✓ Aprobado"
+                    color = "#2ECC71"
+                elif n >= 3.0:
+                    estado = "✓ Aprobado"
+                    color = "#F39C12"
+                else:
+                    estado = "✗ Reprobado"
+                    color = "#E74C3C"
+                nota_mostrar = f"{n:.1f}"
+            except:
+                estado = "Pendiente"
+                color = "#95a5a6"
+                nota_mostrar = "—"
+
+        filas_notas += f"""
+        <tr>
+            <td><strong>{num}</strong></td>
+            <td>Nota {num}</td>
+            <td style="color: {color}; font-weight: bold;">{nota_mostrar}</td>
+            <td style="color: {color}; font-weight: bold;">{estado}</td>
+        </tr>
+        """
+
+    # Estadísticas
+    promedio = round(sum(notas_validas) / len(notas_validas), 2) if notas_validas else 0
+    maxima = max(notas_validas) if notas_validas else 0
+    minima = min(notas_validas) if notas_validas else 0
+    aprobadas = sum(1 for n in notas_validas if n >= 3.0)
+    reprobadas = len(notas_validas) - aprobadas
+
+    color_promedio = "#27AE60" if promedio >= 4.5 else "#2ECC71" if promedio >= 4.0 else "#F39C12" if promedio >= 3.0 else "#E74C3C"
+
+    fecha_actual = datetime.now().strftime("%d/%m/%Y")
+    hora_actual = datetime.now().strftime("%H:%M")
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 12pt;
+                color: #000;
+                margin: 0;
+                padding: 20pt;
+                background: white;
+            }}
+            .header {{
+                text-align: center;
+                margin-bottom: 20pt;
+            }}
+            .titulo-principal {{
+                font-size: 18pt;
+                font-weight: bold;
+                color: #2C3E50;
+                margin-bottom: 6pt;
+            }}
+            .subtitulo {{
+                font-size: 14pt;
+                font-weight: bold;
+                color: #3498DB;
+                margin-bottom: 10pt;
+            }}
+            .linea-decorativa {{
+                height: 2pt;
+                background: #3498DB;
+                margin: 5pt auto;
+                width: 100%;
+            }}
+            .info-estudiante {{
+                border: 1.5pt solid #2C3E50;
+                margin-bottom: 20pt;
+            }}
+            .info-row {{
+                display: flex;
+            }}
+            .info-label {{
+                background: #ECF0F1;
+                font-weight: bold;
+                color: #2C3E50;
+                padding: 8pt 10pt;
+                width: 120pt;
+                font-size: 11pt;
+            }}
+            .info-value {{
+                padding: 8pt 10pt;
+                color: #34495E;
+                font-size: 11pt;
+            }}
+            .section-title {{
+                font-size: 12pt;
+                font-weight: bold;
+                color: #2C3E50;
+                margin: 20pt 0 10pt 0;
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20pt;
+            }}
+            th {{
+                background: #34495E;
+                color: white;
+                padding: 8pt;
+                font-weight: bold;
+            }}
+            td {{
+                padding: 8pt;
+                text-align: center;
+                border: 0.5pt solid #ddd;
+                font-size: 10pt;
+            }}
+            .pie-pagina {{
+                text-align: center;
+                font-style: italic;
+                color: #7f8c8d;
+                font-size: 10pt;
+                margin-top: 20pt;
+                padding-top: 8pt;
+                border-top: 0.5pt solid #ECF0F1;
+            }}
+            .footer-info {{
+                display: flex;
+                justify-content: space-between;
+                font-size: 10pt;
+                color: #7f8c8d;
+                margin-top: 10pt;
+                padding-top: 10pt;
+                border-top: 0.5pt solid #ECF0F1;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="titulo-principal">COLEGIO STEM 360</div>
+            <div class="subtitulo">REPORTE DE CALIFICACIONES</div>
+            <div class="linea-decorativa"></div>
+        </div>
+
+        <div class="info-estudiante">
+            <div class="info-row">
+                <div class="info-label">ESTUDIANTE:</div>
+                <div class="info-value">{nombre}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">DOCUMENTO:</div>
+                <div class="info-value">{documento}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">GRADO:</div>
+                <div class="info-value">{grado}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">ASIGNATURA:</div>
+                <div class="info-value">{asignatura}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">PERIODO:</div>
+                <div class="info-value">{periodo}</div>
+            </div>
+        </div>
+
+        <div class="section-title">DETALLE DE CALIFICACIONES</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>COLUMNA</th>
+                    <th>NOTA</th>
+                    <th>ESTADO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {filas_notas}
+            </tbody>
+        </table>
+
+        <div style="height: 1pt; background: #ECF0F1; margin: 15pt 0;"></div>
+
+        <div class="section-title">RESUMEN ESTADÍSTICO</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Promedio</th>
+                    <th>Nota Máxima</th>
+                    <th>Nota Mínima</th>
+                    <th>Total Notas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="color: {color_promedio}; font-weight: bold;">{promedio:.2f}</td>
+                    <td>{maxima:.1f}</td>
+                    <td>{minima:.1f}</td>
+                    <td>{len(notas_validas)}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; border: 1pt solid #2C3E50; padding: 10pt; margin-bottom: 30pt; font-weight: bold; font-size: 11pt;">
+            <div><strong>Aprobadas:</strong> {aprobadas}</div>
+            <div><strong>Reprobadas:</strong> {reprobadas}</div>
+        </div>
+
+        <div class="pie-pagina">
+            Documento generado el {fecha_actual} a las {hora_actual}
+        </div>
+
+        <div class="footer-info">
+            <span>Colegio STEM 360</span>
+            <span>Página 1 de 1</span>
+        </div>
+    </body>
+    </html>
+    """
+
+    HTML(string=html_content).write_pdf(buffer)
     
-    
-# Agrega este endpoint temporal para debug
-@router.get("/debug-asignaturas")
-def debug_asignaturas(db: Session = Depends(get_db)):
+@router.post("/pdf/calificaciones")
+def generar_pdf_calificaciones(
+    request: dict = Body(...),
+    db: Session = Depends(get_db)
+):
     try:
-        # Ver todas las asignaturas en la base de datos
-        asignaturas = db.execute(select(Asignatura)).scalars().all()
-        print("📚 Asignaturas en BD:", [a.name for a in asignaturas])
-        
-        # Ver calificaciones existentes
-        calificaciones = db.execute(select(Calificacion)).scalars().all()
-        print("📊 Calificaciones existentes:")
-        for cal in calificaciones:
-            print(f"  - Estudiante {cal.estudiante_id}, Asignatura: '{cal.asignatura}', Periodo: {cal.periodo}")
-        
-        return {
-            "asignaturas": [a.name for a in asignaturas],
-            "calificaciones_count": len(calificaciones)
-        }
+        estudiante_id = request.get("estudiante")
+        grupo_id = request.get("grupo")
+        asignatura = request.get("asignatura")
+        periodo = request.get("periodo")
+
+        if not all([estudiante_id, grupo_id, asignatura, periodo]):
+            raise HTTPException(status_code=400, detail="Faltan parámetros")
+
+        estudiante = db.get(Estudiante, estudiante_id)
+        grado = db.get(Grado, grupo_id)
+        if not estudiante or not grado:
+            raise HTTPException(status_code=404, detail="Estudiante o grado no encontrado")
+
+        calificaciones = db.execute(
+            select(Calificacion)
+            .where(
+                Calificacion.estudiante_id == estudiante_id,
+                Calificacion.asignatura == asignatura,
+                Calificacion.periodo == periodo
+            )
+        ).scalars().all()
+
+        cal_map = {cal.columna: str(cal.nota) for cal in calificaciones}
+        notas = [cal_map.get(i, "") for i in range(1, 11)]
+
+        buffer = BytesIO()
+       
+        generar_calificaciones_pdf_en_memoria(
+            buffer,
+            {
+                "nombre_completo": f"{estudiante.apellidos} {estudiante.nombres}",
+                "grado": grado.nombre,
+                "documento": estudiante.numero_documento or "N/A"
+            },
+            notas,
+            asignatura,
+            str(periodo)
+        )
+        buffer.seek(0)
+
+        return StreamingResponse(
+            buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=Reporte_Calificaciones_{estudiante.apellidos}_{estudiante.nombres}.pdf"}
+        )
+
     except Exception as e:
-        return {"error": str(e)}    
+        raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")    
+    

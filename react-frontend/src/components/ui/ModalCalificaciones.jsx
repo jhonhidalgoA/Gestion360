@@ -5,7 +5,9 @@ const ModalCalificaciones = ({ isOpen, onClose, modalData }) => {
 
   // Calcular estadísticas
   const calcularEstadisticas = (notas) => {
-    const notasValidas = notas.filter(nota => nota !== "" && nota !== null && !isNaN(parseFloat(nota)));
+    const notasValidas = notas.filter(
+      (nota) => nota !== "" && nota !== null && !isNaN(parseFloat(nota))
+    );
     if (notasValidas.length === 0) {
       return {
         promedio: 0,
@@ -13,15 +15,16 @@ const ModalCalificaciones = ({ isOpen, onClose, modalData }) => {
         minima: 0,
         total: 0,
         aprobadas: 0,
-        reprobadas: 0
+        reprobadas: 0,
       };
     }
 
-    const notasNumericas = notasValidas.map(nota => parseFloat(nota));
-    const promedio = notasNumericas.reduce((a, b) => a + b, 0) / notasNumericas.length;
+    const notasNumericas = notasValidas.map((nota) => parseFloat(nota));
+    const promedio =
+      notasNumericas.reduce((a, b) => a + b, 0) / notasNumericas.length;
     const maxima = Math.max(...notasNumericas);
     const minima = Math.min(...notasNumericas);
-    const aprobadas = notasNumericas.filter(nota => nota >= 3.0).length;
+    const aprobadas = notasNumericas.filter((nota) => nota >= 3.0).length;
     const reprobadas = notasNumericas.length - aprobadas;
 
     return {
@@ -30,14 +33,15 @@ const ModalCalificaciones = ({ isOpen, onClose, modalData }) => {
       minima: minima.toFixed(1),
       total: notasValidas.length,
       aprobadas: aprobadas,
-      reprobadas: reprobadas
+      reprobadas: reprobadas,
     };
   };
 
   const estadisticas = modalData ? calcularEstadisticas(modalData.notas) : null;
 
   const determinarEstado = (nota) => {
-    if (nota === "" || nota === null) return { texto: "Pendiente", clase: "pendiente" };
+    if (nota === "" || nota === null)
+      return { texto: "Pendiente", clase: "pendiente" };
     const notaNum = parseFloat(nota);
     if (notaNum >= 4.5) return { texto: "✓ Aprobado", clase: "excelente" };
     if (notaNum >= 4.0) return { texto: "✓ Aprobado", clase: "buena" };
@@ -56,25 +60,68 @@ const ModalCalificaciones = ({ isOpen, onClose, modalData }) => {
   // Obtener fecha actual para el pie de página
   const obtenerFechaActual = () => {
     const ahora = new Date();
-    const fecha = ahora.toLocaleDateString('es-ES');
-    const hora = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    const fecha = ahora.toLocaleDateString("es-ES");
+    const hora = ahora.toLocaleTimeString("es-ES", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
     return `Documento generado el ${fecha} a las ${hora}`;
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!modalData) return;
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/pdf/calificaciones",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            estudiante: modalData.estudianteId,
+            grupo: modalData.grupoId,
+            asignatura: modalData.asignatura, // nombre original, no normalizado
+            periodo: modalData.periodoId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error PDF:", errorText);
+        alert("Error al generar el PDF.");
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Reporte_Calificaciones_${modalData.nombre.replace(
+        /\s+/g,
+        "_"
+      )}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Error descargando PDF:", error);
+      alert("No se pudo conectar con el servidor.");
+    }
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {/* Botón de cerrar con icono */}
-        <button
-          onClick={onClose}
-          className="modal-close-btn"
-        >
+        <button onClick={onClose} className="modal-close-btn">
           <span className="material-symbols-outlined">close</span>
-        </button>       
-       <div class="header">
-            <div class="titulo-principal">COLEGIO STEM 360</div>
-            <div class="subtitulo">REPORTE DE CALIFICACIONES</div>
-            <div class="linea-decorativa"></div>
+        </button>
+        <div class="header">
+          <div class="titulo-principal">COLEGIO STEM 360</div>
+          <div class="subtitulo">REPORTE DE CALIFICACIONES</div>
+          <div class="linea-decorativa"></div>
         </div>
 
         {/* Información del estudiante en formato vertical */}
@@ -118,14 +165,14 @@ const ModalCalificaciones = ({ isOpen, onClose, modalData }) => {
                 const estado = determinarEstado(nota);
                 return (
                   <tr key={index}>
-                    <td><strong>{index + 1}</strong></td>
+                    <td>
+                      <strong>{index + 1}</strong>
+                    </td>
                     <td>Nota {index + 1}</td>
                     <td className={`nota-${estado.clase}`}>
                       {nota && nota !== "" ? parseFloat(nota).toFixed(1) : "—"}
                     </td>
-                    <td className={`estado-${estado.clase}`}>
-                      {estado.texto}
-                    </td>
+                    <td className={`estado-${estado.clase}`}>{estado.texto}</td>
                   </tr>
                 );
               })}
@@ -150,9 +197,15 @@ const ModalCalificaciones = ({ isOpen, onClose, modalData }) => {
             </thead>
             <tbody>
               <tr>
-                <td className={getClasePromedio(estadisticas?.promedio)}>{estadisticas?.promedio || "0.00"}</td>
-                <td className="promedio-excelente">{estadisticas?.maxima || "0.0"}</td>
-                <td className="promedio-bajo">{estadisticas?.minima || "0.0"}</td>
+                <td className={getClasePromedio(estadisticas?.promedio)}>
+                  {estadisticas?.promedio || "0.00"}
+                </td>
+                <td className="promedio-excelente">
+                  {estadisticas?.maxima || "0.0"}
+                </td>
+                <td className="promedio-bajo">
+                  {estadisticas?.minima || "0.0"}
+                </td>
                 <td>{estadisticas?.total || "0"}</td>
               </tr>
             </tbody>
@@ -167,12 +220,10 @@ const ModalCalificaciones = ({ isOpen, onClose, modalData }) => {
           <div className="rendimiento-item rendimiento-reprobadas">
             <strong>Reprobadas:</strong> {estadisticas?.reprobadas || "0"}
           </div>
-        </div>        
+        </div>
 
         {/* Pie de página */}
-        <div className="pie-pagina">
-          {obtenerFechaActual()}
-        </div>
+        <div className="pie-pagina">{obtenerFechaActual()}</div>
 
         <div className="footer-info">
           <span>Colegio STEM 360</span>
@@ -181,25 +232,27 @@ const ModalCalificaciones = ({ isOpen, onClose, modalData }) => {
 
         {/* Botones de acción */}
         <div className="modal-actions">
-          <button 
+          <button
             onClick={() => alert("Enviar por Email (no implementado)")}
             className="modal-btn modal-btn-email"
           >
-            <span className="material-symbols-outlined">email</span> Enviar por Email
+            <span className="material-symbols-outlined">email</span> Enviar por
+            Email
           </button>
 
-          <button 
+          <button
             onClick={() => window.print()}
             className="modal-btn modal-btn-print"
           >
             <span className="material-symbols-outlined">print</span> Imprimir
           </button>
 
-          <button 
-            onClick={() => alert("Descargar PDF (no implementado)")}
+          <button
+            onClick={handleDownloadPDF}
             className="modal-btn modal-btn-download"
           >
-            <span className="material-symbols-outlined">download</span> Descargar PDF
+            <span className="material-symbols-outlined">download</span>{" "}
+            Descargar PDF
           </button>
         </div>
       </div>
