@@ -8,6 +8,7 @@ import NavbarDocente from "../../../components/layout/Navbar/NavbarDocente";
 import SelectField from "../../../components/ui/SelectField";
 import ActionButtons from "../../../components/ui/Botones";
 import ReporteCard from "../../../components/ui/ReporteCard";
+import ModalCalificaciones from "../../../components/ui/ModalCalificaciones";
 
 const Reportes = () => {
   const {
@@ -81,7 +82,9 @@ const Reportes = () => {
 
     const cargar = async () => {
       try {
-        const url = new URL(`http://localhost:8000/api/estudiantes-por-grado/${grupo}`);
+        const url = new URL(
+          `http://localhost:8000/api/estudiantes-por-grado/${grupo}`
+        );
         const asignaturaActual = watch("asignatura") || "matematicas";
         const periodoActual = watch("periodo") || "1";
         url.searchParams.append("asignatura", asignaturaActual);
@@ -181,7 +184,9 @@ const Reportes = () => {
   const handleDelete = () => {
     const data = watch();
     const { grupo, estudiante, asignatura, periodo } = data;
-    const todosVacios = [grupo, estudiante, asignatura, periodo].every((val) => val === "");
+    const todosVacios = [grupo, estudiante, asignatura, periodo].every(
+      (val) => val === ""
+    );
     if (todosVacios) return;
 
     setLoading((prev) => ({ ...prev, borrar: true }));
@@ -196,7 +201,12 @@ const Reportes = () => {
   };
 
   const handleCalificacionesClick = async () => {
-    const isValid = await trigger(["grupo", "estudiante", "asignatura", "periodo"]);
+    const isValid = await trigger([
+      "grupo",
+      "estudiante",
+      "asignatura",
+      "periodo",
+    ]);
     if (!isValid) return;
 
     const data = watch();
@@ -212,27 +222,39 @@ const Reportes = () => {
     setModalOpen(true);
 
     try {
-      const url = new URL(`http://localhost:8000/api/estudiantes-por-grado/${grupo}`);
+      const url = new URL(
+        `http://localhost:8000/api/estudiantes-por-grado/${grupo}`
+      );
       url.searchParams.append("asignatura", asignaturaNormalizada); // ← valor normalizado
       url.searchParams.append("periodo", periodo);
 
       const res = await fetch(url.toString());
       const estudiantesData = await res.json();
 
-      const estudianteSeleccionado = estudiantesData.find(e => String(e.id) === estudiante);
+      const estudianteSeleccionado = estudiantesData.find(
+        (e) => String(e.id) === estudiante
+      );
 
       if (estudianteSeleccionado) {
-        const resEstudiante = await fetch(`http://localhost:8000/api/estudiante/${estudiante}`);
+        const resEstudiante = await fetch(
+          `http://localhost:8000/api/estudiante/${estudiante}`
+        );
         const datosEstudiante = await resEstudiante.json();
 
-        const grupoSeleccionado = selectOptions.grupos.find(g => g.value === grupo);
-        const periodoSeleccionado = selectOptions.periodos.find(p => p.value === periodo);
+        const grupoSeleccionado = selectOptions.grupos.find(
+          (g) => g.value === grupo
+        );
+        const periodoSeleccionado = selectOptions.periodos.find(
+          (p) => p.value === periodo
+        );
 
         setModalData({
           nombre: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
           documento: datosEstudiante.numero_documento || "N/A",
           grado: grupoSeleccionado?.label || "N/A",
-          asignatura: selectOptions.asignaturas.find(a => a.value === asignatura)?.label || asignatura,
+          asignatura:
+            selectOptions.asignaturas.find((a) => a.value === asignatura)
+              ?.label || asignatura,
           periodo: periodoSeleccionado?.label || "N/A",
           notas: estudianteSeleccionado.notas || [],
         });
@@ -243,6 +265,11 @@ const Reportes = () => {
       console.error("Error al cargar datos:", e);
       alert("Error al cargar los datos del estudiante.");
     }
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setModalData(null);
   };
 
   return (
@@ -354,71 +381,11 @@ const Reportes = () => {
       </div>
 
       {/* MODAL DE CALIFICACIONES */}
-      {modalOpen && (
-        <div
-          className="modal-overlay"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-          onClick={() => setModalOpen(false)}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "24px",
-              borderRadius: "8px",
-              maxWidth: "500px",
-              width: "90%",
-              maxHeight: "80vh",
-              overflowY: "auto",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <h3 style={{ margin: 0 }}>Detalles de Calificación</h3>
-              <button
-                onClick={() => setModalOpen(false)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: "24px",
-                  cursor: "pointer",
-                }}
-              >
-                &times;
-              </button>
-            </div>
-
-            {modalData ? (
-              <div>
-                <p><strong>Nombre:</strong> {modalData.nombre}</p>
-                <p><strong>Documento:</strong> {modalData.documento}</p>
-                <p><strong>Grado:</strong> {modalData.grado}</p>
-                <p><strong>Asignatura:</strong> {modalData.asignatura}</p>
-                <p><strong>Periodo:</strong> {modalData.periodo}</p>
-                <div><strong>Notas:</strong></div>
-                <ul>
-                  {modalData.notas
-                    .map((nota, i) => (nota !== "" ? <li key={i}>Nota {i + 1}: {nota}</li> : null))
-                    .filter(Boolean)}
-                </ul>
-                {modalData.notas.every(nota => nota === "") && <p>Sin calificaciones registradas.</p>}
-              </div>
-            ) : (
-              <p>No hay datos disponibles.</p>
-            )}
-          </div>
-        </div>
-      )}
+      <ModalCalificaciones
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        modalData={modalData}
+      />
     </div>
   );
 };
