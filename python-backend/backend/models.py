@@ -9,8 +9,6 @@ from .database import Base
 from datetime import date, datetime, timezone
 
 
-
-
 class Role(Base):
     __tablename__ = "roles"
 
@@ -170,8 +168,11 @@ class Grado(Base):
 
 class Asignatura(Base):
     __tablename__ = "asignaturas"
+
     subject_id: Mapped[int] = mapped_column("subject_id", primary_key=True)
     name: Mapped[str] = mapped_column("name", String(100), nullable=False)
+    area: Mapped[str] = mapped_column("area", String(100), nullable=True)          
+    hours_per_week: Mapped[int] = mapped_column("hours_per_week", Integer, nullable=True) 
 
 class Periodo(Base):
     __tablename__ = "periodos"

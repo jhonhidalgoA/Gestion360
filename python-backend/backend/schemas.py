@@ -207,3 +207,35 @@ class TareaEstudianteCreate(BaseModel):
 
 class TareaConEstudiantesCreate(TareaBase):
     estudiantes: List[int]    
+    
+
+class AsignaturaBoletin(BaseModel):
+    nombre_asignatura: str
+    area: str
+    hours_per_week: int
+    nota_promedio: float | None = None
+    estado: str  # Ej: "✓ Aprobado", "✗ Reprobado", "Pendiente"
+    fallas: int
+
+    class Config:
+        from_attributes = True  # Reemplaza orm_mode (Pydantic v2)
+
+
+# --- MODELO: Estudiante en boletín ---
+class EstudianteBoletin(BaseModel):
+    nombre: str
+    documento: str
+    grado: str
+    periodo: str
+
+    class Config:
+        from_attributes = True
+
+
+# --- MODELO: Respuesta completa del boletín ---
+class BoletinCompletoResponse(BaseModel):
+    estudiante: EstudianteBoletin
+    asignaturas: list[AsignaturaBoletin]
+
+    class Config:
+        from_attributes = True    

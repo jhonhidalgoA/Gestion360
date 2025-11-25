@@ -14,11 +14,12 @@ from datetime import datetime
 from fastapi.responses import StreamingResponse
 from fastapi import Body, HTTPException
 from io import BytesIO
+from backend.schemas import BoletinCompletoResponse
 
 
 router = APIRouter(prefix="/api", tags=["docente"])
 
-@router.get("/grados")
+@router.get("/grados", summary="Obtener lista de grados")
 def get_grados(db: Session = Depends(get_db)):
     try:
         grados = db.execute(select(Grado).order_by(Grado.id)).scalars().all()
@@ -26,7 +27,7 @@ def get_grados(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/asignaturas")
+@router.get("/asignaturas", summary="Obtener lista de asignaturas")
 def get_asignaturas(db: Session = Depends(get_db)):
     try:
         asignaturas = db.execute(select(Asignatura).order_by(Asignatura.name)).scalars().all()
@@ -34,7 +35,7 @@ def get_asignaturas(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/periodos")
+@router.get("/periodos", summary="Obtener lista de periodos")
 def get_periodos(db: Session = Depends(get_db)):
     try:
         periodos = db.execute(select(Periodo).order_by(Periodo.id)).scalars().all()
@@ -649,4 +650,95 @@ def generar_pdf_calificaciones(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")
-    
+
+
+@router.get("/boletin-completo/{estudiante_id}/{periodo_id}",response_model=BoletinCompletoResponse)
+def get_boletin_completo(
+    estudiante_id: int,
+    periodo_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        # Obtener estudiante
+        estudiante = db.get(Estudiante, estudiante_id)
+        if not estudiante:
+            raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+
+        # Obtener grado
+        grado = db.get(Grado, estudiante.grado_id)
+        if not grado:
+            raise HTTPException(status_code=404, detail="Grado no encontrado")
+
+        # Obtener periodo
+        periodo = db.get(Periodo, periodo_id)
+        if not periodo:
+            raise HTTPException(status_code=404, detail="Periodo no encontrado")
+
+        # Obtener todas las asignaturas, excluyendo Descanso y Almuerzo
+        asignaturas = db.execute(
+            select(Asignatura).where(
+                Asignatura.area != "Descanso",
+                Asignatura.area != "Almuerzo"
+            )
+        ).scalars().all()
+
+        asignaturas_boletin = []
+        for asig in asignaturas:
+            # Obtener calificaciones del estudiante en esta asignatura y periodo
+            calificaciones = db.execute(
+                select(Calificacion)
+                .where(
+                    Calificacion.estudiante_id == estudiante_id,
+                    Calificacion.asignatura == asig.name,
+                    Calificacion.periodo == periodo_id
+                )
+            ).scalars().all()
+
+            # Calcular promedio
+            notas_validas = [c.nota for c in calificaciones if c.nota is not None]
+            nota_promedio = sum(notas_validas) / len(notas_validas) if notas_validas else None
+
+            # Determinar estado
+            estado = "Pendiente"
+            if nota_promedio is not None:
+                if nota_promedio >= 3.0:
+                    estado = "✓ Aprobado"
+                else:
+                    estado = "✗ Reprobado"
+
+            # Contar fallas (ausencias) en asistencia para esta asignatura
+            fallas = 0
+            asistencias = db.execute(
+                select(Asistencia)
+                .where(
+                    Asistencia.estudiante_id == estudiante_id,
+                    Asistencia.asignatura == asig.name,
+                    Asistencia.periodo_id == periodo_id
+                )
+            ).scalars().all()
+
+            for asist in asistencias:
+                if asist.estado == "A":  # A = Ausente
+                    fallas += 1
+
+            asignaturas_boletin.append({
+                "nombre_asignatura": asig.name, 
+                "area": asig.area,               
+                "hours_per_week": asig.hours_per_week,
+                "nota_promedio": nota_promedio,
+                "estado": estado,
+                "fallas": fallas
+            })
+
+        return {
+            "estudiante": {
+                "nombre": f"{estudiante.apellidos} {estudiante.nombres}",
+                "documento": estudiante.numero_documento or "N/A",
+                "grado": grado.nombre,
+                "periodo": periodo.nombre
+            },
+            "asignaturas": asignaturas_boletin
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al generar boletín: {str(e)}")

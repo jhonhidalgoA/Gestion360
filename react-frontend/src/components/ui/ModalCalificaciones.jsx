@@ -237,12 +237,7 @@ const ModalCalificaciones = ({ isOpen, onClose, modalData }) => {
           >
             <span className="material-symbols-outlined">email</span> Enviar por Email
           </button>
-          <button
-            onClick={() => window.print()}
-            className="modal-btn modal-btn-print"
-          >
-            <span className="material-symbols-outlined">print</span> Imprimir
-          </button>
+          
           <button
             onClick={handleDownloadPDF}
             className="modal-btn modal-btn-download"
