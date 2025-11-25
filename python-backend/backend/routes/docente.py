@@ -345,18 +345,22 @@ def generar_calificaciones_pdf_en_memoria(buffer, datos_estudiante, notas, asign
     grado = datos_estudiante["grado"]
     documento = datos_estudiante.get("documento", "N/A")
 
-    # Procesar notas
-    filas_notas = ""
-    notas_validas = []
+    # Filtrar solo las notas con valor real, manteniendo el número de columna
+    notas_con_indice = []
     for i, nota in enumerate(notas):
-        num = i + 1
-        if nota == "" or nota is None:
-            estado = "Pendiente"
-            nota_mostrar = "—"
-            color = "#95a5a6"
-        else:
+        if nota != "" and nota is not None:
             try:
-                n = float(nota)
+                float(nota)  # validar que sea numérico
+                notas_con_indice.append((i + 1, nota))
+            except ValueError:
+                continue  # ignorar valores no numéricos
+
+    if notas_con_indice:
+        filas_notas = ""
+        notas_validas = []
+        for num, nota_str in notas_con_indice:
+            try:
+                n = float(nota_str)
                 notas_validas.append(n)
                 if n >= 4.5:
                     estado = "✓ Aprobado"
@@ -376,14 +380,23 @@ def generar_calificaciones_pdf_en_memoria(buffer, datos_estudiante, notas, asign
                 color = "#95a5a6"
                 nota_mostrar = "—"
 
-        filas_notas += f"""
+            filas_notas += f"""
+            <tr>
+                <td><strong>{num}</strong></td>
+                <td>Nota {num}</td>
+                <td style="color: {color}; font-weight: bold;">{nota_mostrar}</td>
+                <td style="color: {color}; font-weight: bold;">{estado}</td>
+            </tr>
+            """
+    else:
+        filas_notas = """
         <tr>
-            <td><strong>{num}</strong></td>
-            <td>Nota {num}</td>
-            <td style="color: {color}; font-weight: bold;">{nota_mostrar}</td>
-            <td style="color: {color}; font-weight: bold;">{estado}</td>
+            <td colspan="4" style="text-align: center; padding: 20px; color: #7f8c8d;">
+                No hay calificaciones registradas para este estudiante.
+            </td>
         </tr>
         """
+        notas_validas = []
 
     # Estadísticas
     promedio = round(sum(notas_validas) / len(notas_validas), 2) if notas_validas else 0
@@ -407,19 +420,18 @@ def generar_calificaciones_pdf_en_memoria(buffer, datos_estudiante, notas, asign
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 12pt;
                 color: #000;
-                margin: 0;
-                padding: 20pt;
+                margin: -25pt;                
                 background: white;
             }}
             .header {{
                 text-align: center;
-                margin-bottom: 20pt;
+                margin-bottom: 10pt;
             }}
             .titulo-principal {{
                 font-size: 18pt;
                 font-weight: bold;
                 color: #2C3E50;
-                margin-bottom: 6pt;
+                margin-bottom: 2pt;
             }}
             .subtitulo {{
                 font-size: 14pt;
@@ -601,11 +613,12 @@ def generar_pdf_calificaciones(
         if not estudiante or not grado:
             raise HTTPException(status_code=404, detail="Estudiante o grado no encontrado")
 
+        # Buscar calificaciones usando el nombre exacto de la asignatura (sin normalizar)
         calificaciones = db.execute(
             select(Calificacion)
             .where(
                 Calificacion.estudiante_id == estudiante_id,
-                Calificacion.asignatura == asignatura,
+                Calificacion.asignatura.ilike(asignatura),
                 Calificacion.periodo == periodo
             )
         ).scalars().all()
@@ -635,5 +648,5 @@ def generar_pdf_calificaciones(
         )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")    
+        raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")
     
