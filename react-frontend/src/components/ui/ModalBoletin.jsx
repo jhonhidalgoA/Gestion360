@@ -21,6 +21,9 @@ const ModalBoletin = ({ isOpen, onClose, boletinData }) => {
               <strong>Estudiante:</strong> {boletinData.nombre}
             </p>
             <p>
+              <strong>Documento:</strong> {boletinData.documento}
+            </p>
+            <p>
               <strong>Grado:</strong> {boletinData.grado}
             </p>
             <p>
@@ -30,7 +33,7 @@ const ModalBoletin = ({ isOpen, onClose, boletinData }) => {
             <table className="boletin-table">
               <thead>
                 <tr>
-                  <th>Área</th>
+                  <th>Asignatura</th>
                   <th>I.H</th>
                   <th>Nota</th>
                   <th>Estado</th>
@@ -38,30 +41,61 @@ const ModalBoletin = ({ isOpen, onClose, boletinData }) => {
                 </tr>
               </thead>
               <tbody>
-                {boletinData.asignaturas.length > 0 ? (
-                  boletinData.asignaturas.map((asig, index) => (
-                    <tr key={index}>
-                      <td>{asig.area || "N/A"}</td>
-                      <td>{asig.hours_per_week || "0"}</td>
-                      <td>
-                        {asig.nota_promedio !== undefined
-                          ? asig.nota_promedio.toFixed(2)
-                          : "—"}
-                      </td>
-                      <td>{asig.estado || "Pendiente"}</td>
-                      <td>{asig.fallas || "0"}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan="5"
-                      style={{ textAlign: "center", color: "#7f8c8d" }}
-                    >
-                      No hay asignaturas registradas.
-                    </td>
-                  </tr>
-                )}
+                {(() => {
+                  // Agrupar asignaturas por área
+                  const grupos = {};
+                  boletinData.asignaturas.forEach((asig) => {
+                    if (!grupos[asig.area]) {
+                      grupos[asig.area] = [];
+                    }
+                    grupos[asig.area].push(asig);
+                  });
+
+                  // Crear filas
+                  const filas = [];
+
+                  // Iterar sobre las áreas
+                  Object.keys(grupos).forEach((area) => {
+                    // Fila de encabezado de área (solo una vez por área)
+                    filas.push(
+                      <tr key={`area-${area}`} className="area-header">
+                        <td
+                          colSpan="6"
+                          style={{
+                            backgroundColor: "#d0e7ff",
+                            fontWeight: "bold",
+                            textAlign: "left",
+                            padding: "8px",
+                          }}
+                        >
+                          {area.toUpperCase()}
+                        </td>
+                      </tr>
+                    );
+
+                    // Filas de asignaturas dentro de esta área
+                    grupos[area].forEach((asig, index) => {
+                      filas.push(
+                        <tr key={`asig-${asig.nombre_asignatura}-${index}`}>
+                          <td>
+                            <strong>{asig.nombre_asignatura || "N/A"}</strong>
+                          </td>
+
+                          <td>{asig.hours_per_week || "0"}</td>
+                          <td>
+                            {typeof asig.nota_promedio === "number"
+                              ? asig.nota_promedio.toFixed(2)
+                              : "—"}
+                          </td>
+                          <td>{asig.estado || "Pendiente"}</td>
+                          <td>{asig.fallas || "0"}</td>
+                        </tr>
+                      );
+                    });
+                  });
+
+                  return filas;
+                })()}
               </tbody>
             </table>
 

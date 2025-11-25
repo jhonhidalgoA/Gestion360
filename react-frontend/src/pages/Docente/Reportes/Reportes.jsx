@@ -294,6 +294,7 @@ const Reportes = () => {
       alert("Error al cargar los datos del estudiante.");
     }
   };
+
   const cargarBoletinCompleto = async (estudianteId, periodoId) => {
     try {
       const res = await fetch(
@@ -312,73 +313,77 @@ const Reportes = () => {
   };
 
   const handleBoletinClick = async () => {
-    const isValid = await trigger([
-      "grupo",
-      "estudiante",
-      "asignatura",
-      "periodo",
-    ]);
-    if (!isValid) return;
+  const isValid = await trigger([
+    "grupo",
+    "estudiante",
+    "asignatura",
+    "periodo",
+  ]);
+  if (!isValid) return;
 
-    const data = watch();
-    const { grupo, estudiante, periodo } = data;
+  const data = watch();
+  const { grupo, estudiante, periodo } = data;
 
-    setBoletinOpen(true);
+  setBoletinOpen(true);
 
-    try {
-      const url = new URL(
-        `http://localhost:8000/api/estudiantes-por-grado/${grupo}`
-      );
-      url.searchParams.append("periodo", periodo);
-
-      const res = await fetch(url.toString());
-      const estudiantesData = await res.json();
-
-      const estudianteSeleccionado = estudiantesData.find(
-        (e) => String(e.id) === estudiante
-      );
-
-      if (estudianteSeleccionado) {
-        const resEstudiante = await fetch(
-          `http://localhost:8000/api/estudiante/${estudiante}`
-        );
-        const datosEstudiante = await resEstudiante.json();
-
-        const grupoSeleccionado = selectOptions.grupos.find(
-          (g) => g.value === grupo
-        );
-        const periodoSeleccionado = selectOptions.periodos.find(
-          (p) => p.value === periodo
-        );
-
-        const boletin = await cargarBoletinCompleto(
-          parseInt(estudiante),
-          parseInt(periodo)
-        );
-
-        if (!boletin) {
-          setBoletinOpen(false);
-          return;
-        }
-
-        setBoletinData({
-          nombre: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
-          documento: datosEstudiante.numero_documento || "N/A",
-          grado: grupoSeleccionado?.label || "N/A",
-          periodo: periodoSeleccionado?.label || "N/A",
-          estudianteId: parseInt(estudiante),
-          grupoId: parseInt(grupo),
-          periodoId: parseInt(periodo),
-          asignaturas: boletin.asignaturas || [],
-        });
-      } else {
-        alert("No se encontraron datos para este estudiante.");
-      }
-    } catch (e) {
-      console.error("Error al cargar datos:", e);
-      alert("Error al cargar los datos del estudiante.");
+  try {
+    // ✅ Usamos el nuevo endpoint simple que solo necesita el grupo
+    const res = await fetch(`http://localhost:8000/api/estudiantes-por-grado-simple/${grupo}`);
+    if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+    
+    const estudiantesData = await res.json();
+    if (!Array.isArray(estudiantesData)) {
+      throw new Error("Formato de respuesta inválido: se esperaba un array.");
     }
-  };
+
+    const estudianteSeleccionado = estudiantesData.find(
+      (e) => String(e.id) === estudiante
+    );
+
+    if (!estudianteSeleccionado) {
+      alert("No se encontraron datos para este estudiante.");
+      return;
+    }
+
+    // El resto de la lógica permanece igual
+    const resEstudiante = await fetch(
+      `http://localhost:8000/api/estudiante/${estudiante}`
+    );
+    const datosEstudiante = await resEstudiante.json();
+
+    const grupoSeleccionado = selectOptions.grupos.find(
+      (g) => g.value === grupo
+    );
+    const periodoSeleccionado = selectOptions.periodos.find(
+      (p) => p.value === periodo
+    );
+
+    const boletin = await cargarBoletinCompleto(
+      parseInt(estudiante),
+      parseInt(periodo)
+    );
+
+    if (!boletin) {
+      setBoletinOpen(false);
+      return;
+    }
+
+    setBoletinData({
+      nombre: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
+      documento: datosEstudiante.numero_documento || "N/A",
+      grado: grupoSeleccionado?.label || "N/A",
+      periodo: periodoSeleccionado?.label || "N/A",
+      estudianteId: parseInt(estudiante),
+      grupoId: parseInt(grupo),
+      periodoId: parseInt(periodo),
+      asignaturas: boletin.asignaturas || [],
+    });
+  } catch (e) {
+    console.error("Error al cargar datos:", e);
+    alert("Error al cargar los datos del estudiante: " + e.message);
+    setBoletinOpen(false);
+  }
+};
 
   const handleCloseBoletin = () => {
     setBoletinOpen(false);

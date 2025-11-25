@@ -45,13 +45,14 @@ def get_periodos(db: Session = Depends(get_db)):
 
 
 def normalizar_asignatura(nombre: str) -> str:
-    """Convierte 'Biología' → 'biologia', 'Cátedra de Paz' → 'catedra_de_paz'"""
     return (
         unicodedata.normalize('NFD', nombre)
         .encode('ascii', 'ignore')
         .decode('utf-8')
         .lower()
         .replace(' ', '_')
+        .replace('-', '_')  # 👈 Agregamos esto para manejar "C. Sociales" -> "c._sociales"
+        .rstrip('_')       # Elimina guiones bajos al final
     )
 
 @router.get("/estudiantes-por-grado/{grado_id}")
@@ -651,8 +652,7 @@ def generar_pdf_calificaciones(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")
 
-
-@router.get("/boletin-completo/{estudiante_id}/{periodo_id}",response_model=BoletinCompletoResponse)
+@router.get("/boletin-completo/{estudiante_id}/{periodo_id}", response_model=BoletinCompletoResponse)
 def get_boletin_completo(
     estudiante_id: int,
     periodo_id: int,
@@ -684,27 +684,35 @@ def get_boletin_completo(
 
         asignaturas_boletin = []
         for asig in asignaturas:
-            # Obtener calificaciones del estudiante en esta asignatura y periodo
+            # Normalizar el nombre de la asignatura para la búsqueda
+            nombre_asig_normalizado = normalizar_asignatura(asig.name)
+
+            # Obtener calificaciones del estudiante en este periodo (sin filtrar por asignatura aún)
             calificaciones = db.execute(
                 select(Calificacion)
                 .where(
                     Calificacion.estudiante_id == estudiante_id,
-                    Calificacion.asignatura == asig.name,
                     Calificacion.periodo == periodo_id
                 )
             ).scalars().all()
 
+            # Filtrar calificaciones en Python usando la normalización
+            calificaciones_filtradas = [
+                c for c in calificaciones
+                if normalizar_asignatura(c.asignatura) == nombre_asig_normalizado
+            ]
+
             # Calcular promedio
-            notas_validas = [c.nota for c in calificaciones if c.nota is not None]
+            notas_validas = [c.nota for c in calificaciones_filtradas if c.nota is not None]
             nota_promedio = sum(notas_validas) / len(notas_validas) if notas_validas else None
 
             # Determinar estado
             estado = "Pendiente"
             if nota_promedio is not None:
                 if nota_promedio >= 3.0:
-                    estado = "✓ Aprobado"
+                    estado = "Aprobado"
                 else:
-                    estado = "✗ Reprobado"
+                    estado = "Reprobado"
 
             # Contar fallas (ausencias) en asistencia para esta asignatura
             fallas = 0
@@ -712,12 +720,17 @@ def get_boletin_completo(
                 select(Asistencia)
                 .where(
                     Asistencia.estudiante_id == estudiante_id,
-                    Asistencia.asignatura == asig.name,
                     Asistencia.periodo_id == periodo_id
                 )
             ).scalars().all()
 
-            for asist in asistencias:
+            # Filtrar asistencias en Python usando la normalización
+            asistencias_filtradas = [
+                a for a in asistencias
+                if normalizar_asignatura(a.asignatura) == nombre_asig_normalizado
+            ]
+
+            for asist in asistencias_filtradas:
                 if asist.estado == "A":  # A = Ausente
                     fallas += 1
 
@@ -742,3 +755,24 @@ def get_boletin_completo(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al generar boletín: {str(e)}")
+
+    
+@router.get("/estudiantes-por-grado-simple/{grado_id}")
+def get_estudiantes_por_grado_simple(grado_id: int, db: Session = Depends(get_db)):
+    try:
+        estudiantes = db.execute(
+            select(Estudiante)
+            .where(Estudiante.grado_id == grado_id)
+            .order_by(Estudiante.apellidos, Estudiante.nombres)
+        ).scalars().all()
+
+        return [
+            {
+                "id": est.id,
+                "nombres": est.nombres,
+                "apellidos": est.apellidos,
+            }
+            for est in estudiantes
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))    
