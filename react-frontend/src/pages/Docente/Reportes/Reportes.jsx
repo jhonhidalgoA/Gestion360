@@ -25,6 +25,7 @@ const Reportes = () => {
       asignatura: "",
       periodo: "",
     },
+    mode: "onChange", // ← ¡CORRECCIÓN PRINCIPAL!
   });
 
   const [selectOptions, setSelectOptions] = useState({
@@ -76,7 +77,7 @@ const Reportes = () => {
         ...prev,
         estudiantes: [{ value: "", label: "Seleccionar Grupo" }],
       }));
-      setValue("estudiante", "");
+      setValue("estudiante", ""); // ← Sin shouldValidate
       return;
     }
 
@@ -103,6 +104,8 @@ const Reportes = () => {
             })),
           ],
         }));
+
+        setValue("estudiante", ""); // ← Sin shouldValidate
       } catch (error) {
         console.error("Error cargando estudiantes:", error);
       }
@@ -117,7 +120,7 @@ const Reportes = () => {
         ...prev,
         asignaturas: [{ value: "", label: "Seleccionar" }],
       }));
-      setValue("asignatura", "");
+      setValue("asignatura", ""); // ← Sin shouldValidate
       return;
     }
 
@@ -154,7 +157,7 @@ const Reportes = () => {
         ...prev,
         periodos: [{ value: "", label: "Seleccionar" }],
       }));
-      setValue("periodo", "");
+      setValue("periodo", ""); // ← Sin shouldValidate
       return;
     }
 
@@ -201,74 +204,91 @@ const Reportes = () => {
   };
 
   const handleCalificacionesClick = async () => {
-    const isValid = await trigger([
-      "grupo",
-      "estudiante",
-      "asignatura",
-      "periodo",
-    ]);
-    if (!isValid) return;
+  const isValid = await trigger([
+    "grupo",
+    "estudiante",
+    "asignatura",
+    "periodo",
+  ]);
+  if (!isValid) return;
 
-    const data = watch();
-    const { grupo, estudiante, asignatura, periodo } = data;
+  const data = watch();
+  const { grupo, estudiante, asignatura, periodo } = data;
 
-    // Normalizar SOLO para la petición al backend
-    const asignaturaNormalizada = asignatura
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // quita tildes
-      .replace(/\s+/g, "_"); // espacios → _
+  const asignaturaNormalizada = asignatura
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "_");
 
-    setModalOpen(true);
+  setModalOpen(true);
 
-    try {
-      const url = new URL(
-        `http://localhost:8000/api/estudiantes-por-grado/${grupo}`
+  try {
+    const url = new URL(
+      `http://localhost:8000/api/estudiantes-por-grado/${grupo}`
+    );
+    url.searchParams.append("asignatura", asignaturaNormalizada);
+    url.searchParams.append("periodo", periodo);
+
+    const res = await fetch(url.toString());
+    const estudiantesData = await res.json();
+
+    const estudianteSeleccionado = estudiantesData.find(
+      (e) => String(e.id) === estudiante
+    );
+
+    if (estudianteSeleccionado) {
+      const resEstudiante = await fetch(
+        `http://localhost:8000/api/estudiante/${estudiante}`
       );
-      url.searchParams.append("asignatura", asignaturaNormalizada); // ← valor normalizado
-      url.searchParams.append("periodo", periodo);
+      const datosEstudiante = await resEstudiante.json();
 
-      const res = await fetch(url.toString());
-      const estudiantesData = await res.json();
-
-      const estudianteSeleccionado = estudiantesData.find(
-        (e) => String(e.id) === estudiante
+      const grupoSeleccionado = selectOptions.grupos.find(
+        (g) => g.value === grupo
+      );
+      const periodoSeleccionado = selectOptions.periodos.find(
+        (p) => p.value === periodo
       );
 
-      if (estudianteSeleccionado) {
-        const resEstudiante = await fetch(
-          `http://localhost:8000/api/estudiante/${estudiante}`
-        );
-        const datosEstudiante = await resEstudiante.json();
+      // ⭐ Filtrar y convertir notas a número con validación robusta
+      const notasValidas = estudianteSeleccionado.notas
+        .map((nota, index) => {
+          const notaLimpia = String(nota).trim();
+          const numero = parseFloat(notaLimpia);
 
-        const grupoSeleccionado = selectOptions.grupos.find(
-          (g) => g.value === grupo
-        );
-        const periodoSeleccionado = selectOptions.periodos.find(
-          (p) => p.value === periodo
-        );
-        setModalData({
-          nombre: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
-          documento: datosEstudiante.numero_documento || "N/A",
-          grado: grupoSeleccionado?.label || "N/A",
-          asignatura:
-            selectOptions.asignaturas.find((a) => a.value === asignatura)
-              ?.label || asignatura,
-          periodo: periodoSeleccionado?.label || "N/A",
-          // ---- IDs necesarios para el PDF ----
-          estudianteId: parseInt(estudiante),
-          grupoId: parseInt(grupo),
-          periodoId: parseInt(periodo),
-          notas: estudianteSeleccionado.notas || [],
-        });
-      } else {
-        alert("No se encontraron datos para este estudiante.");
-      }
-    } catch (e) {
-      console.error("Error al cargar datos:", e);
-      alert("Error al cargar los datos del estudiante.");
+          if (!isNaN(numero) && isFinite(numero)) {
+            return {
+              nota: numero,
+              columna: index + 1,
+            };
+          }
+
+          return null; // Ignorar valores inválidos
+        })
+        .filter(Boolean); // Eliminar nulls
+
+      setModalData({
+        nombre: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
+        documento: datosEstudiante.numero_documento || "N/A",
+        grado: grupoSeleccionado?.label || "N/A",
+        asignatura:
+          selectOptions.asignaturas.find((a) => a.value === asignatura)
+            ?.label || asignatura,
+        periodo: periodoSeleccionado?.label || "N/A",
+        estudianteId: parseInt(estudiante),
+        grupoId: parseInt(grupo),
+        periodoId: parseInt(periodo),
+        notas: notasValidas,
+      });
+    console.log("Notas recibidas del backend:", estudianteSeleccionado.notas); 
+    } else {
+      alert("No se encontraron datos para este estudiante.");
     }
-  };
+  } catch (e) {
+    console.error("Error al cargar datos:", e);
+    alert("Error al cargar los datos del estudiante.");
+  }
+};
 
   const handleCloseModal = () => {
     setModalOpen(false);
