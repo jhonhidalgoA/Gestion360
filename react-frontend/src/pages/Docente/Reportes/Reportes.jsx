@@ -252,7 +252,6 @@ const Reportes = () => {
           (p) => p.value === periodo
         );
 
-        // ⭐ Filtrar y convertir notas a número con validación robusta
         const notasValidas = estudianteSeleccionado.notas
           .map((nota, index) => {
             const notaLimpia = String(nota).trim();
@@ -313,77 +312,100 @@ const Reportes = () => {
   };
 
   const handleBoletinClick = async () => {
-  const isValid = await trigger([
-    "grupo",
-    "estudiante",
-    "asignatura",
-    "periodo",
-  ]);
-  if (!isValid) return;
+    const isValid = await trigger([
+      "grupo",
+      "estudiante",
+      "asignatura",
+      "periodo",
+    ]);
+    if (!isValid) return;
 
-  const data = watch();
-  const { grupo, estudiante, periodo } = data;
+    const data = watch();
+    const { grupo, estudiante, periodo } = data;
 
-  setBoletinOpen(true);
+    setBoletinOpen(true);
 
-  try {
-    // ✅ Usamos el nuevo endpoint simple que solo necesita el grupo
-    const res = await fetch(`http://localhost:8000/api/estudiantes-por-grado-simple/${grupo}`);
-    if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-    
-    const estudiantesData = await res.json();
-    if (!Array.isArray(estudiantesData)) {
-      throw new Error("Formato de respuesta inválido: se esperaba un array.");
-    }
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/estudiantes-por-grado-simple/${grupo}`
+      );
+      if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
 
-    const estudianteSeleccionado = estudiantesData.find(
-      (e) => String(e.id) === estudiante
-    );
+      const estudiantesData = await res.json();
+      if (!Array.isArray(estudiantesData)) {
+        throw new Error("Formato de respuesta inválido: se esperaba un array.");
+      }
 
-    if (!estudianteSeleccionado) {
-      alert("No se encontraron datos para este estudiante.");
-      return;
-    }
+      const estudianteSeleccionado = estudiantesData.find(
+        (e) => String(e.id) === estudiante
+      );
 
-    // El resto de la lógica permanece igual
-    const resEstudiante = await fetch(
-      `http://localhost:8000/api/estudiante/${estudiante}`
-    );
-    const datosEstudiante = await resEstudiante.json();
+      if (!estudianteSeleccionado) {
+        alert("No se encontraron datos para este estudiante.");
+        return;
+      }
 
-    const grupoSeleccionado = selectOptions.grupos.find(
-      (g) => g.value === grupo
-    );
-    const periodoSeleccionado = selectOptions.periodos.find(
-      (p) => p.value === periodo
-    );
+      const resEstudiante = await fetch(
+        `http://localhost:8000/api/estudiante/${estudiante}`
+      );
+      const datosEstudiante = await resEstudiante.json();
 
-    const boletin = await cargarBoletinCompleto(
-      parseInt(estudiante),
-      parseInt(periodo)
-    );
+      const grupoSeleccionado = selectOptions.grupos.find(
+        (g) => g.value === grupo
+      );
+      const periodoSeleccionado = selectOptions.periodos.find(
+        (p) => p.value === periodo
+      );
 
-    if (!boletin) {
+      const boletin = await cargarBoletinCompleto(
+        parseInt(estudiante),
+        parseInt(periodo)
+      );
+
+      if (!boletin) {
+        setBoletinOpen(false);
+        return;
+      }
+
+      setBoletinData({
+        nombre: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
+        documento: datosEstudiante.numero_documento || "N/A",
+        grado: grupoSeleccionado?.label || "N/A",
+        periodo: periodoSeleccionado?.label || "N/A",
+        estudianteId: parseInt(estudiante),
+        grupoId: parseInt(grupo),
+        periodoId: parseInt(periodo),
+        asignaturas: boletin.asignaturas || [],
+      });
+    } catch (e) {
+      console.error("Error al cargar datos:", e);
+      alert("Error al cargar los datos del estudiante: " + e.message);
       setBoletinOpen(false);
-      return;
     }
+  };
 
-    setBoletinData({
-      nombre: `${estudianteSeleccionado.apellidos} ${estudianteSeleccionado.nombres}`,
-      documento: datosEstudiante.numero_documento || "N/A",
-      grado: grupoSeleccionado?.label || "N/A",
-      periodo: periodoSeleccionado?.label || "N/A",
-      estudianteId: parseInt(estudiante),
-      grupoId: parseInt(grupo),
-      periodoId: parseInt(periodo),
-      asignaturas: boletin.asignaturas || [],
-    });
-  } catch (e) {
-    console.error("Error al cargar datos:", e);
-    alert("Error al cargar los datos del estudiante: " + e.message);
-    setBoletinOpen(false);
-  }
-};
+  /* Generar certificado escolar PDF */
+
+  const handleCertificadoClick = async () => {
+    const isValid = await trigger([
+      "grupo",
+      "estudiante",
+      "asignatura",
+      "periodo",
+    ]);
+    if (!isValid) return;
+
+    const data = watch();
+    const { estudiante } = data;
+
+    try {
+      const url = `http://localhost:8000/api/pdf/certificado-escolar/${estudiante}`;
+      window.open(url, "_blank");
+    } catch (error) {
+      console.error("Error al generar el certificado:", error);
+      alert("No se pudo generar el certificado escolar.");
+    }
+  };
 
   const handleCloseBoletin = () => {
     setBoletinOpen(false);
@@ -469,7 +491,7 @@ const Reportes = () => {
               icon="assignment_turned_in"
               title="Certificado Escolar PDF"
               subtitle="Certificado escolar de estudio"
-              onClick={handleValidateOnly}
+              onClick={handleCertificadoClick}
               bgColor="#9333ea"
             />
             <ReporteCard

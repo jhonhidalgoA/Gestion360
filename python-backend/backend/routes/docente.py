@@ -10,11 +10,14 @@ from io import BytesIO
 import unicodedata
 from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante
 from weasyprint import HTML
-from datetime import datetime
+from datetime import datetime, date
 from fastapi.responses import StreamingResponse
 from fastapi import Body, HTTPException
 from io import BytesIO
 from backend.schemas import BoletinCompletoResponse
+import qrcode
+import base64
+
 
 
 router = APIRouter(prefix="/api", tags=["docente"])
@@ -51,8 +54,8 @@ def normalizar_asignatura(nombre: str) -> str:
         .decode('utf-8')
         .lower()
         .replace(' ', '_')
-        .replace('-', '_')  # 👈 Agregamos esto para manejar "C. Sociales" -> "c._sociales"
-        .rstrip('_')       # Elimina guiones bajos al final
+        .replace('-', '_')  
+        .rstrip('_')      
     )
 
 @router.get("/estudiantes-por-grado/{grado_id}")
@@ -338,9 +341,7 @@ def get_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))       
 
 
-# backend/pdf_calificaciones.py
-from weasyprint import HTML
-from datetime import datetime
+
 
 def generar_calificaciones_pdf_en_memoria(buffer, datos_estudiante, notas, asignatura, periodo):
     nombre = datos_estudiante["nombre_completo"]
@@ -483,6 +484,7 @@ def generar_calificaciones_pdf_en_memoria(buffer, datos_estudiante, notas, asign
                 color: white;
                 padding: 8pt;
                 font-weight: bold;
+                text-align: center;
             }}
             td {{
                 padding: 8pt;
@@ -775,19 +777,48 @@ def get_estudiantes_por_grado_simple(grado_id: int, db: Session = Depends(get_db
             for est in estudiantes
         ]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))    
+        raise HTTPException(status_code=500, detail=str(e))   
+
+# --- GENERAR BOLETÍN PDF --- #     
     
 def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
     
     estudiante = datos_boletin["estudiante"]
     asignaturas = datos_boletin["asignaturas"]
     
-    # Calcular el promedio general
+    # --- Cálculo del Promedio General ---
     notas_validas = [asig['nota_promedio'] for asig in asignaturas if asig['nota_promedio'] is not None]
     promedio_general = sum(notas_validas) / len(notas_validas) if notas_validas else 0.0
     promedio_str = f"{promedio_general:.2f}" if notas_validas else "—"
-    
-    # Agrupar asignaturas por área
+
+    # --- GENERAR CÓDIGO QR ---
+    qr_data = f"""
+    COLEGIO STEM 360
+    Estudiante: {estudiante['nombre']}
+    Documento: {estudiante['documento']}
+    Grado: {estudiante['grado']}
+    Periodo: {estudiante['periodo']}
+    Promedio General: {promedio_str}
+    Fecha: {datetime.now().strftime('%d/%m/%Y')}
+    """.strip()
+
+    # Crea y configura el código QR
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.ERROR_CORRECT_L,
+        box_size=8,  # Tamaño más grande para el PDF
+        border=4,
+    )
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    # Convierte la imagen del QR a base64
+    qr_buffer = BytesIO()
+    img.save(qr_buffer, "PNG")
+    qr_base64 = base64.b64encode(qr_buffer.getvalue()).decode("utf-8")
+
+    # --- Agrupar asignaturas por área ---
     grupos = {}
     for asig in asignaturas:
         area = asig["area"]
@@ -798,15 +829,13 @@ def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
     # Construir las filas de la tabla
     filas_html = ""
     for area, lista_asignaturas in grupos.items():
-        # Fila de encabezado de área
         filas_html += f"""
         <tr>
-            <td colspan="6" style="background-color: #d0e7ff; font-weight: bold; text-align: left; padding: 8pt;">
+            <td colspan="5" style="background-color: #d0e7ff; font-weight: bold; text-align: left; padding: 8pt;">
                 {area.upper()}
             </td>
         </tr>
         """
-        # Filas de asignaturas
         for asig in lista_asignaturas:
             nota_str = f"{asig['nota_promedio']:.2f}" if asig['nota_promedio'] is not None else "—"
             estado_color = "#27AE60" if asig['estado'] == "Aprobado" else "#E74C3C" if asig['estado'] == "Reprobado" else "#95a5a6"
@@ -816,7 +845,7 @@ def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
                 <td style="text-align: center; padding: 8pt;">{asig['hours_per_week']}</td>
                 <td style="text-align: center; padding: 8pt; color: {estado_color};">{nota_str}</td>
                 <td style="text-align: center; padding: 8pt; color: {estado_color};">
-                    {" " if asig['estado'] == 'Aprobado' else ' ' if asig['estado'] == 'Reprobado' else ''}{asig['estado']}
+                    {asig['estado']}
                 </td>
                 <td style="text-align: center; padding: 8pt;">{asig['fallas']}</td>
             </tr>
@@ -893,19 +922,27 @@ def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
                 border-collapse: collapse;
                 margin-bottom: 20pt;
                 margin-right: 20pt;
-                
             }}
             th {{
                 background: #34495E;
                 color: white;
                 padding: 8pt;
                 font-weight: bold;
+                text-align: center;
             }}
             td {{
                 padding: 8pt;
                 border: 0.5pt solid #ddd;
                 font-size: 9pt;
-            }}           
+            }}  
+            
+            .section-title-promedio{{
+                font-size: 10pt;
+                font-weight: normal;
+                color: #7f8c8d;
+                margin: 10pt 0 10pt 0;
+                text-align: center;
+            }}         
               
             .promedio-general-container {{
                 background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%);
@@ -942,6 +979,23 @@ def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
                 text-align: center;
                 color: #7f8c8d;
             }}
+            
+            /* Estilos para el contenedor del QR */
+            .qr-container {{
+                text-align: center;
+                margin: 30pt 0;
+            }}
+            .qr-container img {{
+                width: 150pt;
+                height: 150pt;
+            }}
+            .qr-container p {{
+                margin-top: 8pt;
+                font-size: 10pt;
+                color: #7f8c8d;
+                font-weight: 600;
+            }}
+            
             .pie-pagina {{
                 text-align: center;
                 font-style: italic;
@@ -960,6 +1014,20 @@ def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
                 padding-top: 10pt;
                 border-top: 0.5pt solid #ECF0F1;
             }}
+            .version-info {{
+                text-align: center;
+                font-size: 9pt;
+                color: #7f8c8d;
+                margin-top: 10pt;
+                padding-top: 10pt;
+                border-top: 0.5pt solid #ECF0F1;
+            }}
+            .version-info-software {{
+                text-align: center;
+                font-size: 9pt;
+                color: #7f8c8d;
+                 margin-top: 5pt;
+            }}    
         </style>
     </head>
     <body>
@@ -992,7 +1060,7 @@ def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
         <table>
             <thead>
                 <tr>
-                    <th>REPORTE DE ÁREAS</th>
+                    <th>ASIGNATURA</th>
                     <th>I.H.</th>
                     <th>NOTA</th>
                     <th>ESTADO</th>
@@ -1003,6 +1071,9 @@ def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
                 {filas_html}
             </tbody>
         </table>
+        <div class="section-title-promedio">
+            Escala de Calificación: 1.0 - 2.9 Reprobado | 3.0 - 4.0 Aprobado | 4.5 - 5.0 Excelente
+        </div>
         <div class="promedio-general-container">
             <div class="promedio-texto">
                 <div class="promedio-titulo">Promedio General</div>
@@ -1010,23 +1081,30 @@ def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
                 <div class="promedio-periodo">Periodo {estudiante['periodo'].replace('Periodo ', '')}</div>
             </div>           
         </div>
-        <div class="promedio-title">
-           <h4>Escala de Calificación: 1.0 - 2.9 Reprobado | 3.0 - 4.0 Aprobado | 4.5 - 5.0 Excelente</h4>
+        
+        <!-- Código QR grande y centrado -->
+        <div class="qr-container">
+            <img src="data:image/png;base64,{qr_base64}" alt="Código QR de verificación">
+            <p>Código de verificación - Gestión 360</p>
         </div>
 
-        <div class="pie-pagina">
-            Documento generado el {fecha_actual} a las {hora_actual}
+        <!-- Línea de generación automática y versión -->
+        <div class="version-info">
+            Documento generado automáticamente el: {fecha_actual} a las {hora_actual}            
         </div>
-
+        <div class="version-info-software">
+            Sistema de Gestión Administrativa y Procesos Académicos (SGAPA) - Versión 1.0
+        </div>
         <div class="footer-info">
             <span>Colegio STEM 360</span>
-            <span>Página 1 de 1</span>
+            <span>Página 2 de 2</span>
         </div>
     </body>
     </html>
     """
 
-    HTML(string=html_content).write_pdf(buffer)  
+    HTML(string=html_content).write_pdf(buffer)    
+    
 
 @router.get("/pdf/boletin/{estudiante_id}/{periodo_id}")
 def generar_pdf_boletin(
@@ -1052,4 +1130,262 @@ def generar_pdf_boletin(
     except Exception as e:
         print(f"Error generando PDF del boletín: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al generar el PDF del boletín: {str(e)}")    
+    
+    
+# --- GENERAR CERTIFICADO ESCOLAR PDF --- #   
+def generar_certificado_escolar_pdf(buffer, estudiante, grado_nombre):
+    
+    nombre_completo = f"{estudiante.nombres} {estudiante.apellidos}"
+    documento = estudiante.numero_documento or "N/A"
+    tipo_documento = estudiante.tipo_documento or "TI y/o C.C"
+    
+    # --- Fecha ---
+    hoy = date.today()
+    dia = hoy.day
+    mes = hoy.strftime("%B")
+    año = hoy.year
+
+    meses = {
+        "January": "enero", "February": "febrero", "March": "marzo", "April": "abril",
+        "May": "mayo", "June": "junio", "July": "julio", "August": "agosto",
+        "September": "septiembre", "October": "octubre", "November": "noviembre", "December": "diciembre"
+    }
+    mes_es = meses.get(mes, mes).lower()
+    fecha_emision = hoy.strftime('%d/%m/%Y')
+
+  
+    qr_data = f"""COLEGIO STEM 360
+        Estudiante: {nombre_completo}
+        Documento: {documento}
+        Grado: {grado_nombre}
+        Fecha de emisión: {fecha_emision}
+        Tipo: Certificado de estudio""".strip()
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.ERROR_CORRECT_L,
+        box_size=8,
+        border=4,
+    )
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    qr_buffer = BytesIO()
+    img.save(qr_buffer, "PNG")
+    qr_base64 = base64.b64encode(qr_buffer.getvalue()).decode("utf-8")
+
+   
+    ahora = datetime.now()
+    fecha_hora_generacion = ahora.strftime("%d/%m/%Y a las %H:%M")
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{
+                font-family: 'Times New Roman', Times, serif;
+                font-size: 13pt;
+                color: #000;
+                text-align: center;
+                margin: 0.1cm;
+            }}
+            .titulo-principal {{
+                font-size: 16pt;
+                font-weight: bold;
+                color: #2C3E50;
+            }}
+            .subtitulo {{
+                font-size: 12pt;
+                font-weight: bold;
+                color: #3498DB;
+                margin-top: 15pt;
+            }}
+            .linea-decorativa {{
+                height: 2pt;
+                background: #3498DB;
+                width: 100%;
+                margin: 15pt auto 25pt auto;
+            }}
+            .certifica-texto {{
+                font-size: 12pt;
+                line-height: 1.7;
+                text-align: justify;
+                margin: 0 auto 10pt auto;
+                max-width: 1200pt;   
+            }}
+            .certifican {{
+                font-size: 12pt;
+                font-weight: bold;                
+                display: block;
+                text-align: center;
+                margin: 20pt 0;
+            }}
+            .firma-container {{
+                display: flex;
+                justify-content: center;
+                gap: 40pt;   
+                margin-top: 80pt;
+            }}
+            .firma-item {{
+                text-align: center;
+                width: 280pt;
+            }}
+            .firma-linea {{
+                border-top: 1pt solid #000;
+                margin-bottom: 5pt;
+            }}
+            .firma-titulo {{
+                font-weight: bold;
+                margin: 0;
+                font-size: 10pt;
+            }}
+            /* Estilos para el QR */
+            .qr-container {{
+                text-align: center;
+                margin: 40pt 0 20pt 0;
+            }}
+            .qr-container img {{
+                width: 140pt;
+                height: 140pt;
+            }}
+            .qr-container p {{
+                margin-top: 8pt;
+                font-size: 10pt;
+                color: #7f8c8d;
+                font-weight: 600;
+            }}
+             .version-info {{
+                text-align: center;
+                font-size: 9pt;
+                color: #7f8c8d;
+                margin-top: 10pt;
+                padding-top: 10pt;
+                border-top: 0.5pt solid #ECF0F1;
+            }}
+            .version-info-software {{
+                text-align: center;
+                font-size: 9pt;
+                color: #7f8c8d;
+                 margin-top: 5pt;
+            }}    
+            /* Firma digital a la izquierda */
+            .firma-digital {{
+                text-align: left;
+                font-size: 10pt;
+                color: #7f8c8d;
+                margin: 10pt 0 20pt 0;
+                font-style: italic;
+            }}
+             .footer-info {{
+                display: flex;
+                justify-content: space-between;
+                font-size: 9pt;
+                color: #7f8c8d;
+                margin-top: 10pt;
+                padding-top: 10pt;
+                border-top: 0.5pt solid #ECF0F1;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="titulo-principal">COLEGIO STEM 360</div>
+        <div class="subtitulo">CERTIFICADO DE ESTUDIO</div>
+        <div class="linea-decorativa"></div>
+
+        <p class="certifica-texto" style="text-align:center; font-weight:bold;">
+            LA SUSCRITA RECTORA Y LA SECRETARIA ACADÉMICA
+        </p>
+
+        <span class="certifican">CERTIFICAN</span>
+
+        <p class="certifica-texto">
+            Que el(la) estudiante <strong>{nombre_completo}</strong>, identificado(a)
+            con {tipo_documento} No <strong>{documento}</strong>, se encuentra
+            matriculado(a) y asistiendo a clases en esta Institución Educativa en el grado 
+            <strong>{grado_nombre}</strong>, jornada única en el año lectivo 
+            <strong>2025</strong> calendario A, con un horario de 
+            <strong>7:00 am a 2:00 pm</strong> de lunes a viernes, para un total de 
+            <strong>40 horas semanales</strong>.
+        </p>
+
+        <p class="certifica-texto">
+            Se expide a solicitud del interesado(a), a los <strong>{dia}</strong> días del mes de 
+            <strong>{mes_es}</strong> del <strong>{año}</strong>.
+        </p>
+
+        <div class="firma-container">
+            <div class="firma-item">
+                <div class="firma-linea"></div>
+                <p class="firma-titulo">RECTORA</p>
+            </div>
+            <div class="firma-item">
+                <div class="firma-linea"></div>
+                <p class="firma-titulo">SECRETARIA ACADÉMICA</p>
+            </div> 
+        </div>
+
+        <!-- Firma digital a la izquierda -->
+        <div class="firma-digital">
+            Firma digital Autorizada
+        </div>
+
+        <!-- Código QR de verificación -->
+        <div class="qr-container">
+            <img src="data:image/png;base64,{qr_base64}" alt="Código QR de verificación">
+            <p>Código de verificación - Gestión 360</p>
+        </div>
+
+          <!-- Línea de generación automática y versión -->
+        <div class="version-info">
+            Documento generado automáticamente el: {fecha_hora_generacion}               
+        </div>
+        <div class="version-info-software">
+            Sistema de Gestión Administrativa y Procesos Académicos (SGAPA) - Versión 1.0
+        </div>
+        <div class="footer-info">
+            <span>Colegio STEM 360</span>
+            <span>Página 1 de 1</span>
+        </div>
+
+       
+    </body>
+    </html>
+    """
+
+    HTML(string=html_content).write_pdf(buffer)
+
+    
+
+@router.get("/pdf/certificado-escolar/{estudiante_id}")
+def generar_pdf_certificado_escolar(
+    estudiante_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        # Obtener estudiante
+        estudiante = db.get(Estudiante, estudiante_id)
+        if not estudiante:
+            raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+
+        # Obtener grado
+        grado = db.get(Grado, estudiante.grado_id)
+        if not grado:
+            raise HTTPException(status_code=404, detail="Grado no encontrado")
+
+        buffer = BytesIO()
+        generar_certificado_escolar_pdf(buffer, estudiante, grado.nombre)
+        buffer.seek(0)
+
+        nombre_estudiante = f"{estudiante.apellidos}_{estudiante.nombres}".replace(" ", "_")
+        return StreamingResponse(
+            buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=Certificado_Escolar_{nombre_estudiante}.pdf"}
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al generar el certificado: {str(e)}")
       
