@@ -365,16 +365,16 @@ def generar_calificaciones_pdf_en_memoria(buffer, datos_estudiante, notas, asign
                 n = float(nota_str)
                 notas_validas.append(n)
                 if n >= 4.5:
-                    estado = "✓ Aprobado"
+                    estado = "Aprobado"
                     color = "#27AE60"
                 elif n >= 4.0:
-                    estado = "✓ Aprobado"
+                    estado = "Aprobado"
                     color = "#2ECC71"
                 elif n >= 3.0:
-                    estado = "✓ Aprobado"
+                    estado = "Aprobado"
                     color = "#F39C12"
                 else:
-                    estado = "✗ Reprobado"
+                    estado = "Reprobado"
                     color = "#E74C3C"
                 nota_mostrar = f"{n:.1f}"
             except:
@@ -776,3 +776,280 @@ def get_estudiantes_por_grado_simple(grado_id: int, db: Session = Depends(get_db
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))    
+    
+def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
+    
+    estudiante = datos_boletin["estudiante"]
+    asignaturas = datos_boletin["asignaturas"]
+    
+    # Calcular el promedio general
+    notas_validas = [asig['nota_promedio'] for asig in asignaturas if asig['nota_promedio'] is not None]
+    promedio_general = sum(notas_validas) / len(notas_validas) if notas_validas else 0.0
+    promedio_str = f"{promedio_general:.2f}" if notas_validas else "—"
+    
+    # Agrupar asignaturas por área
+    grupos = {}
+    for asig in asignaturas:
+        area = asig["area"]
+        if area not in grupos:
+            grupos[area] = []
+        grupos[area].append(asig)
+    
+    # Construir las filas de la tabla
+    filas_html = ""
+    for area, lista_asignaturas in grupos.items():
+        # Fila de encabezado de área
+        filas_html += f"""
+        <tr>
+            <td colspan="6" style="background-color: #d0e7ff; font-weight: bold; text-align: left; padding: 8pt;">
+                {area.upper()}
+            </td>
+        </tr>
+        """
+        # Filas de asignaturas
+        for asig in lista_asignaturas:
+            nota_str = f"{asig['nota_promedio']:.2f}" if asig['nota_promedio'] is not None else "—"
+            estado_color = "#27AE60" if asig['estado'] == "Aprobado" else "#E74C3C" if asig['estado'] == "Reprobado" else "#95a5a6"
+            filas_html += f"""
+            <tr>
+                <td style="text-align: left; padding: 8pt;">{asig['nombre_asignatura']}</td>
+                <td style="text-align: center; padding: 8pt;">{asig['hours_per_week']}</td>
+                <td style="text-align: center; padding: 8pt; color: {estado_color};">{nota_str}</td>
+                <td style="text-align: center; padding: 8pt; color: {estado_color};">
+                    {" " if asig['estado'] == 'Aprobado' else ' ' if asig['estado'] == 'Reprobado' else ''}{asig['estado']}
+                </td>
+                <td style="text-align: center; padding: 8pt;">{asig['fallas']}</td>
+            </tr>
+            """
+
+    fecha_actual = datetime.now().strftime("%d/%m/%Y")
+    hora_actual = datetime.now().strftime("%H:%M")
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 10pt;
+                color: #000;
+                margin: -25pt;
+                background: white;
+            }}
+            .header {{
+                text-align: center;
+                margin-bottom: 15pt;
+            }}
+            .titulo-principal {{
+                font-size: 18pt;
+                font-weight: bold;
+                color: #2C3E50;
+                margin-bottom: 2pt;
+            }}
+            .subtitulo {{
+                font-size: 14pt;
+                font-weight: bold;
+                color: #3498DB;
+                margin-bottom: 10pt;
+            }}
+            .linea-decorativa {{
+                height: 2pt;
+                background: #3498DB;
+                margin: 5pt auto;
+                width: 100%;
+            }}
+            .info-estudiante {{
+                border: 1.0pt solid #2C3E50;
+                border-radius: 5pt;
+                margin-bottom: 20pt;                
+            }}
+            .info-row {{
+                display: flex;
+            }}
+            .info-label {{
+                background: #ECF0F1;
+                border-radius: 5pt 0 0 5pt;
+                font-weight: bold;
+                color: #2C3E50;
+                padding: 8pt 10pt;
+                width: 120pt;
+                font-size: 10pt;
+            }}
+            .info-value {{
+                padding: 8pt 10pt;
+                color: #34495E;
+                font-size: 10pt;
+            }}
+            .section-title {{
+                font-size: 12pt;
+                font-weight: bold;
+                color: #2C3E50;
+                margin: 20pt 0 10pt 0;
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20pt;
+                margin-right: 20pt;
+                
+            }}
+            th {{
+                background: #34495E;
+                color: white;
+                padding: 8pt;
+                font-weight: bold;
+            }}
+            td {{
+                padding: 8pt;
+                border: 0.5pt solid #ddd;
+                font-size: 9pt;
+            }}           
+              
+            .promedio-general-container {{
+                background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%);
+                border-radius: 5px;
+                padding: 16pt;
+                margin: 20pt 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
+            }}
+            .promedio-texto {{
+                display: flex;
+                flex-direction: column;
+                gap: 4pt;
+            }}
+            .promedio-titulo {{
+                font-size: 10pt;
+                color: #7c3aed;
+                font-weight: 600;
+            }}
+            .promedio-numero {{
+                font-size: 24pt;
+                font-weight: 700;
+                color: #7c3aed;
+                line-height: 1;
+            }}
+            .promedio-periodo {{
+                font-size: 8pt;
+                color: #9333ea;
+                font-weight: 500;
+            }}
+            .promedio-title {{
+                text-align: center;
+                color: #7f8c8d;
+            }}
+            .pie-pagina {{
+                text-align: center;
+                font-style: italic;
+                color: #7f8c8d;
+                font-size: 9pt;
+                margin-top: 20pt;
+                padding-top: 8pt;
+                border-top: 0.5pt solid #ECF0F1;
+            }}
+            .footer-info {{
+                display: flex;
+                justify-content: space-between;
+                font-size: 9pt;
+                color: #7f8c8d;
+                margin-top: 10pt;
+                padding-top: 10pt;
+                border-top: 0.5pt solid #ECF0F1;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="titulo-principal">COLEGIO STEM 360</div>
+            <div class="subtitulo">BOLETÍN DE CALIFICACIONES</div>
+            <div class="linea-decorativa"></div>
+        </div>
+
+        <div class="info-estudiante">
+            <div class="info-row">
+                <div class="info-label">ESTUDIANTE:</div>
+                <div class="info-value">{estudiante['nombre']}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">DOCUMENTO:</div>
+                <div class="info-value">{estudiante['documento']}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">GRADO:</div>
+                <div class="info-value">{estudiante['grado']}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">PERIODO:</div>
+                <div class="info-value">{estudiante['periodo']}</div>
+            </div>
+        </div>       
+
+        <div class="section-title">INFORME ACADÉMICO</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>REPORTE DE ÁREAS</th>
+                    <th>I.H.</th>
+                    <th>NOTA</th>
+                    <th>ESTADO</th>
+                    <th>FALLAS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {filas_html}
+            </tbody>
+        </table>
+        <div class="promedio-general-container">
+            <div class="promedio-texto">
+                <div class="promedio-titulo">Promedio General</div>
+                <div class="promedio-numero">{promedio_str}</div>
+                <div class="promedio-periodo">Periodo {estudiante['periodo'].replace('Periodo ', '')}</div>
+            </div>           
+        </div>
+        <div class="promedio-title">
+           <h4>Escala de Calificación: 1.0 - 2.9 Reprobado | 3.0 - 4.0 Aprobado | 4.5 - 5.0 Excelente</h4>
+        </div>
+
+        <div class="pie-pagina">
+            Documento generado el {fecha_actual} a las {hora_actual}
+        </div>
+
+        <div class="footer-info">
+            <span>Colegio STEM 360</span>
+            <span>Página 1 de 1</span>
+        </div>
+    </body>
+    </html>
+    """
+
+    HTML(string=html_content).write_pdf(buffer)  
+
+@router.get("/pdf/boletin/{estudiante_id}/{periodo_id}")
+def generar_pdf_boletin(
+    estudiante_id: int,
+    periodo_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        # Reutilizar la lógica existente para obtener los datos
+        datos_boletin = get_boletin_completo(estudiante_id, periodo_id, db)
+        
+        buffer = BytesIO()
+        generar_boletin_pdf_en_memoria(buffer, datos_boletin)
+        buffer.seek(0)
+
+        nombre_estudiante = datos_boletin["estudiante"]["nombre"].replace(" ", "_")
+        return StreamingResponse(
+            buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=Boletin_{nombre_estudiante}_P{periodo_id}.pdf"}
+        )
+
+    except Exception as e:
+        print(f"Error generando PDF del boletín: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al generar el PDF del boletín: {str(e)}")    
+      
