@@ -1,0 +1,63 @@
+.progress-stepper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8rem auto;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 5px;
+  width: 95%;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 30px;
+  width: calc(100% + 60px);
+  height: 2px;
+  background: #ccc;
+  z-index: -1;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.step.active .step-number {
+  border-color: #9c27b0;
+  color: #9c27b0;
+}
+
+.step.completed .step-number {
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
+}
+
+.step-label {
+  font-size: 0.8rem;
+  text-align: center;
+  color: #666;
+}
+
+.step.active .step-label,
+.step.completed .step-label {
+  color: #333;
+  font-weight: bold;
+}

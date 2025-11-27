@@ -405,7 +405,7 @@ const Asistencia = () => {
     <div className="asistencia-container">
       <NavbarDocente
         title="Asistencia"
-        color="#2e83c5"
+        color="#32cd32"
         icon={<span className="material-symbols-outlined">edit_note</span>}
       />
       <div className="main-content">
