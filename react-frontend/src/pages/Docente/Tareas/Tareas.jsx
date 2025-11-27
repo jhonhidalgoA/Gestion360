@@ -411,16 +411,9 @@ const Tareas = () => {
               saveLabel="Enviar Tarea"
               onDelete={handleDelete}
               deleteLoading={loading.borrar}
-              deleteLabel="Limpiar"
+              deleteLabel="Borrar"
             />
-          </form>
-
-          {/* Eliminamos la barra de mensajes original */}
-          {/* {mensaje.texto && (
-            <div className={`mensaje-feedback mensaje-${mensaje.tipo}`}>
-              {mensaje.texto}
-            </div>
-          )} */}
+          </form>         
         </div>
         <div className="task-right">
           <div className="task__students">
