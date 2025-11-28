@@ -5,7 +5,7 @@ import { useState } from "react";
 
 const PlanesVer = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 4;
 
   const planesData = [
     {
@@ -47,6 +47,36 @@ const PlanesVer = () => {
       dateEnd: "30-Abr-2025",
       plan: "Proyecto",
     },
+    {
+      icon: "public",
+      name: "Lenguaje",
+      asignatura: "Español",
+      grado: "4° Grado",
+      periodo: "Tercer Periodo",
+      datestart: "01-Abr-2025",
+      dateEnd: "30-Abr-2025",
+      plan: "Recuperación",
+    },
+    {
+      icon: "public",
+      name: "Lenguaje",
+      asignatura: "Español",
+      grado: "4° Grado",
+      periodo: "Tercer Periodo",
+      datestart: "01-Abr-2025",
+      dateEnd: "30-Abr-2025",
+      plan: "Recuperación",
+    },
+    {
+      icon: "public",
+      name: "Lenguaje",
+      asignatura: "Español",
+      grado: "4° Grado",
+      periodo: "Tercer Periodo",
+      datestart: "01-Abr-2025",
+      dateEnd: "30-Abr-2025",
+      plan: "Recuperación",
+    },
   ];
 
   const totalPages = Math.ceil(planesData.length / itemsPerPage);
@@ -76,6 +106,9 @@ const PlanesVer = () => {
         }
       />
       <main className="main-content">
+        <div className="planes-search">
+           <input type="search" name="" id="" placeholder="Buscar por materia, grado o periodo ..." />
+        </div>       
         <div className="planes-container">
           {currentItems.map((plan, index) => (
             <PlanesCard

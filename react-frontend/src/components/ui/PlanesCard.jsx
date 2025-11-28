@@ -11,19 +11,6 @@ const PlanesCard = ({
   dateEnd,
   plan,
 }) => {
-  const handleEditarPlanes = () => {
-    console.log("Cargar estudiantes");
-  };
-
-  const handleBorrarPlanes = () => {
-    console.log("Borrar estudiantes");
-  };
-
-  const loading = {
-    cargar: false,
-    guardar: false,
-  };
-
   return (
     <>
       <div className="planes-card">
@@ -48,15 +35,17 @@ const PlanesCard = ({
             <p>{plan} </p>
           </div>
         </div>
-        <div className="planes-buttom">
-          <ActionButtons
-            onEdit={handleEditarPlanes}
-            editLoading={loading.cargar}
-            editLabel="Editar"
-            onDelete={handleBorrarPlanes}
-            deleteLoading={loading.borrar}
-            deleteLabel="Borrar"
-          />
+        <div className="planes-button">
+          <button>
+            <span class="material-symbols-outlined icons-planes-right">visibility</span>
+          </button>
+          <button>
+            <span class="material-symbols-outlined icons-planes-right">edit</span>
+          </button>
+          <button>
+            <span class="material-symbols-outlined icons-planes-right">delete</span>
+          </button>
+          
         </div>
       </div>
     </>

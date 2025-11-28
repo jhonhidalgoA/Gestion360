@@ -257,3 +257,28 @@ class TareaEstudiante(Base):
     )
     visto: Mapped[bool] = mapped_column(default=False)
     entregado: Mapped[bool] = mapped_column(default=False)
+    
+class AsignaturaGrado(Base):
+    __tablename__ = "asignatura_grado"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    subject_id: Mapped[int] = mapped_column(ForeignKey("asignaturas.subject_id"), nullable=False)
+    grado_id: Mapped[int] = mapped_column(ForeignKey("grados.id"), nullable=False)
+
+
+class Estandar(Base):
+    __tablename__ = "estandar"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    subject_id: Mapped[int] = mapped_column(ForeignKey("asignaturas.subject_id"), nullable=False)
+    nombre: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class Dba(Base):
+    __tablename__ = "dba"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    asignatura_grado_id: Mapped[int] = mapped_column(ForeignKey("asignatura_grado.id"), nullable=False)
+    estandar_id: Mapped[int] = mapped_column(ForeignKey("estandar.id"), nullable=False)
+    descripcion: Mapped[str] = mapped_column(Text, nullable=False)
+    codigo: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)

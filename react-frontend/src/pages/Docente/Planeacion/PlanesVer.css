@@ -1,0 +1,58 @@
+.planes-search {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.planes-search input[type="search"] {
+  width: 100%;
+  max-width: 800px;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;  
+}
+
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination button.active {
+  background: #9c27b0;
+  color: white;
+  border-color: #9c27b0;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  margin: 0 4px;
+  font-weight: bold;
+}
+
+.pagination-info {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #666;
+  text-align: center;
+  width: 100%;
+}

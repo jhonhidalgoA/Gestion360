@@ -55,6 +55,40 @@
   margin-top: 5px;
 }
 
-.planes-buttom{
+.planes-button{
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap:30px;
+}
+
+.planes-button button{
+    width:50px;
+    height:50px;
+    border-radius: 5px;
+    border:none;
+    cursor: pointer;
+}
+
+.planes-button button:hover{
+    transform: scale(1.05);
+}
+
+.icons-planes-right{
+  font-size:25px;
+}
+
+.planes-button button:nth-child(1) {
+  background-color: #0a48f2ff; 
+  color: white;
+}
+
+.planes-button button:nth-child(2) {
+  background-color: #ffc107; 
+  color: white;
+}
+
+.planes-button button:nth-child(3) {
+  background-color: #dc3545; 
+  color: white;
 }

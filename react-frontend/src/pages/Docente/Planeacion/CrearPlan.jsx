@@ -8,7 +8,7 @@ import PreviewMode from "./PreviewMode";
 import ProgressStepper from "./ProgressStepper";
 import FormStep from "./FormStep";
 
-// --- Opciones estáticas ---
+// --- Opciones estáticas que SÍ se mantienen ---
 const tipoOptions = [
   { value: "", label: "Seleccionar" },
   { value: "clase", label: "Clase" },
@@ -17,32 +17,6 @@ const tipoOptions = [
   { value: "refuerzo", label: "Refuerzo" },
   { value: "nivelacion", label: "Nivelación" },
   { value: "habilitacion", label: "Habilitación" },
-];
-
-const estandarOptions = [
-  { value: "", label: "Seleccionar" },
-  { value: "est1", label: "Pensamiento espacial y sistemas geométricos" },
-  { value: "est2", label: "Estándar 2" },
-];
-
-const dbaOptions = [
-  { value: "", label: "Seleccionar" },
-  {
-    value: "dba1",
-    label:
-      "Utiliza teoremas, propiedades y relaciones geométricas (teorema de Thales y el teorema de Pitágoras) para proponer y  justificar estrategias de medición y cálculo de longitudes.",
-  },
-  { value: "dba2", label: "DBA 2" },
-];
-
-const evidenciaOptions = [
-  { value: "", label: "Seleccionar" },
-  {
-    value: "evid1",
-    label:
-      "Justifica procedimientos de medición a partir del Teorema de Thales, Teorema de Pitágoras y relaciones intra e interfigurales. ",
-  },
-  { value: "evid2", label: "Evidencia 2" },
 ];
 
 const proyectoOptions = [
@@ -85,7 +59,7 @@ const STEPS = [
   {
     id: 3,
     title: "Actividades y Desarrollo de la Clase",
-    fields: ["saberes_previos", "analiza", ],
+    fields: ["saberes_previos", "analiza"],
     icon: "psychology",
   },
   {
@@ -109,6 +83,7 @@ const Planeacion = () => {
     formState: { errors },
     getValues,
     reset,
+    watch,
   } = useForm({
     defaultValues: {
       fecha_inicio: "",
@@ -133,14 +108,19 @@ const Planeacion = () => {
     mode: "onBlur",
   });
 
+  // --- Estados dinámicos ---
   const [grupos, setGrupos] = useState([{ value: "", label: "Cargando..." }]);
-  const [asignaturas, setAsignaturas] = useState([
-    { value: "", label: "Cargando..." },
-  ]);
-  const [periodos, setPeriodos] = useState([
-    { value: "", label: "Cargando..." },
-  ]);
+  const [asignaturas, setAsignaturas] = useState([{ value: "", label: "Cargando..." }]);
+  const [periodos, setPeriodos] = useState([{ value: "", label: "Cargando..." }]);
+  const [estandares, setEstandares] = useState([{ value: "", label: "Seleccionar..." }]);
+  const [dbas, setDbas] = useState([{ value: "", label: "Seleccionar..." }]);
 
+  // --- Watchers para detectar cambios ---
+  const selectedAsignatura = watch("asignatura");
+  const selectedGrupo = watch("grupo");
+  const selectedEstandar = watch("estandar");
+
+  // --- Cargar datos iniciales ---
   useEffect(() => {
     const cargarDatos = async () => {
       try {
@@ -153,20 +133,14 @@ const Planeacion = () => {
         }));
         setGrupos([{ value: "", label: "Seleccionar" }, ...opcionesGrados]);
 
-        const resAsignaturas = await fetch(
-          "http://localhost:8000/api/asignaturas"
-        );
-        if (!resAsignaturas.ok)
-          throw new Error("Error al cargar las asignaturas");
+        const resAsignaturas = await fetch("http://localhost:8000/api/asignaturas");
+        if (!resAsignaturas.ok) throw new Error("Error al cargar las asignaturas");
         const dataAsignaturas = await resAsignaturas.json();
         const opcionesAsignaturas = dataAsignaturas.map((asig) => ({
           value: asig.nombre.toLowerCase().replace(/\s+/g, "_"),
           label: asig.nombre,
         }));
-        setAsignaturas([
-          { value: "", label: "Seleccionar" },
-          ...opcionesAsignaturas,
-        ]);
+        setAsignaturas([{ value: "", label: "Seleccionar" }, ...opcionesAsignaturas]);
 
         const resPeriodos = await fetch("http://localhost:8000/api/periodos");
         if (!resPeriodos.ok) throw new Error("Error al cargar los períodos");
@@ -187,6 +161,67 @@ const Planeacion = () => {
     cargarDatos();
   }, []);
 
+  // --- Cargar estándares cuando cambia la asignatura ---
+  useEffect(() => {
+    if (!selectedAsignatura) {
+      setEstandares([{ value: "", label: "Seleccionar..." }]);
+      reset({ ...getValues(), estandar: "", dba: "" });
+      return;
+    }
+
+    const fetchEstandares = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/api/estandares-por-asignatura?asignatura=${selectedAsignatura}`
+        );
+        if (!res.ok) throw new Error("Error al cargar estándares");
+        const data = await res.json();
+        const opciones = data.map((est) => ({
+          value: String(est.id),
+          label: est.nombre,
+        }));
+        setEstandares([{ value: "", label: "Seleccionar" }, ...opciones]);
+      } catch (err) {
+        console.error("Error al cargar estándares:", err);
+        setEstandares([{ value: "", label: "Error al cargar" }]);
+        reset({ ...getValues(), estandar: "", dba: "" });
+      }
+    };
+
+    fetchEstandares();
+  }, [selectedAsignatura, reset, getValues]);
+
+  // --- Cargar DBA cuando cambian: grupo + asignatura + estándar ---
+  useEffect(() => {
+    if (!selectedAsignatura || !selectedGrupo || !selectedEstandar) {
+      setDbas([{ value: "", label: "Seleccionar..." }]);
+      reset({ ...getValues(), dba: "" });
+      return;
+    }
+
+    const fetchDbas = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/api/dba-por-filtros?asignatura=${selectedAsignatura}&grado_id=${selectedGrupo}&estandar_id=${selectedEstandar}`
+        );
+        if (!res.ok) throw new Error("Error al cargar DBA");
+        const data = await res.json();
+        const opciones = data.map((dba) => ({
+          value: String(dba.id),
+          label: dba.descripcion,
+        }));
+        setDbas([{ value: "", label: "Seleccionar" }, ...opciones]);
+      } catch (err) {
+        console.error("Error al cargar DBA:", err);
+        setDbas([{ value: "", label: "Error al cargar" }]);
+        reset({ ...getValues(), dba: "" });
+      }
+    };
+
+    fetchDbas();
+  }, [selectedAsignatura, selectedGrupo, selectedEstandar, reset, getValues]);
+
+  // --- Estados UI ---
   const [currentStep, setCurrentStep] = useState(1);
   const [previewMode, setPreviewMode] = useState(false);
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
@@ -234,6 +269,8 @@ const Planeacion = () => {
     setCurrentStep(1);
     setPreviewMode(false);
     setMensaje({ tipo: "", texto: "" });
+    setEstandares([{ value: "", label: "Seleccionar..." }]);
+    setDbas([{ value: "", label: "Seleccionar..." }]);
   };
 
   if (mensaje.tipo === "exito") {
@@ -242,11 +279,7 @@ const Planeacion = () => {
         <NavbarDocente
           title="Planes de Clase"
           color="#9c27b0"
-          icon={
-            <span className="material-symbols-outlined navbars-icon">
-              checklist_rtl
-            </span>
-          }
+          icon={<span className="material-symbols-outlined navbars-icon">checklist_rtl</span>}
         />
         <main className="post-save-container">
           <div className="post-save-actions">
@@ -263,11 +296,7 @@ const Planeacion = () => {
               </button>
             </div>
             {mensaje.texto && (
-              <div
-                className={`feedback-message feedback-${
-                  mensaje.tipo === "exito" ? "success" : "error"
-                }`}
-              >
+              <div className={`feedback-message feedback-${mensaje.tipo === "exito" ? "success" : "error"}`}>
                 {mensaje.texto}
               </div>
             )}
@@ -282,16 +311,10 @@ const Planeacion = () => {
       <NavbarDocente
         title="Planes de Clase"
         color="#9c27b0"
-        icon={
-          <span className="material-symbols-outlined navbars-icon">
-            checklist_rtl
-          </span>
-        }
+        icon={<span className="material-symbols-outlined navbars-icon">checklist_rtl</span>}
       />
 
-      {!previewMode && (
-        <ProgressStepper steps={STEPS} currentStep={currentStep} />
-      )}
+      {!previewMode && <ProgressStepper steps={STEPS} currentStep={currentStep} />}
 
       <main>
         <form className="form-wrappers" onSubmit={(e) => e.preventDefault()}>
@@ -302,9 +325,9 @@ const Planeacion = () => {
               asignaturas={asignaturas}
               periodos={periodos}
               tipoOptions={tipoOptions}
-              estandarOptions={estandarOptions}
-              dbaOptions={dbaOptions}
-              evidenciaOptions={evidenciaOptions}
+              estandarOptions={estandares}
+              dbaOptions={dbas}
+              evidenciaOptions={[]} // Puedes agregar lógica similar para evidencias
               proyectoOptions={proyectoOptions}
               onEdit={() => setPreviewMode(false)}
               onSave={handleGuardar}
@@ -319,9 +342,9 @@ const Planeacion = () => {
                 asignaturas={asignaturas}
                 periodos={periodos}
                 tipoOptions={tipoOptions}
-                estandarOptions={estandarOptions}
-                dbaOptions={dbaOptions}
-                evidenciaOptions={evidenciaOptions}
+                estandarOptions={estandares}
+                dbaOptions={dbas}
+                evidenciaOptions={[]} // Puedes agregar lógica similar para evidencias
                 proyectoOptions={proyectoOptions}
               />
 
@@ -382,9 +405,7 @@ const Planeacion = () => {
           {/* Mensaje de feedback */}
           {mensaje.texto && mensaje.tipo !== "exito" && (
             <div
-              className={`feedback-message feedback-${
-                mensaje.tipo === "exito" ? "success" : "error"
-              }`}
+              className={`feedback-message feedback-${mensaje.tipo === "exito" ? "success" : "error"}`}
             >
               {mensaje.texto}
             </div>

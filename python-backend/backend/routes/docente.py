@@ -8,7 +8,7 @@ import shutil
 import json
 from io import BytesIO
 import unicodedata
-from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante
+from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante, Estandar, AsignaturaGrado, Dba 
 from weasyprint import HTML
 from datetime import datetime, date
 from fastapi.responses import StreamingResponse
@@ -1357,8 +1357,6 @@ def generar_certificado_escolar_pdf(buffer, estudiante, grado_nombre):
 
     HTML(string=html_content).write_pdf(buffer)
 
-    
-
 @router.get("/pdf/certificado-escolar/{estudiante_id}")
 def generar_pdf_certificado_escolar(
     estudiante_id: int,
@@ -1388,4 +1386,104 @@ def generar_pdf_certificado_escolar(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al generar el certificado: {str(e)}")
-      
+
+# === NUEVOS ENDPOINTS PARA ESTÁNDARES Y DBA ===
+
+@router.get("/estandares-por-asignatura")
+def get_estandares_por_asignatura(
+    asignatura: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene los estándares asociados a una asignatura (ej. 'matematicas').
+    El parámetro 'asignatura' debe ser el nombre normalizado (ej. 'matematicas').
+    """
+    try:
+        # Buscar la asignatura por nombre (insensible a mayúsculas y acentos)
+        asignatura_obj = db.execute(
+            select(Asignatura).where(
+                Asignatura.name.op('~*')(asignatura.replace("_", " "))
+            )
+        ).scalar_one_or_none()
+
+        if not asignatura_obj:
+            raise HTTPException(status_code=404, detail="Asignatura no encontrada")
+
+        # Obtener estándares
+        estandares = db.execute(
+            select(Estandar).where(Estandar.subject_id == asignatura_obj.subject_id)
+        ).scalars().all()
+
+        return [
+            {"id": est.id, "nombre": est.nombre}
+            for est in estandares
+        ]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al cargar estándares: {str(e)}")
+
+
+@router.get("/dba-por-filtros")
+def get_dba_por_filtros(
+    asignatura: str,
+    grado_id: int,
+    estandar_id: int,
+    db: Session = Depends(get_db)
+):
+    
+    try:
+        # 1. Validar asignatura
+        asignatura_obj = db.execute(
+            select(Asignatura).where(
+                Asignatura.name.op('~*')(asignatura.replace("_", " "))
+            )
+        ).scalar_one_or_none()
+        if not asignatura_obj:
+            raise HTTPException(status_code=404, detail="Asignatura no encontrada")
+
+        # 2. Validar grado
+        grado_obj = db.get(Grado, grado_id)
+        if not grado_obj:
+            raise HTTPException(status_code=404, detail="Grado no encontrado")
+
+        # 3. Validar estándar y que pertenezca a la asignatura
+        estandar_obj = db.get(Estandar, estandar_id)
+        if not estandar_obj:
+            raise HTTPException(status_code=404, detail="Estándar no encontrado")
+        
+        # CORRECCIÓN: Comparar subject_id del estándar con subject_id de la asignatura
+        # Extraer valores explícitamente
+        estandar_subject_id = estandar_obj.subject_id
+        asignatura_subject_id = asignatura_obj.subject_id
+        
+        if estandar_subject_id != asignatura_subject_id:
+            raise HTTPException(status_code=400, detail="El estándar no pertenece a la asignatura indicada")
+
+        # 4. Buscar la combinación asignatura-grado
+        asignatura_grado = db.execute(
+            select(AsignaturaGrado).where(
+                AsignaturaGrado.subject_id == asignatura_obj.subject_id,
+                AsignaturaGrado.grado_id == grado_id
+            )
+        ).scalar_one_or_none()
+
+        if not asignatura_grado:
+            return []  # No hay DBA si no existe la combinación
+
+        # 5. Obtener los DBA
+        dbas = db.execute(
+            select(Dba).where(
+                Dba.asignatura_grado_id == asignatura_grado.id,
+                Dba.estandar_id == estandar_id
+            )
+        ).scalars().all()
+
+        return [
+            {"id": dba.id, "descripcion": dba.descripcion, "codigo": dba.codigo or ""}
+            for dba in dbas
+        ]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al cargar DBA: {str(e)}")
