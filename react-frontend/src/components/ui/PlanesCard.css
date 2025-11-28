@@ -1,0 +1,60 @@
+.planes-card {
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 8px;
+  margin: 10px auto;
+  width: 1400px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-planes {
+  font-size:80px;
+  color: #090a09ff;
+}
+
+.planes-subtitle{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.planes-title {
+  font-size: 1.0rem;
+  margin: 0;
+  color: #333;
+}
+
+.planes-subtitle p {
+  margin: 2px 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.planes-date {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  color: #555;
+}
+
+.icon-planes-date{
+    font-size:26px;
+    color: #090a09ff;
+}
+
+.planes-type p {
+  font-size: 0.8rem;  
+  font-weight: bold;
+  color: #9c27b0;
+  margin-top: 5px;
+}
+
+.planes-buttom{
+    margin-left: auto;
+}

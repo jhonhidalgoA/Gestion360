@@ -1,4 +1,6 @@
 import SelectField from "../../../components/ui/SelectField";
+import "./FormStep.css";
+
 
 const FormStep = ({
   currentStep,

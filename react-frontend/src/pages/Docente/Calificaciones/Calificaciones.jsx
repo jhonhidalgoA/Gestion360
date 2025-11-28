@@ -2,7 +2,6 @@ import NavbarDocente from "../../../components/layout/Navbar/NavbarDocente";
 import SelectField from "../../../components/ui/SelectField";
 import ActionButtons from "../../../components/ui/Botones";
 import Modal from "../../../components/ui/Modal";
-import "./Calificaciones.css";
 import { useForm } from "react-hook-form";
 import { useState, useRef, useEffect } from "react";
 

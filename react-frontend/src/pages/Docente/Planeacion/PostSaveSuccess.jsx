@@ -1,5 +1,4 @@
-// src/components/planeacion/PostSaveSuccess.jsx
-import React from "react";
+import "./PostSaveSuccess.css"; 
 import NavbarDocente from "../../layout/Navbar/NavbarDocente";
 
 const PostSaveSuccess = ({ onVerPlan, onGenerarPDF, onNuevoPlan, mensaje }) => {

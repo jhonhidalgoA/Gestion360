@@ -1,25 +1,4 @@
-.select-field {
-  margin-bottom: 1rem;
-}
 
-.select-field label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.select-field .form-select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.select-field .form-select.is-invalid {
-  border-color: #dc3545;
-  background-color: #f8d7da;
-}
 
 .select-field .error-message {
   color: #dc3545;
@@ -66,24 +45,6 @@
   z-index: 1000;
 }
 
-.modal-content {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #eee;
-}
 
 .modal-header h3 {
   margin: 0;

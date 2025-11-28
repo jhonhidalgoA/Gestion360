@@ -1,5 +1,4 @@
 import PrivateRoute from "./PrivateRoute";
-import Calendario from "../pages/Docente/Calendario/CalendarioVer"
 import Calificaciones from "../pages/Docente/Calificaciones/Calificaciones";
 import Asistencia from "../pages/Docente/Asistencia/Asistencia";
 import Planeacion from "../pages/Docente/Planeacion/Planeacion";
@@ -7,6 +6,9 @@ import Reportes from "../pages/Docente/Reportes/Reportes";
 import Tareas from "../pages/Docente/Tareas/Tareas";
 import Comunicacion from "../pages/Docente/Comunicacion/Comunicacion";
 import Docente from "../pages/Docente/Docente";
+import CrearPlan from "../pages/Docente/Planeacion/CrearPlan";
+import PlanesVer from "../pages/Docente/Planeacion/PlanesVer";
+
 
 const docenteRoutes = [
   {
@@ -38,6 +40,22 @@ const docenteRoutes = [
     element: (
       <PrivateRoute roles={["docente"]}>
         <Planeacion />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/crear-plan",
+    element: (
+      <PrivateRoute roles={["docente"]}>
+        <CrearPlan />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/ver-planes",
+    element: (
+      <PrivateRoute roles={["docente"]}>
+        <PlanesVer />
       </PrivateRoute>
     ),
   },

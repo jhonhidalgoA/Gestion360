@@ -1,0 +1,136 @@
+/* Estilos específicos para el componente PostSaveSuccess */
+
+.post-save-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f0fa, #ede7f6);
+}
+
+.post-save-actions {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.post-save-actions h3 {
+  color: #27ae60;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.action-buttons .btn {
+  padding: 0.875rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 140px;
+}
+
+.action-buttons .btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.action-buttons .btn-secondary:hover {
+  background: #4b5563;
+  transform: translateY(-2px);
+}
+
+.action-buttons .btn-primary {
+  background: #9c27b0;
+  color: white;
+}
+
+.action-buttons .btn-primary:hover {
+  background: #7b1fa2;
+  transform: translateY(-2px);
+}
+
+.action-buttons .btn-outline {
+  background: transparent;
+  border: 2px solid #9c27b0;
+  color: #9c27b0;
+}
+
+.action-buttons .btn-outline:hover {
+  background: #9c27b0;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Mensajes de feedback */
+.feedback-message {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.feedback-success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.feedback-error {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .post-save-container {
+    padding: 1rem;
+  }
+  
+  .post-save-actions {
+    padding: 2rem 1.5rem;
+  }
+  
+  .post-save-actions h3 {
+    font-size: 1.5rem;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .action-buttons .btn {
+    width: 100%;
+    min-width: auto;
+  }
+}

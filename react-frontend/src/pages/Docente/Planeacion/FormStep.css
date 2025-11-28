@@ -1,0 +1,251 @@
+/* Estilos específicos para el componente FormStep */
+
+/* Form Rows */
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.form-row-group {
+  margin-top: -52px;
+}
+
+.form-group-name {
+  margin-top: 70px;
+}
+
+.information-basic {
+  height: 125px;
+}
+
+/* Form Groups */
+.form-group {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+  font-size: 14px;
+  display: block;
+  text-transform: lowercase;
+  margin-left: 5px;
+  line-height: 1.2;
+}
+
+.form-group label::first-letter {
+  text-transform: uppercase;
+}
+
+.form-full-width {
+  margin-top: 40px;
+}
+
+/* Inputs */
+.input-line, input[type="date"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fbf9f9ff;
+}
+
+.input-line:focus, input[type="date"]:focus {
+  outline: none;
+  border-color: #9c27b0;
+  box-shadow: 0 0 0 2px rgba(156, 39, 176, 0.1);
+}
+
+.form-group .input-planning {
+  border: 2px solid #e1e5e9;
+  padding: 12px;
+  border-radius: 5px;
+  border: 1px solid #9c9999ff;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+/* Textarea */
+.form-group textarea {
+  padding: 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+  width: 100%;
+  height: 120px;
+  box-sizing: border-box;
+}
+
+.input-error {
+  border: 2px solid #dc3545 !important;
+  background-color: #f8d7da !important;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Accordion Sections */
+.accordion-section {
+  width: 95%;
+  margin: 30px auto;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.accordion-header {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #E1BEE7;
+  cursor: pointer;
+  font-weight: 600;
+  height: 60px;
+}
+
+.accordion-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9c27b0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.accordion-content {
+  padding: 16px;
+  background: white;
+  border-top: 1px solid #eee;
+}
+
+.icon-planning {
+  font-size: 40px;
+  color: #9c27b0;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+/* Step Navigation */
+.step-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding: 0 2.7rem;  
+}
+
+.step-navigation .btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+}
+
+.step-navigation .btn-secondary {
+  background: #6c757d;
+}
+
+.step-navigation .btn-secondary:hover {
+  background: #5a6268;
+}
+
+.step-navigation .btn-primary {
+  background: #007bff;
+}
+
+.step-navigation .btn-primary:hover {
+  background: #0056b3;
+}
+
+.step-navigation .btn-success {
+  background: #28a745;
+}
+
+.step-navigation .btn-success:hover {
+  background: #218838;
+}
+
+/* Mensajes de feedback */
+.feedback-message {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.feedback-success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.feedback-error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .form-row-group {
+    margin-top: 0;
+  }
+  
+  .form-group-name {
+    margin-top: 20px;
+  }
+  
+  .information-basic {
+    height: auto;
+  }
+  
+  .step-navigation {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+  
+  .step-navigation .btn {
+    width: 100%;
+  }
+  
+  .accordion-section {
+    width: 100%;
+    margin: 20px auto;
+  }
+  
+  .accordion-header {
+    height: auto;
+    padding: 10px 12px;
+  }
+  
+  .accordion-title {
+    font-size: 16px;
+  }
+}
