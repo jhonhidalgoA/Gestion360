@@ -8,7 +8,7 @@ import shutil
 import json
 from io import BytesIO
 import unicodedata
-from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante, Estandar, AsignaturaGrado, Dba 
+from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante, Estandar, AsignaturaGrado, Dba, EvidenciaAprendizaje 
 from weasyprint import HTML
 from datetime import datetime, date
 from fastapi.responses import StreamingResponse
@@ -1487,3 +1487,24 @@ def get_dba_por_filtros(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al cargar DBA: {str(e)}")
+
+@router.get("/evidencias-por-dba")
+def get_evidencias_por_dba(
+    dba_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene las evidencias de aprendizaje asociadas a un DBA específico.
+    """
+    try:
+        evidencias = db.execute(
+            select(EvidenciaAprendizaje).where(EvidenciaAprendizaje.dba_id == dba_id)
+        ).scalars().all()
+
+        return [
+            {"id": evid.id, "descripcion": evid.descripcion, "codigo": evid.codigo or ""}
+            for evid in evidencias
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al cargar evidencias: {str(e)}")
+    

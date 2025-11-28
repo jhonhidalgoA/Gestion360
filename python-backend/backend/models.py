@@ -282,3 +282,14 @@ class Dba(Base):
     estandar_id: Mapped[int] = mapped_column(ForeignKey("estandar.id"), nullable=False)
     descripcion: Mapped[str] = mapped_column(Text, nullable=False)
     codigo: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    
+class EvidenciaAprendizaje(Base):
+    __tablename__ = "evidencia_aprendizaje"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    dba_id: Mapped[int] = mapped_column(ForeignKey("dba.id"), nullable=False)
+    descripcion: Mapped[str] = mapped_column(Text, nullable=False)
+    codigo: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    
+    
+    

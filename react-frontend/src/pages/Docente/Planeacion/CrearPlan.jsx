@@ -114,11 +114,13 @@ const Planeacion = () => {
   const [periodos, setPeriodos] = useState([{ value: "", label: "Cargando..." }]);
   const [estandares, setEstandares] = useState([{ value: "", label: "Seleccionar..." }]);
   const [dbas, setDbas] = useState([{ value: "", label: "Seleccionar..." }]);
+  const [evidencias, setEvidencias] = useState([{ value: "", label: "Seleccionar..." }]);
 
   // --- Watchers para detectar cambios ---
   const selectedAsignatura = watch("asignatura");
   const selectedGrupo = watch("grupo");
   const selectedEstandar = watch("estandar");
+  const selectedDba = watch("dba");
 
   // --- Cargar datos iniciales ---
   useEffect(() => {
@@ -165,7 +167,7 @@ const Planeacion = () => {
   useEffect(() => {
     if (!selectedAsignatura) {
       setEstandares([{ value: "", label: "Seleccionar..." }]);
-      reset({ ...getValues(), estandar: "", dba: "" });
+      reset({ ...getValues(), estandar: "", dba: "", evidencia: "" });
       return;
     }
 
@@ -184,7 +186,7 @@ const Planeacion = () => {
       } catch (err) {
         console.error("Error al cargar estándares:", err);
         setEstandares([{ value: "", label: "Error al cargar" }]);
-        reset({ ...getValues(), estandar: "", dba: "" });
+        reset({ ...getValues(), estandar: "", dba: "", evidencia: "" });
       }
     };
 
@@ -195,7 +197,8 @@ const Planeacion = () => {
   useEffect(() => {
     if (!selectedAsignatura || !selectedGrupo || !selectedEstandar) {
       setDbas([{ value: "", label: "Seleccionar..." }]);
-      reset({ ...getValues(), dba: "" });
+      setEvidencias([{ value: "", label: "Seleccionar..." }]);
+      reset({ ...getValues(), dba: "", evidencia: "" });
       return;
     }
 
@@ -211,15 +214,47 @@ const Planeacion = () => {
           label: dba.descripcion,
         }));
         setDbas([{ value: "", label: "Seleccionar" }, ...opciones]);
+        setEvidencias([{ value: "", label: "Seleccionar..." }]); // Reset evidencias
       } catch (err) {
         console.error("Error al cargar DBA:", err);
         setDbas([{ value: "", label: "Error al cargar" }]);
-        reset({ ...getValues(), dba: "" });
+        setEvidencias([{ value: "", label: "Seleccionar..." }]);
+        reset({ ...getValues(), dba: "", evidencia: "" });
       }
     };
 
     fetchDbas();
   }, [selectedAsignatura, selectedGrupo, selectedEstandar, reset, getValues]);
+
+  // --- Cargar EVIDENCIAS cuando cambia el DBA ---
+  useEffect(() => {
+    if (!selectedDba) {
+      setEvidencias([{ value: "", label: "Seleccionar..." }]);
+      reset({ ...getValues(), evidencia: "" });
+      return;
+    }
+
+    const fetchEvidencias = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/api/evidencias-por-dba?dba_id=${selectedDba}`
+        );
+        if (!res.ok) throw new Error("Error al cargar evidencias");
+        const data = await res.json();
+        const opciones = data.map((evid) => ({
+          value: String(evid.id),
+          label: evid.descripcion,
+        }));
+        setEvidencias([{ value: "", label: "Seleccionar" }, ...opciones]);
+      } catch (err) {
+        console.error("Error al cargar evidencias:", err);
+        setEvidencias([{ value: "", label: "Error al cargar" }]);
+        reset({ ...getValues(), evidencia: "" });
+      }
+    };
+
+    fetchEvidencias();
+  }, [selectedDba, reset, getValues]);
 
   // --- Estados UI ---
   const [currentStep, setCurrentStep] = useState(1);
@@ -271,6 +306,7 @@ const Planeacion = () => {
     setMensaje({ tipo: "", texto: "" });
     setEstandares([{ value: "", label: "Seleccionar..." }]);
     setDbas([{ value: "", label: "Seleccionar..." }]);
+    setEvidencias([{ value: "", label: "Seleccionar..." }]);
   };
 
   if (mensaje.tipo === "exito") {
@@ -327,7 +363,7 @@ const Planeacion = () => {
               tipoOptions={tipoOptions}
               estandarOptions={estandares}
               dbaOptions={dbas}
-              evidenciaOptions={[]} // Puedes agregar lógica similar para evidencias
+              evidenciaOptions={evidencias}
               proyectoOptions={proyectoOptions}
               onEdit={() => setPreviewMode(false)}
               onSave={handleGuardar}
@@ -344,7 +380,7 @@ const Planeacion = () => {
                 tipoOptions={tipoOptions}
                 estandarOptions={estandares}
                 dbaOptions={dbas}
-                evidenciaOptions={[]} // Puedes agregar lógica similar para evidencias
+                evidenciaOptions={evidencias}
                 proyectoOptions={proyectoOptions}
               />
 
