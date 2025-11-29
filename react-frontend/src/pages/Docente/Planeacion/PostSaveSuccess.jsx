@@ -15,13 +15,13 @@ const PostSaveSuccess = ({ onVerPlan, onGenerarPDF, onNuevoPlan, mensaje }) => {
       />
       <main className="post-save-container">
         <div className="post-save-actions">
-          <h3>Planificación guardada exitosamente</h3>
+          <h3>Planificación guardada exitosamente2</h3>
           <div className="action-buttons">
             <button className="btn btn-secondary" onClick={onVerPlan}>
               Ver Plan
             </button>
             <button className="btn btn-primary" onClick={onGenerarPDF}>
-              Generar PDF
+              Generar PDF2
             </button>
             <button className="btn btn-outline" onClick={onNuevoPlan}>
               Nuevo Plan

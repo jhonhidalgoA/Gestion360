@@ -22,7 +22,7 @@ const Modal = ({ isOpen, onClose, title, message, buttons = [] }) => {
           {buttons.map((btn, index) => (
             <button
               key={index}
-              className={`modal-btn ${btn.variant || "primary"}`}
+              className={`btn ${btn.className || ""}`}
               onClick={btn.onClick || onClose}
             >
               {btn.icon && <span className="btn-icon">{btn.icon}</span>}

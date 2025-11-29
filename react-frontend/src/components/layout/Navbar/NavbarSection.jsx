@@ -49,13 +49,13 @@ const NavbarSection = ({ title, color = "#1976d2" }) => {
         buttons={[
           {
             text: "Confirmar",
-            variant: "success",
+            className: "btn-save",
             icon: <FaCheck />,
             onClick: handleLogout,
           },
           {
             text: "Cancelar",
-            variant: "danger",
+            className: "btn-delet",
             icon: <FaTimes />,
             onClick: () => setIsModalOpen(false),
           },

@@ -1,9 +1,13 @@
 import NavbarDocente from "../../../components/layout/Navbar/NavbarDocente";
+import Modal from "../../../components/ui/Modal";
+
 import "./CrearPlan.css";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
+import { FaDownload } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 
-// Componentes extraídos
+// Componentes
 import PreviewMode from "./PreviewMode";
 import ProgressStepper from "./ProgressStepper";
 import FormStep from "./FormStep";
@@ -109,6 +113,14 @@ const Planeacion = () => {
     { value: "", label: "Cargando..." },
   ]);
   const [planGuardadoId, setPlanGuardadoId] = useState(null);
+
+  // --- Estados UI ---
+  const [currentStep, setCurrentStep] = useState(1);
+  const [previewMode, setPreviewMode] = useState(false);
+  const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showAlreadyExistsModal, setShowAlreadyExistsModal] = useState(false);
+  const [planGuardado, setPlanGuardado] = useState(false); // 👈 Control duplicado
 
   // --- Watchers ---
   const selectedAsignatura = watch("asignatura");
@@ -258,33 +270,30 @@ const Planeacion = () => {
     fetchEvidencias();
   }, [selectedDba, reset, getValues]);
 
-  // --- Estados UI ---
-  const [currentStep, setCurrentStep] = useState(1);
-  const [previewMode, setPreviewMode] = useState(false);
-  const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
-
   const canProceed = (stepId) => {
     const step = STEPS.find((s) => s.id === stepId);
     return step.fields.every((field) => !errors[field]);
   };
 
   const handleGuardar = handleSubmit(async (data) => {
+    // ✅ Evitar duplicado
+    if (planGuardado) {
+      setShowAlreadyExistsModal(true);
+      return;
+    }
+
     setMensaje({ tipo: "", texto: "" });
     try {
-      // 👇 Obtener la sesión desde "user_session"
       const userSessionString = sessionStorage.getItem("user_session");
       if (!userSessionString) {
         throw new Error("No se encontró la sesión del usuario");
       }
 
       const userSession = JSON.parse(userSessionString);
-
-      // Validar que tenga username
       if (!userSession.username) {
         throw new Error("No se encontró el username en la sesión");
       }
 
-      // 👇 Llamar al endpoint /docente-uuid/{username} para obtener el UUID real
       const resDocente = await fetch(
         `http://localhost:8000/api/docente-uuid/${userSession.username}`
       );
@@ -301,7 +310,6 @@ const Planeacion = () => {
         throw new Error("No se recibió un ID válido del docente");
       }
 
-      // 👇 Preparar y enviar el plan
       const payload = {
         ...data,
         docente_user_id: docente_user_id,
@@ -322,10 +330,9 @@ const Planeacion = () => {
 
       const result = await res.json();
       setPlanGuardadoId(result.plan_id);
-      setMensaje({
-        tipo: "exito",
-        texto: "Planificación guardada exitosamente.",
-      });
+      setPlanGuardado(true); // ✅ Marcar como guardado
+
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Error al guardar el plan:", error);
       setMensaje({
@@ -336,20 +343,13 @@ const Planeacion = () => {
     }
   });
 
-  const handleVerPlan = () => {
-    setMensaje({ tipo: "info", texto: "Mostrando plan guardado..." });
-  };
-
   const handleGenerarPDF = async () => {
     setMensaje({ tipo: "info", texto: "Generando PDF..." });
     try {
-      // Aquí deberías usar planGuardadoId
       const url = `http://localhost:8000/api/pdf/plan-clase/${planGuardadoId}`;
       window.open(url, "_blank");
-      setMensaje({
-        tipo: "exito",
-        texto: "PDF generado y abierto en nueva pestaña.",
-      });
+      setShowSuccessModal(false);
+      setShowAlreadyExistsModal(false);
     } catch (err) {
       console.error("Error al generar PDF:", err);
       setMensaje({ tipo: "error", texto: "No se pudo generar el PDF." });
@@ -357,46 +357,48 @@ const Planeacion = () => {
   };
 
   const handleNuevoPlan = () => {
-    reset();
+    //  Reiniciar el formulario (todos los campos)
+    reset({
+      fecha_inicio: "",
+      fecha_fin: "",
+      periodo: "",
+      grupo: "",
+      asignatura: "",
+      tipo: "",
+      tema: "",
+      estandar: "",
+      dba: "",
+      evidencia: "",
+      competencias: "",
+      proyecto: "",
+      saberes_previos: "",
+      contenidos: "",
+      evaluacion: "",
+      observaciones: "",
+      bibliografia: "",
+      objetivos: "",
+    });
+
+    //  Reiniciar estados de navegación
     setCurrentStep(1);
     setPreviewMode(false);
-    setMensaje({ tipo: "", texto: "" });
+
+    //  Reiniciar listas dependientes
     setEstandares([{ value: "", label: "Seleccionar..." }]);
     setDbas([{ value: "", label: "Seleccionar..." }]);
     setEvidencias([{ value: "", label: "Seleccionar..." }]);
-  };
 
-  if (mensaje.tipo === "exito") {
-    return (
-      <div className="planning">
-        <main className="post-save-container">
-          <div className="post-save-actions">
-            <h3>Planificación guardada exitosamente</h3>
-            <div className="action-buttons">
-              <button className="btn btn-secondary" onClick={handleVerPlan}>
-                Ver Plan
-              </button>
-              <button className="btn btn-primary" onClick={handleGenerarPDF}>
-                Generar PDF
-              </button>
-              <button className="btn btn-outline" onClick={handleNuevoPlan}>
-                Nuevo Plan
-              </button>
-            </div>
-            {mensaje.texto && (
-              <div
-                className={`feedback-message feedback-${
-                  mensaje.tipo === "exito" ? "success" : "error"
-                }`}
-              >
-                {mensaje.texto}
-              </div>
-            )}
-          </div>
-        </main>
-      </div>
-    );
-  }
+    //  Reiniciar estado de guardado y mensajes
+    setPlanGuardado(false); 
+    setMensaje({ tipo: "", texto: "" });
+
+    //  Cerrar modales
+    setShowSuccessModal(false);
+    setShowAlreadyExistsModal(false);
+
+    // Opcional: borrar ID anterior (por seguridad)
+    setPlanGuardadoId(null);
+  };
 
   return (
     <div className="planning">
@@ -500,18 +502,67 @@ const Planeacion = () => {
             </>
           )}
 
-          {/* Mensaje de feedback */}
-          {mensaje.texto && mensaje.tipo !== "exito" && (
-            <div
-              className={`feedback-message feedback-${
-                mensaje.tipo === "exito" ? "success" : "error"
-              }`}
-            >
+          {/* Mensajes solo de error */}
+          {mensaje.tipo === "error" && mensaje.texto && (
+            <div className="feedback-message feedback-error">
               {mensaje.texto}
             </div>
           )}
         </form>
       </main>
+
+      {/* Modal*/}
+      <Modal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title={
+          <>
+            Colegio <span className="modal-title-360">STEM 360</span>
+          </>
+        }
+        message="Planeación guardada con exito"
+        buttons={[
+          {
+            text: "Nuevo Plan",
+            className: "btn-load",
+            icon: <FaPlus />,
+            onClick: handleNuevoPlan,
+          },
+          {
+            text: "Generar PDF",
+            className: "btn-pdf",
+            icon: <FaDownload />,
+            onClick: handleGenerarPDF,
+          },
+        ]}
+      />
+
+      {/*Ya existe el plan */}
+      <Modal
+        isOpen={showAlreadyExistsModal}
+        onClose={() => setShowAlreadyExistsModal(false)}
+        title={
+          <>
+            Colegio <span className="modal-title-360">STEM 360</span>
+          </>
+        }
+        message="Plan de clase ya existe "
+        buttons={[
+          {
+            text: "Nuevo Plan",
+            className: "btn-load",
+            icon: <FaPlus />,
+            onClick: handleNuevoPlan,
+          },
+
+          {
+            text: "Generar PDF",
+            className: "btn-pdf",
+            icon: <FaDownload />,
+            onClick: handleGenerarPDF,
+          },
+        ]}
+      />
     </div>
   );
 };
