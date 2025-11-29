@@ -3,7 +3,7 @@ import Modal from "../../../components/ui/Modal";
 
 import "./CrearPlan.css";
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaDownload } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 
@@ -113,6 +113,7 @@ const Planeacion = () => {
     { value: "", label: "Cargando..." },
   ]);
   const [planGuardadoId, setPlanGuardadoId] = useState(null);
+  const mainRef = useRef(null);
 
   // --- Estados UI ---
   const [currentStep, setCurrentStep] = useState(1);
@@ -120,7 +121,6 @@ const Planeacion = () => {
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showAlreadyExistsModal, setShowAlreadyExistsModal] = useState(false);
-  const [planGuardado, setPlanGuardado] = useState(false); // 👈 Control duplicado
 
   // --- Watchers ---
   const selectedAsignatura = watch("asignatura");
@@ -276,12 +276,6 @@ const Planeacion = () => {
   };
 
   const handleGuardar = handleSubmit(async (data) => {
-    // ✅ Evitar duplicado
-    if (planGuardado) {
-      setShowAlreadyExistsModal(true);
-      return;
-    }
-
     setMensaje({ tipo: "", texto: "" });
     try {
       const userSessionString = sessionStorage.getItem("user_session");
@@ -325,13 +319,17 @@ const Planeacion = () => {
 
       if (!res.ok) {
         const errorData = await res.json();
+        // ✅ Manejo del error 409: plan ya existe
+        if (res.status === 409) {
+          setPlanGuardadoId(null);
+          setShowAlreadyExistsModal(true);
+          return;
+        }
         throw new Error(errorData.detail || "Error al guardar el plan");
       }
 
       const result = await res.json();
       setPlanGuardadoId(result.plan_id);
-      setPlanGuardado(true); // ✅ Marcar como guardado
-
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error al guardar el plan:", error);
@@ -346,6 +344,13 @@ const Planeacion = () => {
   const handleGenerarPDF = async () => {
     setMensaje({ tipo: "info", texto: "Generando PDF..." });
     try {
+      if (!planGuardadoId) {
+        setMensaje({
+          tipo: "error",
+          texto: "No hay un plan guardado para generar PDF.",
+        });
+        return;
+      }
       const url = `http://localhost:8000/api/pdf/plan-clase/${planGuardadoId}`;
       window.open(url, "_blank");
       setShowSuccessModal(false);
@@ -356,8 +361,20 @@ const Planeacion = () => {
     }
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleEdit = () => {
+    setPreviewMode(false); 
+    setCurrentStep(1); 
+    scrollToTop(); 
+  };
+
   const handleNuevoPlan = () => {
-    //  Reiniciar el formulario (todos los campos)
     reset({
       fecha_inicio: "",
       fecha_fin: "",
@@ -378,30 +395,23 @@ const Planeacion = () => {
       bibliografia: "",
       objetivos: "",
     });
-
-    //  Reiniciar estados de navegación
     setCurrentStep(1);
     setPreviewMode(false);
-
-    //  Reiniciar listas dependientes
     setEstandares([{ value: "", label: "Seleccionar..." }]);
     setDbas([{ value: "", label: "Seleccionar..." }]);
     setEvidencias([{ value: "", label: "Seleccionar..." }]);
-
-    //  Reiniciar estado de guardado y mensajes
-    setPlanGuardado(false); 
     setMensaje({ tipo: "", texto: "" });
-
-    //  Cerrar modales
     setShowSuccessModal(false);
     setShowAlreadyExistsModal(false);
-
-    // Opcional: borrar ID anterior (por seguridad)
     setPlanGuardadoId(null);
+
+    if (mainRef.current) {
+      mainRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   return (
-    <div className="planning">
+    <div className="planning" ref={mainRef}>
       <NavbarDocente
         title="Planes de Clase"
         color="#9c27b0"
@@ -429,7 +439,7 @@ const Planeacion = () => {
               dbaOptions={dbas}
               evidenciaOptions={evidencias}
               proyectoOptions={proyectosTransversales}
-              onEdit={() => setPreviewMode(false)}
+              onEdit={handleEdit}
               onSave={handleGuardar}
             />
           ) : (
@@ -511,7 +521,7 @@ const Planeacion = () => {
         </form>
       </main>
 
-      {/* Modal*/}
+      {/* Modal: Plan guardado exitosamente */}
       <Modal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
@@ -537,16 +547,17 @@ const Planeacion = () => {
         ]}
       />
 
-      {/*Ya existe el plan */}
+      {/* Ya existe el plan */}
       <Modal
         isOpen={showAlreadyExistsModal}
         onClose={() => setShowAlreadyExistsModal(false)}
-        title={
+         title={
           <>
             Colegio <span className="modal-title-360">STEM 360</span>
           </>
         }
-        message="Plan de clase ya existe "
+        message="Ya existe el plan de clase."
+       
         buttons={[
           {
             text: "Nuevo Plan",
@@ -554,7 +565,6 @@ const Planeacion = () => {
             icon: <FaPlus />,
             onClick: handleNuevoPlan,
           },
-
           {
             text: "Generar PDF",
             className: "btn-pdf",

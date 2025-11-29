@@ -18,6 +18,8 @@ from io import BytesIO
 from backend.schemas import BoletinCompletoResponse
 import qrcode
 import base64
+from typing import List
+from backend.auth import verificar_token_jwt
 
 
 
@@ -1396,10 +1398,7 @@ def get_estandares_por_asignatura(
     asignatura: str,
     db: Session = Depends(get_db)
 ):
-    """
-    Obtiene los estándares asociados a una asignatura (ej. 'matematicas').
-    El parámetro 'asignatura' debe ser el nombre normalizado (ej. 'matematicas').
-    """
+    
     try:
         # Buscar la asignatura por nombre (insensible a mayúsculas y acentos)
         asignatura_obj = db.execute(
@@ -1732,7 +1731,6 @@ def generar_pdf_plan_clase(plan_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")   
     
     
-    
 @router.post("/guardar-plan-clase")
 def guardar_plan_clase(
     data: dict,
@@ -1740,6 +1738,7 @@ def guardar_plan_clase(
 ):
     """
     Guarda un plan de clase completo en la base de datos.
+    Verifica duplicados (incluyendo el tema) antes de insertar.
     """
     try:
         print("=== INICIO GUARDAR PLAN ===")
@@ -1783,13 +1782,34 @@ def guardar_plan_clase(
             if not evidencia:
                 raise HTTPException(status_code=400, detail=f"Evidencia {evidencia_id} no existe.")
 
-        # Convertir docente_user_id a UUID si existe
+        # Convertir docente_user_id a UUID
         docente_user_id = None
         if data.get("docente_user_id"):
             try:
                 docente_user_id = uuid.UUID(data["docente_user_id"])
             except ValueError:
                 raise HTTPException(status_code=400, detail="Formato inválido para docente_user_id")
+        else:
+            raise HTTPException(status_code=400, detail="docente_user_id es obligatorio.")
+
+        # VERIFICAR DUPLICADOS (INCLUYENDO EL TEMA)
+        plan_existente = db.execute(
+            select(PlanClase)
+            .where(
+                PlanClase.docente_user_id == docente_user_id,
+                PlanClase.periodo_id == periodo_id,
+                PlanClase.grado_id == grado_id,
+                PlanClase.asignatura_nombre == data["asignatura"],
+                PlanClase.tema == data["tema"]  # 👈 AGREGADO: Validar también el tema
+            )
+        ).scalar_one_or_none()
+
+        if plan_existente:
+            # Devolver error 409 (Conflict) solo si el tema también coincide
+            raise HTTPException(
+                status_code=409,
+                detail="Ya existe un plan de clase para este docente, período, grado, asignatura y tema."
+            )
 
         # Crear el registro
         nuevo_plan = PlanClase(
@@ -1812,23 +1832,24 @@ def guardar_plan_clase(
             evaluacion=data.get("evaluacion"),
             observaciones=data.get("observaciones"),
             bibliografia=data.get("bibliografia"),
-            docente_user_id=docente_user_id  # 👈 Aquí está la corrección
+            docente_user_id=docente_user_id
         )
 
-        print("Creando plan con ID:", nuevo_plan.id)  # Esto mostrará None antes de commit
         db.add(nuevo_plan)
         db.commit()
         db.refresh(nuevo_plan)
 
-        print("Plan guardado con ID:", nuevo_plan.id)  # Debería mostrar un número
-
+        print("Plan guardado con ID:", nuevo_plan.id)
         return {"message": "Plan de clase guardado exitosamente.", "plan_id": nuevo_plan.id}
-    except HTTPException:
-        raise
+
+    except HTTPException as he:
+        db.rollback()
+        raise he
     except Exception as e:
         db.rollback()
-        print("ERROR AL GUARDAR PLAN:", str(e))  # Log en consola del servidor
+        print("ERROR AL GUARDAR PLAN:", str(e))
         raise HTTPException(status_code=500, detail=f"Error al guardar el plan: {str(e)}")
+
     
 @router.get("/docente-uuid/{username}")
 def get_docente_uuid(username: str, db: Session = Depends(get_db)):
@@ -1851,3 +1872,60 @@ def get_docente_uuid(username: str, db: Session = Depends(get_db)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al obtener el ID del docente: {str(e)}")
+    
+@router.get("/planes/mis-planes")
+def get_mis_planes(
+    db: Session = Depends(get_db),
+    usuario_actual: dict = Depends(verificar_token_jwt)
+):
+    """
+    Obtiene los planes de clase del docente autenticado.
+    Solo accesible para usuarios con rol 'docente'.
+    """
+    if usuario_actual["rol"] != "docente":
+        raise HTTPException(status_code=403, detail="Acceso denegado")
+
+    try:
+        # Convertir el user_id de string a UUID
+        docente_user_id = uuid.UUID(usuario_actual["user_id"])
+
+        # Obtener planes del docente
+        planes = db.query(PlanClase).filter(
+            PlanClase.docente_user_id == docente_user_id
+        ).all()
+
+        resultado = []
+        for plan in planes:
+            # Cargar relaciones
+            periodo = db.get(Periodo, plan.periodo_id)
+            grado = db.get(Grado, plan.grado_id)
+            
+            # Formatear fechas
+            fecha_inicio_str = plan.fecha_inicio.strftime("%d-%b-%Y") if plan.fecha_inicio else "N/A"
+            fecha_fin_str = plan.fecha_fin.strftime("%d-%b-%Y") if plan.fecha_fin else "N/A"
+
+            # Obtener etiqueta del tipo de actividad
+            tipo_etiqueta = "Clase"  # valor por defecto
+            if plan.tipo_actividad:
+                tipo_res = db.execute(
+                    select(TipoActividad.etiqueta)
+                    .where(TipoActividad.nombre == plan.tipo_actividad)
+                ).scalar_one_or_none()
+                tipo_etiqueta = tipo_res or plan.tipo_actividad
+
+            plan_data = {
+                "id": plan.id,
+                "name": plan.tema,
+                "asignatura": plan.asignatura_nombre,
+                "grado": grado.nombre if grado else "N/A",
+                "periodo": periodo.nombre if periodo else "N/A",
+                "datestart": fecha_inicio_str,
+                "dateEnd": fecha_fin_str,
+                "plan": tipo_etiqueta,
+            }
+            resultado.append(plan_data)
+
+        return resultado
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al cargar tus planes: {str(e)}")
