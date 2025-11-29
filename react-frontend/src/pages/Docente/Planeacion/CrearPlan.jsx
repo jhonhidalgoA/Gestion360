@@ -271,20 +271,43 @@ const Planeacion = () => {
   const handleGuardar = handleSubmit(async (data) => {
     setMensaje({ tipo: "", texto: "" });
     try {
-      // Obtener el docente_user_id desde sessionStorage o contexto
-      const docente_user_id = "6621c135-e0a0-44e4-9895-1aa641117b1b"; 
-
-      if (!docente_user_id) {
-        throw new Error("No se pudo obtener el ID del docente");
+      // 👇 Obtener la sesión desde "user_session"
+      const userSessionString = sessionStorage.getItem("user_session");
+      if (!userSessionString) {
+        throw new Error("No se encontró la sesión del usuario");
       }
 
-      // Preparar los datos para enviar
+      const userSession = JSON.parse(userSessionString);
+
+      // Validar que tenga username
+      if (!userSession.username) {
+        throw new Error("No se encontró el username en la sesión");
+      }
+
+      // 👇 Llamar al endpoint /docente-uuid/{username} para obtener el UUID real
+      const resDocente = await fetch(
+        `http://localhost:8000/api/docente-uuid/${userSession.username}`
+      );
+      if (!resDocente.ok) {
+        const errorData = await resDocente.json();
+        throw new Error(
+          errorData.detail || "Error al obtener el ID del docente"
+        );
+      }
+      const docenteData = await resDocente.json();
+      const docente_user_id = docenteData.docente_user_id;
+
+      if (!docente_user_id) {
+        throw new Error("No se recibió un ID válido del docente");
+      }
+
+      // 👇 Preparar y enviar el plan
       const payload = {
         ...data,
         docente_user_id: docente_user_id,
       };
 
-      console.log("Plan guardado:", payload); // Verifica los datos antes de enviar
+      console.log("Plan guardado:", payload);
 
       const res = await fetch("http://localhost:8000/api/guardar-plan-clase", {
         method: "POST",
@@ -294,11 +317,11 @@ const Planeacion = () => {
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.detail || "Error al guardar");
+        throw new Error(errorData.detail || "Error al guardar el plan");
       }
 
       const result = await res.json();
-      setPlanGuardadoId(result.plan_id); // 👈 Aquí se usa setPlanGuardadoId
+      setPlanGuardadoId(result.plan_id);
       setMensaje({
         tipo: "exito",
         texto: "Planificación guardada exitosamente.",
@@ -307,7 +330,8 @@ const Planeacion = () => {
       console.error("Error al guardar el plan:", error);
       setMensaje({
         tipo: "error",
-        texto: "Error al guardar el plan. Inténtalo más tarde.",
+        texto:
+          error.message || "Error al guardar el plan. Inténtalo más tarde.",
       });
     }
   });

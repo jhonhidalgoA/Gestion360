@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Form, File, UploadFile
 from sqlalchemy.orm import Session
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, text
 from backend.database import get_db
 from pathlib import Path
 import uuid
@@ -18,6 +18,7 @@ from io import BytesIO
 from backend.schemas import BoletinCompletoResponse
 import qrcode
 import base64
+
 
 
 
@@ -1828,3 +1829,25 @@ def guardar_plan_clase(
         db.rollback()
         print("ERROR AL GUARDAR PLAN:", str(e))  # Log en consola del servidor
         raise HTTPException(status_code=500, detail=f"Error al guardar el plan: {str(e)}")
+    
+@router.get("/docente-uuid/{username}")
+def get_docente_uuid(username: str, db: Session = Depends(get_db)):
+    """
+    Obtiene el user_id (UUID) de un docente a partir de su número de documento.
+    Usa comillas dobles para respetar mayúsculas y TRIM para evitar errores por espacios.
+    """
+    try:
+        docente = db.execute(
+            select(text("user_id"))
+            .select_from(text("docentes"))
+            .where(text('TRIM("teacherDocumentNumber") = :username'))
+            .params(username=username.strip())
+        ).fetchone()
+
+        if not docente:
+            raise HTTPException(status_code=404, detail="Docente no encontrado")
+
+        return {"docente_user_id": str(docente.user_id)}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al obtener el ID del docente: {str(e)}")

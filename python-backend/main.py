@@ -87,7 +87,7 @@ def root():
     return {"message": "API funcionando correctamente "}
 
 
-# --- LOGIN --- #
+# --- LOGIN CORREGIDO ---
 @app.post("/login")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == data.username).first()
@@ -95,23 +95,29 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     if not user or not verify_password(data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
 
-    # Rol del usuario
     role_name = "sin_rol"
     if user.role:
         role_name = str(user.role.name).lower()
         
     grado_id = None   
-    
-    if role_name == "estudiante":
+    username_final = user.username  # 👈 Valor por defecto
+
+    # 🔸 Si es docente, obtener su teacherDocumentNumber real
+    if role_name == "docente":
+        docente = db.query(Docente).filter(Docente.user_id == user.id).first()
+        if docente and docente.teacherDocumentNumber is not None:  # ✅ Aquí se corrige
+            username_final = docente.teacherDocumentNumber  # ✅ Esto es un string, no una columna
+
+    # Si es estudiante, obtener grado
+    elif role_name == "estudiante":
         estudiante = db.query(Estudiante).filter(Estudiante.user_id == user.id).first()
         if estudiante:
             grado_id = estudiante.grado_id 
 
-    # Crear token
+    # Token y redirección
     token_data = {"sub": user.username, "role": role_name}
     access_token = create_access_token(token_data)
 
-    # Redirección según rol
     redirect_map = {
         "administrador": "/administrador",
         "docente": "/docente",
@@ -121,20 +127,19 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     }
     redirect = redirect_map.get(role_name, "/")
 
-    # Actualizar última conexión
     user.last_login = datetime.utcnow()
     user.last_active = datetime.utcnow()
     db.commit()
 
     return {
-        "username": user.username,
+        "username": username_final,
+        "user_id": str(user.id),  
         "full_name": user.full_name,
         "rol": role_name,
         "redirect": redirect,
         "access_token": access_token,
         "grado_id": grado_id 
     }
-
 
 # --- MODULO ADMINISTRADOR --- #
 
