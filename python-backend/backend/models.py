@@ -292,4 +292,43 @@ class EvidenciaAprendizaje(Base):
     codigo: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     
     
+class TipoActividad(Base):
+    __tablename__ = "tipo_actividad"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    nombre: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    etiqueta: Mapped[str] = mapped_column(String(100), nullable=False)    
+
+class ProyectoTransversal(Base):
+    __tablename__ = "proyecto_transversal"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    nombre: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    etiqueta: Mapped[str] = mapped_column(String(150), nullable=False) 
+    
+class PlanClase(Base):
+    __tablename__ = "plan_clase"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    fecha_inicio: Mapped[date] = mapped_column(Date, nullable=False)
+    fecha_fin: Mapped[date] = mapped_column(Date, nullable=False)
+    periodo_id: Mapped[int] = mapped_column(ForeignKey("periodos.id"), nullable=False)
+    grado_id: Mapped[int] = mapped_column(ForeignKey("grados.id"), nullable=False)
+    asignatura_nombre: Mapped[str] = mapped_column(String(100), nullable=False)
+    tipo_actividad: Mapped[str] = mapped_column(String(50), nullable=False)
+    tema: Mapped[str] = mapped_column(Text, nullable=False)
+    estandar_id: Mapped[int] = mapped_column(ForeignKey("estandar.id"), nullable=False)
+    dba_id: Mapped[int] = mapped_column(ForeignKey("dba.id"), nullable=False)
+    evidencia_id: Mapped[Optional[int]] = mapped_column(ForeignKey("evidencia_aprendizaje.id"), nullable=True)
+    competencias: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    proyecto_transversal: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    objetivos: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    saberes_previos: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    analiza: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    contenidos: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    evaluacion: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    observaciones: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    bibliografia: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    creado_en: Mapped[datetime] = mapped_column(TIMESTAMP, default=lambda: datetime.now(timezone.utc))
+    docente_user_id: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("users.id"), nullable=True)       
     

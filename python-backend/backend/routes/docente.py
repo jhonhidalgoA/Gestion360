@@ -9,6 +9,7 @@ import json
 from io import BytesIO
 import unicodedata
 from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante, Estandar, AsignaturaGrado, Dba, EvidenciaAprendizaje 
+from backend.models import TipoActividad, ProyectoTransversal, PlanClase
 from weasyprint import HTML
 from datetime import datetime, date
 from fastapi.responses import StreamingResponse
@@ -1508,3 +1509,322 @@ def get_evidencias_por_dba(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al cargar evidencias: {str(e)}")
     
+@router.get("/tipos-actividad")
+def get_tipos_actividad(db: Session = Depends(get_db)):
+    try:
+        tipos = db.execute(select(TipoActividad).order_by(TipoActividad.id)).scalars().all()
+        return [{"value": t.nombre, "label": t.etiqueta} for t in tipos]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))    
+
+@router.get("/proyectos-transversales")
+def get_proyectos_transversales(db: Session = Depends(get_db)):
+    try:
+        proyectos = db.execute(select(ProyectoTransversal).order_by(ProyectoTransversal.id)).scalars().all()
+        return [{"value": p.nombre, "label": p.etiqueta} for p in proyectos]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))    
+    
+
+
+def generar_plan_clase_pdf(buffer, plan_data):
+    """
+    Genera un PDF del plan de clase usando WeasyPrint.
+    """
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                font-size: 11pt;
+                color: #000;
+                margin: 2cm;
+                line-height: 1.5;
+            }}
+            .header {{
+                text-align: center;
+                margin-bottom: 20pt;
+            }}
+            .titulo {{
+                font-size: 18pt;
+                font-weight: bold;
+                color: #2c3e50;
+                margin-bottom: 5pt;
+            }}
+            .subtitulo {{
+                font-size: 14pt;
+                color: #3498db;
+                margin-bottom: 15pt;
+            }}
+            .seccion {{
+                margin-bottom: 20pt;
+            }}
+            .seccion-titulo {{
+                font-weight: bold;
+                color: #2c3e50;
+                margin-bottom: 8pt;
+                border-bottom: 1pt solid #3498db;
+                padding-bottom: 4pt;
+            }}
+            .contenido {{
+                margin-left: 10pt;
+            }}
+            .tabla-info {{
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20pt;
+            }}
+            .tabla-info td {{
+                padding: 6pt;
+                vertical-align: top;
+            }}
+            .label {{
+                font-weight: bold;
+                width: 20%;
+            }}
+            .valor {{
+                width: 80%;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="titulo">COLEGIO STEM 360</div>
+            <div class="subtitulo">PLAN DE CLASE</div>
+        </div>
+
+        <table class="tabla-info">
+            <tr>
+                <td class="label">Fecha(s):</td>
+                <td class="valor">{plan_data['fecha_inicio']} al {plan_data['fecha_fin']}</td>
+            </tr>
+            <tr>
+                <td class="label">Período:</td>
+                <td class="valor">{plan_data['periodo_nombre']}</td>
+            </tr>
+            <tr>
+                <td class="label">Grado:</td>
+                <td class="valor">{plan_data['grado_nombre']}</td>
+            </tr>
+            <tr>
+                <td class="label">Asignatura:</td>
+                <td class="valor">{plan_data['asignatura_nombre']}</td>
+            </tr>
+            <tr>
+                <td class="label">Tipo:</td>
+                <td class="valor">{plan_data['tipo_actividad_etiqueta']}</td>
+            </tr>
+            <tr>
+                <td class="label">Tema:</td>
+                <td class="valor">{plan_data['tema']}</td>
+            </tr>
+        </table>
+
+        <div class="seccion">
+            <div class="seccion-titulo">Estándar</div>
+            <div class="contenido">{plan_data['estandar_nombre']}</div>
+        </div>
+
+        <div class="seccion">
+            <div class="seccion-titulo">Derechos Básicos de Aprendizaje (DBA)</div>
+            <div class="contenido">{plan_data['dba_descripcion']}</div>
+        </div>
+
+        {"<div class='seccion'><div class='seccion-titulo'>Evidencia de Aprendizaje</div><div class='contenido'>" + plan_data['evidencia_descripcion'] + "</div></div>" if plan_data.get('evidencia_descripcion') else ""}
+
+        {"<div class='seccion'><div class='seccion-titulo'>Competencias</div><div class='contenido'>" + plan_data['competencias'] + "</div></div>" if plan_data.get('competencias') else ""}
+
+        {"<div class='seccion'><div class='seccion-titulo'>Proyecto Transversal</div><div class='contenido'>" + plan_data['proyecto_etiqueta'] + "</div></div>" if plan_data.get('proyecto_etiqueta') else ""}
+
+        {"<div class='seccion'><div class='seccion-titulo'>Objetivos</div><div class='contenido'>" + plan_data['objetivos'] + "</div></div>" if plan_data.get('objetivos') else ""}
+
+        {"<div class='seccion'><div class='seccion-titulo'>Saberes Previos</div><div class='contenido'>" + plan_data['saberes_previos'] + "</div></div>" if plan_data.get('saberes_previos') else ""}
+
+        {"<div class='seccion'><div class='seccion-titulo'>¿Cómo analiza el docente?</div><div class='contenido'>" + plan_data['analiza'] + "</div></div>" if plan_data.get('analiza') else ""}
+
+        {"<div class='seccion'><div class='seccion-titulo'>Contenidos</div><div class='contenido'>" + plan_data['contenidos'] + "</div></div>" if plan_data.get('contenidos') else ""}
+
+        {"<div class='seccion'><div class='seccion-titulo'>Evaluación</div><div class='contenido'>" + plan_data['evaluacion'] + "</div></div>" if plan_data.get('evaluacion') else ""}
+
+        {"<div class='seccion'><div class='seccion-titulo'>Observaciones</div><div class='contenido'>" + plan_data['observaciones'] + "</div></div>" if plan_data.get('observaciones') else ""}
+
+        {"<div class='seccion'><div class='seccion-titulo'>Bibliografía</div><div class='contenido'>" + plan_data['bibliografia'] + "</div></div>" if plan_data.get('bibliografia') else ""}
+
+        <div style="margin-top: 40pt; font-size: 10pt; color: #7f8c8d; text-align: center;">
+            Documento generado el {datetime.now().strftime('%d/%m/%Y a las %H:%M')}
+        </div>
+    </body>
+    </html>
+    """
+    HTML(string=html_content).write_pdf(buffer) 
+    
+@router.get("/pdf/plan-clase/{plan_id}")
+def generar_pdf_plan_clase(plan_id: int, db: Session = Depends(get_db)):
+    try:
+        # 1. Obtener el plan
+        plan = db.get(PlanClase, plan_id)
+        if not plan:
+            raise HTTPException(status_code=404, detail="Plan de clase no encontrado")
+
+        # 2. Cargar datos relacionados
+        estandar = db.get(Estandar, plan.estandar_id)
+        dba = db.get(Dba, plan.dba_id)
+        evidencia = db.get(EvidenciaAprendizaje, plan.evidencia_id) if plan.evidencia_id else None
+        grado = db.get(Grado, plan.grado_id)
+        periodo = db.get(Periodo, plan.periodo_id)
+
+        # 3. Obtener etiquetas para tipo_actividad y proyecto_transversal
+        tipo_etiqueta = ""
+        if plan.tipo_actividad:
+            tipo_res = db.execute(
+                select(TipoActividad.etiqueta)
+                .where(TipoActividad.nombre == plan.tipo_actividad)
+            ).scalar_one_or_none()
+            tipo_etiqueta = tipo_res or plan.tipo_actividad
+
+        proyecto_etiqueta = ""
+        if plan.proyecto_transversal:
+            proy_res = db.execute(
+                select(ProyectoTransversal.etiqueta)
+                .where(ProyectoTransversal.nombre == plan.proyecto_transversal)
+            ).scalar_one_or_none()
+            proyecto_etiqueta = proy_res or plan.proyecto_transversal
+
+        # 4. Construir el diccionario de datos
+        plan_data = {
+            "fecha_inicio": plan.fecha_inicio.strftime("%d/%m/%Y"),
+            "fecha_fin": plan.fecha_fin.strftime("%d/%m/%Y"),
+            "periodo_nombre": periodo.nombre if periodo else "N/A",
+            "grado_nombre": grado.nombre if grado else "N/A",
+            "asignatura_nombre": plan.asignatura_nombre,
+            "tipo_actividad_etiqueta": tipo_etiqueta,
+            "tema": plan.tema,
+            "estandar_nombre": estandar.nombre if estandar else "N/A",
+            "dba_descripcion": dba.descripcion if dba else "N/A",
+            "evidencia_descripcion": evidencia.descripcion if evidencia else None,
+            "competencias": plan.competencias,
+            "proyecto_etiqueta": proyecto_etiqueta,
+            "objetivos": plan.objetivos,
+            "saberes_previos": plan.saberes_previos,
+            "analiza": plan.analiza,
+            "contenidos": plan.contenidos,
+            "evaluacion": plan.evaluacion,
+            "observaciones": plan.observaciones,
+            "bibliografia": plan.bibliografia,
+        }
+
+        # 5. Generar PDF en memoria
+        buffer = BytesIO()
+        generar_plan_clase_pdf(buffer, plan_data)
+        buffer.seek(0)
+
+        # 6. Devolver PDF
+        return StreamingResponse(
+            buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"inline; filename=Plan_Clase_{plan_id}.pdf"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")   
+    
+    
+    
+@router.post("/guardar-plan-clase")
+def guardar_plan_clase(
+    data: dict,
+    db: Session = Depends(get_db)
+):
+    """
+    Guarda un plan de clase completo en la base de datos.
+    """
+    try:
+        print("=== INICIO GUARDAR PLAN ===")
+        print("Datos recibidos:", data)
+
+        # Validar campos obligatorios
+        campos_obligatorios = [
+            "fecha_inicio", "fecha_fin", "periodo", "grupo", "asignatura",
+            "tipo", "tema", "estandar", "dba"
+        ]
+        for campo in campos_obligatorios:
+            if not data.get(campo):
+                raise HTTPException(status_code=400, detail=f"El campo '{campo}' es obligatorio.")
+
+        # Convertir a enteros y validar existencia
+        periodo_id = int(data["periodo"])
+        grado_id = int(data["grupo"])
+        estandar_id = int(data["estandar"])
+        dba_id = int(data["dba"])
+        evidencia_id = int(data["evidencia"]) if data.get("evidencia") else None
+
+        # Validar que los IDs existan
+        periodo = db.get(Periodo, periodo_id)
+        if not periodo:
+            raise HTTPException(status_code=400, detail=f"Período {periodo_id} no existe.")
+
+        grado = db.get(Grado, grado_id)
+        if not grado:
+            raise HTTPException(status_code=400, detail=f"Grado {grado_id} no existe.")
+
+        estandar = db.get(Estandar, estandar_id)
+        if not estandar:
+            raise HTTPException(status_code=400, detail=f"Estándar {estandar_id} no existe.")
+
+        dba = db.get(Dba, dba_id)
+        if not dba:
+            raise HTTPException(status_code=400, detail=f"DBA {dba_id} no existe.")
+
+        if evidencia_id:
+            evidencia = db.get(EvidenciaAprendizaje, evidencia_id)
+            if not evidencia:
+                raise HTTPException(status_code=400, detail=f"Evidencia {evidencia_id} no existe.")
+
+        # Convertir docente_user_id a UUID si existe
+        docente_user_id = None
+        if data.get("docente_user_id"):
+            try:
+                docente_user_id = uuid.UUID(data["docente_user_id"])
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Formato inválido para docente_user_id")
+
+        # Crear el registro
+        nuevo_plan = PlanClase(
+            fecha_inicio=data["fecha_inicio"],
+            fecha_fin=data["fecha_fin"],
+            periodo_id=periodo_id,
+            grado_id=grado_id,
+            asignatura_nombre=data["asignatura"],
+            tipo_actividad=data["tipo"],
+            tema=data["tema"],
+            estandar_id=estandar_id,
+            dba_id=dba_id,
+            evidencia_id=evidencia_id,
+            competencias=data.get("competencias"),
+            proyecto_transversal=data.get("proyecto"),
+            objetivos=data.get("objetivos"),
+            saberes_previos=data.get("saberes_previos"),
+            analiza=data.get("analiza"),
+            contenidos=data.get("contenidos"),
+            evaluacion=data.get("evaluacion"),
+            observaciones=data.get("observaciones"),
+            bibliografia=data.get("bibliografia"),
+            docente_user_id=docente_user_id  # 👈 Aquí está la corrección
+        )
+
+        print("Creando plan con ID:", nuevo_plan.id)  # Esto mostrará None antes de commit
+        db.add(nuevo_plan)
+        db.commit()
+        db.refresh(nuevo_plan)
+
+        print("Plan guardado con ID:", nuevo_plan.id)  # Debería mostrar un número
+
+        return {"message": "Plan de clase guardado exitosamente.", "plan_id": nuevo_plan.id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        print("ERROR AL GUARDAR PLAN:", str(e))  # Log en consola del servidor
+        raise HTTPException(status_code=500, detail=f"Error al guardar el plan: {str(e)}")
