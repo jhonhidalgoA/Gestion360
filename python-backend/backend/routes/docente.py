@@ -1878,20 +1878,14 @@ def get_mis_planes(
     db: Session = Depends(get_db),
     usuario_actual: dict = Depends(verificar_token_jwt)
 ):
-    """
-    Obtiene los planes de clase del docente autenticado.
-    Solo accesible para usuarios con rol 'docente'.
-    """
+   
     if usuario_actual["rol"] != "docente":
         raise HTTPException(status_code=403, detail="Acceso denegado")
 
     try:
-        # Convertir el user_id de string a UUID
-        docente_user_id = uuid.UUID(usuario_actual["user_id"])
-
-        # Obtener planes del docente
+        docente_user_id_str = usuario_actual["user_id"]
         planes = db.query(PlanClase).filter(
-            PlanClase.docente_user_id == docente_user_id
+            PlanClase.docente_user_id == docente_user_id_str
         ).all()
 
         resultado = []

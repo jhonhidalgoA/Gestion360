@@ -36,7 +36,7 @@ const PlanesVer = () => {
     const fetchPlanes = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/planes'); // 👈 Asegúrate de usar tu endpoint real
+        const response = await fetch('/api/planes'); 
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
         }

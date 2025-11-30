@@ -1,46 +1,33 @@
-# backend/auth.py
-
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, JWTError
-from sqlalchemy.orm import Session
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
+from jose import jwt
 from backend.database import get_db
 from backend.models import User
 import uuid
 
-# Esquema para leer el token del encabezado
+SECRET_KEY = "tu_clave_secreta_aqui_cambiar_en_produccion"
+ALGORITHM = "HS256"
+
 security = HTTPBearer()
 
-def verificar_token_jwt(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
-    """
-    Valida el JWT y devuelve el UUID del usuario (user.id) y su rol.
-    """
+def verificar_token_jwt(credentials: HTTPAuthorizationCredentials = Depends(security), db=Depends(get_db)):
     try:
-        # Decodificar el token
-        payload = jwt.decode(credentials.credentials, "tu_clave_secreta_aqui_cambiar_en_produccion", algorithms=["HS256"])
-        
-        # Obtener los campos
-        username = payload.get("sub")
-        rol = payload.get("role")
-        
-        # Validar que sean strings
-        if not isinstance(username, str) or not isinstance(rol, str):
-            raise JWTError()
-            
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token inválido o expirado",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Buscar al usuario por username (que es el número de documento)
-    user = db.query(User).filter(User.username == username).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    
-    # Devolver el user.id como string (es UUID) y el rol
-    return {
-        "user_id": str(user.id),
-        "rol": rol
-    }
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id_str = payload.get("sub")
+        rol = payload.get("rol")
+
+        if not user_id_str or not rol:
+            raise Exception()
+
+        # ✅ Convertir string a UUID explícitamente
+        user_id_uuid = uuid.UUID(user_id_str)
+
+        # ✅ Comparar UUID con UUID
+        user = db.query(User).filter(User.id == user_id_uuid).first()
+        if not user:
+            raise Exception()
+
+        return {"user_id": str(user_id_uuid), "rol": rol}
+
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token inválido o expirado")

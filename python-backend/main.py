@@ -115,7 +115,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
             grado_id = estudiante.grado_id 
 
     # Token y redirección
-    token_data = {"sub": user.username, "role": role_name}
+    token_data = {"sub": str(user.id), "rol": role_name}
     access_token = create_access_token(token_data)
 
     redirect_map = {
