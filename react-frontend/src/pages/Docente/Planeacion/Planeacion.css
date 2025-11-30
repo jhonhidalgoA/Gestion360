@@ -12,13 +12,13 @@
 }
 
 .action-cards {
-  background: white;
+  background: #f9f9f9;
   border-radius: 10px;
+  border: 2px solid #ddd;
   padding: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  cursor: pointer;
-  border: 2px solid transparent;
+  cursor: pointer;  
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -31,8 +31,7 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);  
 }
 
-.action-icons {
-  background: white;
+.action-icons {  
   width: 90px;
   height: 90px;
   border-radius: 5px;
@@ -41,17 +40,16 @@
   justify-content: center;  
 }
 
-.icon-white{
-  color: white;
+.icon-white{  
   font-size: 3.5rem;
 }
 
 .action-cards:nth-child(1) .action-icons {
-  background: #2196f3; 
+  color: #4CAF50;
 }
 
 .action-cards:nth-child(2) .action-icons {
-  background: #4caf50; 
+  color: #2196F3;
 }
 
 .action-card-text {

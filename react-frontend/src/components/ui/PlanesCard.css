@@ -1,18 +1,20 @@
 .planes-card {
-  background-color: white;
+  background-color:#f9f9f9;
   border-radius: 5px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  padding: 8px;
-  margin: 10px auto;
-  width: 1400px;
+  border: 2px solid #ddd;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+  padding: 10px;
+  margin: 5px auto;
+  width: 1300px;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
+
 .icon-planes {
-  font-size:80px;
-  color: #090a09ff;
+  font-size:70px;
+  color: #3F51B5;
 }
 
 .planes-subtitle{
@@ -57,6 +59,7 @@
 
 .planes-button{
     margin-left: auto;
+    margin-right:20px;
     display: flex;
     align-items: center;
     gap:30px;
@@ -91,4 +94,55 @@
 .planes-button button:nth-child(3) {
   background-color: #dc3545; 
   color: white;
+}
+
+.plan-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.tag {
+  font-size: 0.8rem; 
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: white;
+  font-weight:800;
+  display: inline-block;
+}
+
+.tag.materia {
+  background: #e7f5ff;
+  color: #1971c2; 
+}
+
+.tag.grado {
+  background: #d3f9d8;
+  color: #2f9e44; 
+}
+
+.tag.periodo {
+  background: #fff4e6;
+  color: #e8590c;
+}
+
+.tag.plan{
+  background: #f3f0ff;
+  color: #7950f2;
+}
+
+.tag.fechas { 
+  color: black;
+  font-family: 'Courier New', monospace;
+  font-size:0.9rem;
+  font-weight: 500;
+}
+
+
+.planes-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
 }

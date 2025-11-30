@@ -18,8 +18,8 @@ from io import BytesIO
 from backend.schemas import BoletinCompletoResponse
 import qrcode
 import base64
-from typing import List
-from backend.auth import verificar_token_jwt
+from fastapi import Depends, Query
+from sqlalchemy.orm import Session
 
 
 
@@ -1853,10 +1853,7 @@ def guardar_plan_clase(
     
 @router.get("/docente-uuid/{username}")
 def get_docente_uuid(username: str, db: Session = Depends(get_db)):
-    """
-    Obtiene el user_id (UUID) de un docente a partir de su número de documento.
-    Usa comillas dobles para respetar mayúsculas y TRIM para evitar errores por espacios.
-    """
+    
     try:
         docente = db.execute(
             select(text("user_id"))
@@ -1873,19 +1870,14 @@ def get_docente_uuid(username: str, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al obtener el ID del docente: {str(e)}")
     
-    
-    
-from fastapi import Depends, Query
-from sqlalchemy.orm import Session
+
 
 @router.get("/planes/mis-planes")
 def get_mis_planes(
     username: str = Query(..., description="Número de documento del docente"),
     db: Session = Depends(get_db)
 ):
-    """
-    Obtiene los planes de clase del docente autenticado
-    """
+   
     # Buscar docente por teacherDocumentNumber
     docente = db.query(Docente).filter(
         Docente.teacherDocumentNumber == username

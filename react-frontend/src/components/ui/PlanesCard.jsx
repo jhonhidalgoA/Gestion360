@@ -1,5 +1,4 @@
 import "./PlanesCard.css";
-import ActionButtons from "../ui/Botones";
 
 const PlanesCard = ({
   icon,
@@ -11,44 +10,67 @@ const PlanesCard = ({
   dateEnd,
   plan,
 }) => {
+  // Formatear fechas al estilo anglosajón: "Nov 3 – 17, 2025"
+  const formatDateRange = (start, end) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const startPart = startDate.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+
+    const endPart = endDate.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
+    return `${startPart} – ${endPart}`;
+  };
+
   return (
-    <>
-      <div className="planes-card">
-        <div className="planes-icon">
-          <span class="material-symbols-outlined icon-planes">{icon}</span>
-        </div>
-        <div className="planes-name">
-          <h3 className="planes-title">{name}</h3>
-          <div className="planes-subtitle">
-            <p className="subject">{asignatura}</p>
-            <p>{grado}</p>
-            <p>{periodo}</p>
-          </div>
-          <div className="planes-date">
-            <span class="material-symbols-outlined icon-planes-date">
-              calendar_month
-            </span>
-            <p>{datestart}</p>
-            <p>{dateEnd}</p>
-          </div>
-          <div className="planes-type">
-            <p>{plan} </p>
-          </div>
-        </div>
-        <div className="planes-button">
-          <button>
-            <span class="material-symbols-outlined icons-planes-right">visibility</span>
-          </button>
-          <button>
-            <span class="material-symbols-outlined icons-planes-right">edit</span>
-          </button>
-          <button>
-            <span class="material-symbols-outlined icons-planes-right">delete</span>
-          </button>
-          
+    <div className="planes-card">
+      <div className="planes-icon">
+        <span className="material-symbols-outlined icon-planes">{icon}</span>
+      </div>
+      <div className="planes-name">
+        <h3 className="planes-title">Tema: {name}</h3>
+
+        {/* Fecha formateada */}
+        <div className="planes-date">
+          <span className="material-symbols-outlined icon-planes-date">
+            calendar_month
+          </span>
+          <span className="tag fechas">
+            {formatDateRange(datestart, dateEnd)}
+          </span>
+        </div>       
+        <div className="plan-tags">
+          <span className="tag materia">{asignatura}</span>
+          <span className="tag grado">{grado}</span>
+          <span className="tag periodo">{periodo}</span>
+          <span className="tag plan">{plan}</span>
         </div>
       </div>
-    </>
+      <div className="planes-button">
+        <button>
+          <span className="material-symbols-outlined icons-planes-right">
+            visibility
+          </span>
+        </button>
+        <button>
+          <span className="material-symbols-outlined icons-planes-right">
+            edit
+          </span>
+        </button>
+        <button>
+          <span className="material-symbols-outlined icons-planes-right">
+            delete
+          </span>
+        </button>
+      </div>
+    </div>
   );
 };
 

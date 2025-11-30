@@ -8,6 +8,8 @@ const PlanesVer = () => {
   const [planesData, setPlanesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const [currentPage, setCurrentPage] = useState(1);
+  const planesPerPage = 4;
 
   const getIconForAsignatura = (asignatura) => {
     const normalized = (asignatura || '').toLowerCase()
@@ -16,6 +18,8 @@ const PlanesVer = () => {
     
     const icons = {
       'matematicas': 'functions',
+      'geometria' : 'format_shapes',
+      'estadistica' : 'statistics',
       'ciencias': 'science',
       'espanol': 'public',
       'ingles': 'translate',
@@ -27,7 +31,7 @@ const PlanesVer = () => {
       'tecnologia': 'memory',
       'arte': 'palette',
       'musica': 'music_note',
-      'educacion fisica': 'fitness_center',
+      'educacion_fisica': 'fitness_center',
     };
     return icons[normalized] || 'description';
   };
@@ -60,6 +64,17 @@ const PlanesVer = () => {
         setLoading(false);
       });
   }, [user]);
+
+  // Paginación
+  const totalPages = Math.max(1, Math.ceil(planesData.length / planesPerPage));
+  const startIndex = (currentPage - 1) * planesPerPage;
+  const currentPlanes = planesData.slice(startIndex, startIndex + planesPerPage);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   if (loading) {
     return (
@@ -105,7 +120,7 @@ const PlanesVer = () => {
               No tienes planes creados.
             </p>
           ) : (
-            planesData.map(plan => (
+            currentPlanes.map(plan => (
               <PlanesCard
                 key={plan.id}
                 icon={getIconForAsignatura(plan.asignatura)}
@@ -120,6 +135,36 @@ const PlanesVer = () => {
             ))
           )}
         </div>
+
+        {/* Paginación centrada */}
+        {planesData.length > planesPerPage && (
+          <div className="pagination">
+            <p className="pagination-info">
+              Página {currentPage} de {totalPages}
+            </p>
+            <button 
+              onClick={() => handlePageChange(currentPage - 1)} 
+              disabled={currentPage === 1}
+            >
+              ‹
+            </button>
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => handlePageChange(i + 1)}
+                className={currentPage === i + 1 ? 'active' : ''}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button 
+              onClick={() => handlePageChange(currentPage + 1)} 
+              disabled={currentPage === totalPages}
+            >
+              ›
+            </button>
+          </div>
+        )}
       </main>
     </>
   );

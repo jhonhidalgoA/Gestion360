@@ -342,24 +342,41 @@ const Planeacion = () => {
   });
 
   const handleGenerarPDF = async () => {
-    setMensaje({ tipo: "info", texto: "Generando PDF..." });
-    try {
-      if (!planGuardadoId) {
-        setMensaje({
-          tipo: "error",
-          texto: "No hay un plan guardado para generar PDF.",
-        });
-        return;
-      }
-      const url = `http://localhost:8000/api/pdf/plan-clase/${planGuardadoId}`;
-      window.open(url, "_blank");
-      setShowSuccessModal(false);
-      setShowAlreadyExistsModal(false);
-    } catch (err) {
-      console.error("Error al generar PDF:", err);
-      setMensaje({ tipo: "error", texto: "No se pudo generar el PDF." });
+  setMensaje({ tipo: "info", texto: "Generando PDF..." });
+  try {
+    if (!planGuardadoId) {
+      setMensaje({
+        tipo: "error",
+        texto: "No hay un plan guardado para generar PDF.",
+      });
+      return;
     }
-  };
+
+    const url = `http://localhost:8000/api/pdf/plan-clase/${planGuardadoId}`;
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error("No se pudo generar el PDF.");
+    }
+
+    const blob = await res.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = `plan_clase_${planGuardadoId}.pdf`; // Nombre del archivo
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+
+    setShowSuccessModal(false);
+    setShowAlreadyExistsModal(false);
+    setMensaje({ tipo: "", texto: "" });
+  } catch (err) {
+    console.error("Error al generar PDF:", err);
+    setMensaje({ tipo: "error", texto: "No se pudo descargar el PDF." });
+  }
+};
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -539,7 +556,7 @@ const Planeacion = () => {
             onClick: handleNuevoPlan,
           },
           {
-            text: "Generar PDF",
+            text: "Descargar PDF",
             className: "btn-pdf",
             icon: <FaDownload />,
             onClick: handleGenerarPDF,
@@ -566,7 +583,7 @@ const Planeacion = () => {
             onClick: handleNuevoPlan,
           },
           {
-            text: "Generar PDF",
+            text: "Descargar PDF",
             className: "btn-pdf",
             icon: <FaDownload />,
             onClick: handleGenerarPDF,
