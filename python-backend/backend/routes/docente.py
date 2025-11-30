@@ -9,7 +9,7 @@ import json
 from io import BytesIO
 import unicodedata
 from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante, Estandar, AsignaturaGrado, Dba, EvidenciaAprendizaje 
-from backend.models import TipoActividad, ProyectoTransversal, PlanClase
+from backend.models import TipoActividad, ProyectoTransversal, PlanClase, Docente
 from weasyprint import HTML
 from datetime import datetime, date
 from fastapi.responses import StreamingResponse
@@ -1873,53 +1873,47 @@ def get_docente_uuid(username: str, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al obtener el ID del docente: {str(e)}")
     
+    
+    
+from fastapi import Depends, Query
+from sqlalchemy.orm import Session
+
 @router.get("/planes/mis-planes")
 def get_mis_planes(
-    db: Session = Depends(get_db),
-    usuario_actual: dict = Depends(verificar_token_jwt)
+    username: str = Query(..., description="Número de documento del docente"),
+    db: Session = Depends(get_db)
 ):
-   
-    if usuario_actual["rol"] != "docente":
-        raise HTTPException(status_code=403, detail="Acceso denegado")
+    """
+    Obtiene los planes de clase del docente autenticado
+    """
+    # Buscar docente por teacherDocumentNumber
+    docente = db.query(Docente).filter(
+        Docente.teacherDocumentNumber == username
+    ).first()
+    
+    if not docente or docente.user_id is None:
+        return []
 
-    try:
-        docente_user_id_str = usuario_actual["user_id"]
-        planes = db.query(PlanClase).filter(
-            PlanClase.docente_user_id == docente_user_id_str
-        ).all()
+    # Buscar planes usando el user_id del docente
+    planes = db.query(PlanClase).filter(
+        PlanClase.docente_user_id == docente.user_id
+    ).all()
 
-        resultado = []
-        for plan in planes:
-            # Cargar relaciones
-            periodo = db.get(Periodo, plan.periodo_id)
-            grado = db.get(Grado, plan.grado_id)
-            
-            # Formatear fechas
-            fecha_inicio_str = plan.fecha_inicio.strftime("%d-%b-%Y") if plan.fecha_inicio else "N/A"
-            fecha_fin_str = plan.fecha_fin.strftime("%d-%b-%Y") if plan.fecha_fin else "N/A"
-
-            # Obtener etiqueta del tipo de actividad
-            tipo_etiqueta = "Clase"  # valor por defecto
-            if plan.tipo_actividad:
-                tipo_res = db.execute(
-                    select(TipoActividad.etiqueta)
-                    .where(TipoActividad.nombre == plan.tipo_actividad)
-                ).scalar_one_or_none()
-                tipo_etiqueta = tipo_res or plan.tipo_actividad
-
-            plan_data = {
-                "id": plan.id,
-                "name": plan.tema,
-                "asignatura": plan.asignatura_nombre,
-                "grado": grado.nombre if grado else "N/A",
-                "periodo": periodo.nombre if periodo else "N/A",
-                "datestart": fecha_inicio_str,
-                "dateEnd": fecha_fin_str,
-                "plan": tipo_etiqueta,
-            }
-            resultado.append(plan_data)
-
-        return resultado
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al cargar tus planes: {str(e)}")
+    # Formatear respuesta
+    resultado = []
+    for p in planes:
+        periodo = db.get(Periodo, p.periodo_id) if p.periodo_id else None
+        grado = db.get(Grado, p.grado_id) if p.grado_id else None
+        
+        resultado.append({
+            "id": p.id,
+            "name": p.tema,
+            "asignatura": p.asignatura_nombre,
+            "grado": grado.nombre if grado else "N/A",
+            "periodo": periodo.nombre if periodo else "N/A",
+            "datestart": p.fecha_inicio.isoformat() if p.fecha_inicio else "",
+            "dateEnd": p.fecha_fin.isoformat() if p.fecha_fin else "",
+            "plan": p.tipo_actividad or "Clase"
+        })
+    
+    return resultado

@@ -5,7 +5,7 @@ const AuthContext = createContext(null);
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Cambiado a true
+  const [loading, setLoading] = useState(true);
 
   // Recuperar sesión al iniciar
   useEffect(() => {
@@ -35,7 +35,7 @@ function AuthProvider({ children }) {
       console.log("Respuesta del backend:", data);
 
       const userData = {
-        username: data.username,
+        username: data.username, // 👈 Este es el teacherDocumentNumber del backend
         fullName: data.full_name,
         role: data.rol ? data.rol.toLowerCase() : '', 
         accessToken: data.access_token,
@@ -45,8 +45,13 @@ function AuthProvider({ children }) {
       };
 
       setUser(userData);
-      sessionStorage.setItem("user_session", JSON.stringify(userData)); 
-      console.log("Usuario guardado en contexto:", userData);
+      sessionStorage.setItem("user_session", JSON.stringify(userData));
+      
+      // ✅ TAMBIÉN GUARDAR EN LOCALSTORAGE PARA COMPATIBILIDAD
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("accessToken", data.access_token);
+      
+      console.log("Usuario guardado:", userData);
 
       return { success: true, redirect: data.redirect };
     } catch (error) {
@@ -59,7 +64,9 @@ function AuthProvider({ children }) {
 
   const logout = () => {
     setUser(null);
-    sessionStorage.removeItem("user_session"); 
+    sessionStorage.removeItem("user_session");
+    localStorage.removeItem("username");
+    localStorage.removeItem("accessToken");
   };
 
   return (

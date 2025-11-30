@@ -1,67 +1,84 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "../../../hooks/useAuth";
 import NavbarDocente from "../../../components/layout/Navbar/NavbarDocente";
 import PlanesCard from "../../../components/ui/PlanesCard";
 import "./PlanesVer.css";
-import { useState, useEffect } from "react";
 
 const PlanesVer = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
   const [planesData, setPlanesData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Mapeo de asignaturas a íconos de Google Material Symbols
-  const asignaturaToIcon = {
-    'Matemáticas': 'functions',
-    'Ciencias': 'science',
-    'Español': 'public',
-    'Ingles': 'translate',
-    'Historia': 'history',
-    'Geografía': 'location_on',
-    'Física': 'lightbulb',
-    'Química': 'chemistry',
-    'Biología': 'biotech',
-    'Tecnología': 'memory',
-    'Arte': 'palette',
-    'Música': 'music_note',
-    'Educación Física': 'fitness_center',
-  };
+  const { user } = useAuth();
 
   const getIconForAsignatura = (asignatura) => {
-    return asignaturaToIcon[asignatura] || 'description';
+    const normalized = (asignatura || '').toLowerCase()
+      .replace(/á/g, 'a').replace(/é/g, 'e')
+      .replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u');
+    
+    const icons = {
+      'matematicas': 'functions',
+      'ciencias': 'science',
+      'espanol': 'public',
+      'ingles': 'translate',
+      'historia': 'history',
+      'geografia': 'location_on',
+      'fisica': 'lightbulb',
+      'quimica': 'chemistry',
+      'biologia': 'biotech',
+      'tecnologia': 'memory',
+      'arte': 'palette',
+      'musica': 'music_note',
+      'educacion fisica': 'fitness_center',
+    };
+    return icons[normalized] || 'description';
   };
 
-  // Cargar planes desde la API
   useEffect(() => {
-    const fetchPlanes = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/planes'); 
-        if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setPlanesData(data);
-      } catch (err) {
-        setError(err.message || 'Error al cargar los planes');
-        console.error('Error fetching planes:', err);
-      } finally {
-        setLoading(false);
+    const username = user?.username || localStorage.getItem('username');
+    const token = user?.accessToken || localStorage.getItem('accessToken');
+    
+    if (!username || !token) {
+      setLoading(false);
+      return;
+    }
+
+    fetch(`http://127.0.0.1:8000/api/planes/mis-planes?username=${username}`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
-    };
+    })
+      .then(res => {
+        if (!res.ok) throw new Error(`Error ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        setPlanesData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error al cargar planes:", err);
+        setLoading(false);
+      });
+  }, [user]);
 
-    fetchPlanes();
-  }, []);
-
-  const totalPages = Math.ceil(planesData.length / itemsPerPage);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = planesData.slice(indexOfFirstItem, indexOfLastItem);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+  if (loading) {
+    return (
+      <>
+        <NavbarDocente
+          title="Mis Planes de Clase"
+          color="#9c27b0"
+          icon={
+            <span className="material-symbols-outlined navbars-icon">
+              checklist_rtl
+            </span>
+          }
+        />
+        <main className="main-content">
+          <p style={{ textAlign: 'center', marginTop: '2rem' }}>Cargando planes...</p>
+        </main>
+      </>
+    );
+  }
 
   return (
     <>
@@ -76,75 +93,33 @@ const PlanesVer = () => {
       />
       <main className="main-content">
         <div className="planes-search">
-          <input
-            type="search"
-            placeholder="Buscar por materia, grado o periodo ..."
+          <input 
+            type="search" 
+            placeholder="Buscar por materia, grado o periodo ..." 
           />
         </div>
 
-        {loading && <p>Cargando planes...</p>}
-        {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-
-        {!loading && !error && planesData.length === 0 && (
-          <p>No se encontraron planes.</p>
-        )}
-
-        {!loading && !error && planesData.length > 0 && (
-          <>
-            <div className="planes-container">
-              {currentItems.map((plan, index) => (
-                <PlanesCard
-                  key={index}
-                  icon={getIconForAsignatura(plan.asignatura)}
-                  name={plan.name}
-                  asignatura={plan.asignatura}
-                  grado={plan.grado}
-                  periodo={plan.periodo}
-                  datestart={plan.datestart}
-                  dateEnd={plan.dateEnd}
-                  plan={plan.plan}
-                />
-              ))}
-            </div>
-
-            <div className="pagination">
-              <button onClick={prevPage} disabled={currentPage === 1}>
-                ←
-              </button>
-
-              {Array.from({ length: totalPages }, (_, i) => {
-                const pageNum = i + 1;
-                if (
-                  pageNum === 1 ||
-                  pageNum === totalPages ||
-                  (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-                ) {
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => paginate(pageNum)}
-                      className={pageNum === currentPage ? "active" : ""}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
-                  return <span key={pageNum}>...</span>;
-                }
-                return null;
-              })}
-
-              <button onClick={nextPage} disabled={currentPage === totalPages}>
-                →
-              </button>
-
-              <p className="pagination-info">
-                Mostrando {indexOfFirstItem + 1}–
-                {Math.min(indexOfLastItem, planesData.length)} de {planesData.length} planes
-              </p>
-            </div>
-          </>
-        )}
+        <div className="planes-container">
+          {planesData.length === 0 ? (
+            <p style={{ textAlign: 'center', marginTop: '2rem' }}>
+              No tienes planes creados.
+            </p>
+          ) : (
+            planesData.map(plan => (
+              <PlanesCard
+                key={plan.id}
+                icon={getIconForAsignatura(plan.asignatura)}
+                name={plan.name}
+                asignatura={plan.asignatura}
+                grado={plan.grado}
+                periodo={plan.periodo}
+                datestart={plan.datestart}
+                dateEnd={plan.dateEnd}
+                plan={plan.plan}
+              />
+            ))
+          )}
+        </div>
       </main>
     </>
   );
