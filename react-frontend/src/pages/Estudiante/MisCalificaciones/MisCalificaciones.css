@@ -1,14 +1,342 @@
-.schedules-containers{
+
+.schedules-containers {
   min-height: 100vh;
-  background: linear-gradient(135deg, #5B8FF9, #3A6DD8);
+  background: linear-gradient(135deg, #5b8ff9, #3a6dd8);
   color: white;
   padding: 50px 20px;
 }
 
-.tasks-grid-schedule{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  padding: 20px;
+.page-title {
+  margin-top: -10px;
 }
 
+
+.legend-card {
+  background: #f9f9f9;
+  border-radius: 5px;
+  border: 2px solid #ddd;
+  width: 97%;
+  margin: 0 auto 1.5rem auto;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1rem;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+.legend-item-notes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.legend-item-notes .icon-legend {
+  width: 40px;
+  height: 40px;
+}
+
+.legend-item-notes:nth-child(1) .icon-legend {
+  color: orange;
+}
+
+.legend-item-notes:nth-child(2) .icon-legend {
+  color: green;
+}
+
+.legend-item-notes:nth-child(3) .icon-legend {
+  color: red;
+}
+
+.legend-item-notes:nth-child(4) .icon-legend {
+  color: grey;
+}
+
+.legend-text {
+  font-size: 1.1rem;
+  color: #374151;
+}
+
+
+.areas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  padding: 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+
+.area-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden; 
+  transition: all 0.3s ease;
+}
+
+.area-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: scale(1.01);
+}
+
+
+.area-header {
+  padding: 1.5rem;
+  cursor: pointer;
+  background: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.area-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.area-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+.chevron-icon {
+  width: 24px;
+  height: 24px;
+  color: white;
+}
+
+.area-header-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.area-average-label {
+  color: white;
+  font-size: 1.0rem;
+  opacity: 0.9;
+  margin-bottom: 0.25rem;
+}
+
+.area-average-value {
+  font-size: 2.25rem;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+/* ============================================
+   AREA CONTENT
+   ============================================ */
+.area-content {
+  padding: 1rem;
+}
+
+.subjects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ============================================
+   SUBJECT CARD
+   ============================================ */
+.subject-card {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.15s ease;
+}
+
+.subject-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.subject-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.subject-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.subject-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.subject-hours {
+  font-size: 0.75rem;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.subject-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subject-grade {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.subject-status {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* ============================================
+   AREA FOOTER
+   ============================================ */
+.area-footer {
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.area-summary {
+  font-size: 0.875rem;
+  color: #4b5563;
+  text-align: center;
+  margin: 0;
+}
+
+.click-hint {
+  margin-left: 0.25rem;
+}
+
+/* ============================================
+   ICONOS
+   ============================================ */
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-gray {
+  color: #6b7280;
+}
+
+.icon-yellow {
+  color: #facc15;
+}
+
+.icon-green {
+  color: #22c55e;
+}
+
+.icon-red {
+  color: #ef4444;
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.badge-gray {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.badge-yellow {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge-green {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-red {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* ============================================
+   COLORES DE ÁREAS - BACKGROUNDS
+   ============================================ */
+.area-orange {
+  background: #FFA500;
+}
+
+.area-purple {
+  background: #9333ea;
+}
+
+.area-yellow {
+  background: #ff0000;
+}
+
+.area-blue {
+  background: #0000ff;
+}
+
+.area-cyan {
+  background: #06b6d4;
+}
+
+.area-pink {
+  background: #777777;
+}
+
+.area-green {
+  background: #22c55e;
+}
+
+.area-indigo {
+  background: #ff6600;
+}
+
+
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1200px) {
+  .areas-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .areas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .schedules-containers {
+    padding: 30px 15px;
+  }
+
+  .legend-items {
+    gap: 1.5rem;
+  }
+}

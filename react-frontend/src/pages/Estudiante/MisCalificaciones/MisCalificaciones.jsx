@@ -1,68 +1,263 @@
-import "./MisCalificaciones.css"
-import NavbarModulo from "../../../components/layout/Navbar/NavbarModulo";
-import ScheduleCard from "../../../components/ui/ScheduleCard"
+import "./MisCalificaciones.css";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MathIcon from "../../../assets/student-img/herramientas.png"
-import ScienceIcon from "../../../assets/student-img/ciencias.png"
-import BookIcon from "../../../assets/student-img/libro.png"
-import EnglishIcon from "../../../assets/student-img/globo.png"
-import EarthIcon from "../../../assets/student-img/mundo.png"
-import ArtIcon from "../../../assets/student-img/paletas.png"
-import BallIcon from "../../../assets/student-img/balon.png"
-import PcIcon from "../../../assets/student-img/pc.png"
-import EticIcon from "../../../assets/student-img/etica.png"
+import NavbarModulo from "../../../components/layout/Navbar/NavbarModulo";
+import {
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Star,
+} from "lucide-react";
 
-
-
-const Tareashacer = () => {
+const Calificaciones = () => {
   const navigate = useNavigate();
-
+  const [expandedAreas, setExpandedAreas] = useState({});
+  
   const handleBack = () => {
     navigate("/estudiante");
   };
 
-  const subjects = [
-    { id: 1, subject: "Matemáticas", icon: MathIcon, n1: 3.5, n2: 4.0, n3: 3.8, average: 3.8, color: "#FF6347" },
-    { id: 2, subject: "Español y Literatura", icon: BookIcon, n1: 9.2, n2: 8.7, n3: 9.0, average: 9.0, color: "#8A2BE2" },
-    { id: 3, subject: "Ciencias Naturales", icon: ScienceIcon, n1: 7.8, n2: 8.2, n3: 8.5, average: 8.2, color: "#1E90FF" },
-    { id: 4, subject: "Inglés", icon: EnglishIcon, n1: 9.5, n2: 9.3, n3: 9.6, average: 9.5, color: "#32CD32" },
-    { id: 5, subject: "Ciencias Sociales", icon: EarthIcon, n1: 8.0, n2: 8.5, n3: 8.3, average: 8.3, color: "#FFD700" },
-    { id: 6, subject: "Artistica", icon: ArtIcon, n1: 9.8, n2: 9.6, n3: 9.9, average: 9.8, color: "#FF8C00" },
-    { id: 7, subject: "Educación Física", icon: BallIcon, n1: 10, n2: 10, n3: 10, average: 10, color: "#FF69B4" },
-    { id: 8, subject: "Tecnología", icon: PcIcon, n1: 8.7, n2: 9.1, n3: 8.9, average: 8.9, color: "#00CED1" },
-    { id: 9, subject: "Ética", icon: EticIcon, n1: 9.0, n2: 9.2, n3: 9.1, average: 9.1, color: "#00C9A7" },
+  const toggleArea = (areaId) => {
+    setExpandedAreas((prev) => ({
+      ...prev,
+      [areaId]: !prev[areaId],
+    }));
+  };
+
+  
+  const getStatusIcon = (nota) => {
+    if (nota === null) return <Clock className="icon icon-gray" />;
+    if (nota >= 4.5) return <Star className="icon icon-yellow" />;
+    if (nota >= 3.0) return <CheckCircle className="icon icon-green" />;
+    return <AlertCircle className="icon icon-red" />;
+  };
+
+  const getStatusBadge = (nota) => {
+    if (nota === null) return { text: "Pendiente", color: "badge-gray" };
+    if (nota >= 4.5) return { text: "Excelente", color: "badge-yellow" };
+    if (nota >= 3.0) return { text: "Aprobado", color: "badge-green" };
+    return { text: "Reprobado", color: "badge-red" };
+  };
+
+  const calcularPromedioArea = (subjects) => {
+    const notasValidas = subjects.filter((s) => s.nota !== null);
+    if (notasValidas.length === 0) return null;
+    const suma = notasValidas.reduce((acc, s) => acc + s.nota, 0);
+    return (suma / notasValidas.length).toFixed(1);
+  };
+
+  
+  const academicAreas = [
+    {
+      id: "exactas",
+      name: "Matemáticas",
+      color: "area-orange",
+      bgLight: "area-orange-light",
+      borderColor: "area-orange-border",
+      subjects: [
+        { name: "Matemáticas", ih: 4, nota: null },
+        { name: "Geometría", ih: 1, nota: null },
+        { name: "Estadística", ih: 1, nota: null },
+      ],
+    },
+    {
+      id: "lenguaje",
+      name: "Humanidades",
+      color: "area-purple",
+      bgLight: "area-purple-light",
+      borderColor: "area-purple-border",
+      subjects: [
+        { name: "Castellano", ih: 4, nota: null },
+        { name: "Inglés", ih: 4, nota: null },
+        { name: "C. Lectora", ih: 1, nota: null },
+      ],
+    },
+    {
+      id: "sociales",
+      name: "Ciencias Sociales",
+      color: "area-yellow",
+      bgLight: "area-yellow-light",
+      borderColor: "area-yellow-border",
+      subjects: [
+        { name: "Ciencias Sociales", ih: 3, nota: null },
+        { name: "Historia y Geografía", ih: 3, nota: null },
+      ],
+    },
+    {
+      id: "naturales",
+      name: "Ciencias Naturales",
+      color: "area-blue",
+      bgLight: "area-blue-light",
+      borderColor: "area-blue-border",
+      subjects: [
+        { name: "Biología", ih: 2, nota: null },
+        { name: "Física", ih: 1, nota: null },
+        { name: "Química", ih: 1, nota: null },
+      ],
+    },
+    {
+      id: "tecnologia",
+      name: "Tecnología e Informática",
+      color: "area-cyan",
+      bgLight: "area-cyan-light",
+      borderColor: "area-cyan-border",
+      subjects: [{ name: "Tecnología e Informática", ih: 2, nota: null }],
+    },
+    {
+      id: "artes",
+      name: "Eduacion Artística y Cultural",
+      color: "area-pink",
+      bgLight: "area-pink-light",
+      borderColor: "area-pink-border",
+      subjects: [{ name: "Artística", ih: 2, nota: null }],
+    },
+    {
+      id: "deportes",
+      name: "Educación Física y Deportes",
+      color: "area-green",
+      bgLight: "area-green-light",
+      borderColor: "area-green-border",
+      subjects: [{ name: "E. Física", ih: 2, nota: null }],
+    },
+    {
+      id: "formacion",
+      name: "Educación Religiosa",
+      color: "area-indigo",
+      bgLight: "area-indigo-light",
+      borderColor: "area-indigo-border",
+      subjects: [
+        { name: "Ética", ih: 1, nota: null },
+        { name: "Cátedra de Paz", ih: 1, nota: null },
+        { name: "Religión", ih: 1, nota: null },
+      ],
+    },
   ];
 
-
+ 
   return (
     <div className="schedules-containers">
       <NavbarModulo />
+
+      {/* Header Section */}
       <div className="page-container">
         <button onClick={handleBack} className="back-button">
           <span className="back-icon">←</span>
           Volver al inicio
         </button>
       </div>
+
       <div className="page-title">
-        <h4>Mis Calificaciones</h4>
+        <h6>Informe de Calificaciones – Período: 4, Año 2025</h6>
       </div>
-      <div className="tasks-grid-schedule">
-        {subjects.map((subject) => (
-          <ScheduleCard
-            key={subject.id}
-            subject={subject.subject}
-            icon={subject.icon}
-            n1={subject.n1}
-            n2={subject.n2}
-            n3={subject.n3}
-            average={subject.average}
-            color={subject.color}
-          />
-        ))}
+
+      {/* Legend Section */}
+      <div className="legend-card">
+        <div className="legend-items">
+          <div className="legend-item-notes">
+            <Star className="icon-legend" />
+            <span className="legend-text">Excelente (4.5-5.0)</span>
+          </div>
+          <div className="legend-item-notes">
+            <CheckCircle className="icon-legend" />
+            <span className="legend-text">Aprobado (3.0-4.4)</span>
+          </div>
+          <div className="legend-item-notes">
+            <AlertCircle className="icon-legend" />
+            <span className="legend-text">Reprobado (1.0-2.9)</span>
+          </div>
+          <div className="legend-item-notes">
+            <Clock className="icon-legend" />
+            <span className="legend-text">Pendiente</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Areas Grid */}
+      <div className="areas-grid">
+        {academicAreas.map((area) => {
+          const promedio = calcularPromedioArea(area.subjects);
+          const isExpanded = expandedAreas[area.id];
+          const status = getStatusBadge(promedio);
+
+          return (
+            <div key={area.id} className={`area-card ${area.borderColor}`}>
+              {/* Area Header */}
+              <div
+                className={`area-header ${area.color}`}
+                onClick={() => toggleArea(area.id)}
+              >
+                <div className="area-header-top">
+                  <h3 className="area-title">{area.name}</h3>
+                  {isExpanded ? (
+                    <ChevronUp className="chevron-icon" />
+                  ) : (
+                    <ChevronDown className="chevron-icon" />
+                  )}
+                </div>
+
+                <div className="area-header-bottom">
+                  <div>
+                    <p className="area-average-label">Promedio del Área</p>
+                    <p className="area-average-value">{promedio || "—"}</p>
+                  </div>
+                  {promedio && (
+                    <div className={`status-badge ${status.color}`}>
+                      {status.text}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Subjects List (Expandible) */}
+              {isExpanded && (
+                <div className={`area-content ${area.bgLight}`}>
+                  <div className="subjects-list">
+                    {area.subjects.map((subject, idx) => (
+                      <div key={idx} className="subject-card">
+                        <div className="subject-header">
+                          <div className="subject-title">
+                            {getStatusIcon(subject.nota)}
+                            <span className="subject-name">{subject.name}</span>
+                          </div>
+                          <span className="subject-hours">{subject.ih}h</span>
+                        </div>
+
+                        <div className="subject-footer">
+                          <span className="subject-grade">
+                            {subject.nota || "—"}
+                          </span>
+                          <span
+                            className={`subject-status ${
+                              getStatusBadge(subject.nota).color
+                            }`}
+                          >
+                            {getStatusBadge(subject.nota).text}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Area Footer */}
+              {!isExpanded && (
+                <div className="area-footer">
+                  <p className="area-summary">
+                    {area.subjects.length}{" "}
+                    {area.subjects.length === 1 ? "Asignatura" : "Asignaturas"} •
+                    <span className="click-hint"> Click para ver detalles</span>
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
-    
   );
 };
 
-export default Tareashacer;
+export default Calificaciones;
