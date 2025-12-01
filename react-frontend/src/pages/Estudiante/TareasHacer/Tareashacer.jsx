@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import NavbarModulo from "../../../components/layout/Navbar/NavbarModulo";
 import TaskStudent from "../../../components/ui/TaskStudent";
@@ -19,6 +19,28 @@ import ScienceIcon from "../../../assets/student-img/ciencias.png";
 import BookIcon from "../../../assets/student-img/libro.png";
 import EnglishIcon from "../../../assets/student-img/globo.png";
 
+const iconMap = {
+  matemáticas: MathIcon,
+  ciencias_naturales: ScienceIcon,
+  español: BookIcon,
+  inglés: EnglishIcon,
+  artística: MathIcon,
+  biología: ScienceIcon,
+  ciencias_sociales: BookIcon,
+  castellano: BookIcon,
+};
+
+const colorMap = {
+  matemáticas: "#FF6347",
+  "ciencias naturales": "#1E90FF",
+  español: "#8A2BE2",
+  inglés: "#32CD32",
+  artística: "#FF8C00",
+  biología: "#20B2AA",
+  "c._sociales": "#9370DB",
+  castellano: "#4682B4",
+};
+
 const Tareashacer = () => {
   const navigate = useNavigate();
   const [selectedTask, setSelectedTask] = useState(null);
@@ -31,31 +53,14 @@ const Tareashacer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = "http://localhost:8000";  // <-- Tu backend
+  const API_URL = "http://localhost:8000";
 
-  // Mapeo de asignaturas a íconos
-  const iconMap = {
-    matemáticas: MathIcon,
-    "ciencias naturales": ScienceIcon,
-    español: BookIcon,
-    inglés: EnglishIcon,
-    artística: MathIcon,
-    biología: ScienceIcon,
-    "c._sociales": BookIcon,
-    castellano: BookIcon,
-  };
-
-  // Mapeo de asignaturas a colores
-  const colorMap = {
-    matemáticas: "#FF6347",
-    "ciencias naturales": "#1E90FF",
-    español: "#8A2BE2",
-    inglés: "#32CD32",
-    artística: "#FF8C00",
-    biología: "#20B2AA",
-    "c._sociales": "#9370DB",
-    castellano: "#4682B4",
-  };
+  // Calcular estadísticas
+  const totalTareas = tareas.length;
+  const pendientes = tareas.filter((t) => !t.entrega?.fecha_entrega).length;
+  const completadas = tareas.filter((t) => t.entrega?.fecha_entrega).length;
+  const porcentajeCompletadas =
+    totalTareas > 0 ? Math.round((completadas / totalTareas) * 100) : 0;
 
   // Efecto para tiempo y fecha
   useEffect(() => {
@@ -81,54 +86,46 @@ const Tareashacer = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Efecto principal para cargar tareas
-  useEffect(() => {
-    cargarTareas();
-  }, []);
-
-  // Función para cargar tareas desde el backend
-  const cargarTareas = async () => {
+  // Función para cargar tareas - con useCallback para estabilidad
+  const cargarTareasDesdeAPI = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Obtener usuario del localStorage
-      const userString = sessionStorage.getItem("user_session") || localStorage.getItem("user");
-      if (!userString) {
-        throw new Error("No estás logueado. Por favor, inicia sesión.");
+
+      // Obtener usuario SOLO de sessionStorage (donde AuthContext guarda)
+      const userSession = sessionStorage.getItem("user_session");
+      console.log("🔍 sessionStorage user_session:", userSession);
+
+      if (!userSession) {
+        // Si no hay sesión, redirigir al login
+        navigate("/login");
+        return;
       }
-      
-      const userData = JSON.parse(userString);
-      
-      // Si NO tiene estudiante_id, obtenerlo del backend
-      if (!userData.estudiante_id && userData.accessToken) {
-        try {
-          // Primero intentar obtener información del usuario
-          const infoResponse = await fetch(`${API_URL}/api/mi-informacion`, {
-            headers: {
-              Authorization: `Bearer ${userData.accessToken}`,
-            },
-          });
-          
-          if (infoResponse.ok) {
-            const userInfo = await infoResponse.json();
-            
-            if (userInfo.estudiante_id) {
-              userData.estudiante_id = userInfo.estudiante_id;
-              localStorage.setItem("user", JSON.stringify(userData));
-            }
-          }
-        } catch (err) {
-          console.log("No se pudo obtener estudiante_id automáticamente:", err);
-        }
-      }
-      
-      // Verificar que tenga estudiante_id
+
+      const userData = JSON.parse(userSession);
+      console.log(
+        "👤 Usuario:",
+        userData.username,
+        "estudiante_id:",
+        userData.estudiante_id
+      );
+
+      // Verificar que tenga estudiante_id (debería venir del login)
       if (!userData.estudiante_id) {
-        throw new Error("No se encontró información del estudiante.");
+        throw new Error(
+          "Error: No se encontró información del estudiante. Por favor, contacte al administrador."
+        );
+      }
+
+      // Verificar que tenga token
+      if (!userData.accessToken) {
+        throw new Error(
+          "Error: Sesión expirada. Por favor, inicie sesión nuevamente."
+        );
       }
 
       // Llamar al backend para obtener las tareas
+      console.log("📞 Llamando API con estudiante_id:", userData.estudiante_id);
       const response = await fetch(
         `${API_URL}/api/tareas-estudiante/${userData.estudiante_id}`,
         {
@@ -138,28 +135,46 @@ const Tareashacer = () => {
         }
       );
 
+      console.log("📊 Status respuesta:", response.status);
+
       if (!response.ok) {
-        throw new Error("Error al cargar las tareas");
+        if (response.status === 401) {
+          throw new Error(
+            "Sesión expirada. Por favor, inicie sesión nuevamente."
+          );
+        }
+        throw new Error(`Error ${response.status} al cargar las tareas`);
       }
 
       const data = await response.json();
-      
+      console.log("✅ Tareas recibidas:", data.length);
+
       // Agregar íconos y colores a cada tarea
-      const tareasConIconos = data.map(tarea => ({
+      const tareasConIconos = data.map((tarea) => ({
         ...tarea,
         icon: iconMap[tarea.subject?.toLowerCase()] || BookIcon,
         color: colorMap[tarea.subject?.toLowerCase()] || "#2563eb",
       }));
-      
+
       setTareas(tareasConIconos);
-      
     } catch (err) {
-      console.error("Error:", err);
+      console.error("❌ Error cargando tareas:", err);
       setError(err.message);
+
+      // Si es error de autenticación, limpiar y redirigir
+      if (err.message.includes("401") || err.message.includes("Sesión")) {
+        sessionStorage.removeItem("user_session");
+        navigate("/login");
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]); // navigate es la única dependencia externa
+
+  // Efecto principal para cargar tareas al inicio
+  useEffect(() => {
+    cargarTareasDesdeAPI();
+  }, [cargarTareasDesdeAPI]); // ✅ Ahora está incluida como dependencia
 
   const handleBack = () => {
     navigate("/estudiante");
@@ -199,12 +214,28 @@ const Tareashacer = () => {
 
   const handleSubmit = async () => {
     try {
-      const userData = JSON.parse(localStorage.getItem("user"));
-      
+      // Obtener usuario de sessionStorage
+      const userSession = sessionStorage.getItem("user_session");
+      const userData = JSON.parse(userSession || "{}");
+
+      console.log("📤 Enviando tarea - estudiante_id:", userData.estudiante_id);
+
+      if (!userData.estudiante_id) {
+        alert(
+          "Error: No se encontró el ID del estudiante. Recargue la página."
+        );
+        return;
+      }
+
       const formData = new FormData();
       formData.append("comentario", comment);
-      
-      if (uploadedFiles.length > 0) {
+
+      if (uploadedFiles.length > 0 && uploadedFiles[0].size) {
+        // Verificar tamaño máximo (10MB)
+        if (uploadedFiles[0].size > 10 * 1024 * 1024) {
+          alert("El archivo es demasiado grande. Máximo 10MB.");
+          return;
+        }
         formData.append("archivo", uploadedFiles[0]);
       }
 
@@ -219,13 +250,15 @@ const Tareashacer = () => {
         }
       );
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error("Error al enviar la tarea");
+        throw new Error(result.detail || "Error al enviar la tarea");
       }
 
       alert("¡Tarea enviada con éxito!");
       closeModal();
-      cargarTareas(); // Recargar tareas
+      cargarTareasDesdeAPI(); // Recargar tareas
     } catch (err) {
       console.error("Error:", err);
       alert("Error al enviar la tarea: " + err.message);
@@ -234,7 +267,16 @@ const Tareashacer = () => {
 
   const handleDescargarArchivo = async () => {
     try {
-      const userData = JSON.parse(localStorage.getItem("user"));
+      if (!selectedTask.archivo) {
+        alert("No hay archivo para descargar");
+        return;
+      }
+
+      // Obtener token de usuario
+      const userSession = sessionStorage.getItem("user_session");
+      const userData = JSON.parse(userSession || "{}");
+
+      // Usar el endpoint de descarga del backend
       const response = await fetch(
         `${API_URL}/api/descargar-archivo-tarea/${selectedTask.id}`,
         {
@@ -248,15 +290,25 @@ const Tareashacer = () => {
         throw new Error("Error al descargar el archivo");
       }
 
+      // Obtener el blob del archivo
       const blob = await response.blob();
+
+      // Obtener el nombre del archivo desde la ruta
+      const fileName = selectedTask.archivo.split(/[/\\]/).pop();
+
+      // Crear un enlace temporal para descargar
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = selectedTask.archivo?.split("/").pop() || "archivo_descargado";
-      document.body.appendChild(a);
-      a.click();
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+
+      // Limpiar
+      document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+
+      console.log("✅ Archivo descargado:", fileName);
     } catch (err) {
       console.error("Error:", err);
       alert("Error al descargar el archivo: " + err.message);
@@ -284,8 +336,10 @@ const Tareashacer = () => {
           <div className="error-message">
             <AlertCircle size={24} />
             <p>Error: {error}</p>
-            <button onClick={cargarTareas}>Reintentar</button>
-            <button onClick={handleBack}>Volver</button>
+            <div className="error-actions">
+              <button onClick={cargarTareasDesdeAPI}>Reintentar</button>
+              <button onClick={handleBack}>Volver al inicio</button>
+            </div>
           </div>
         </div>
       </div>
@@ -312,18 +366,80 @@ const Tareashacer = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="page-title">
         <h4>Mis Tareas</h4>
         <p className="taskDo-subtitle">
           Gestiona y completa tus actividades académicas
         </p>
+
+        {/* Tarjetas de estadísticas */}
+        {tareas.length > 0 && (
+          <div className="stats-section">
+            <div className="stats-cards-container">
+              {/* Tarjeta 1: Total */}
+              <div className="stats-card">
+                <div className="stats-number">{totalTareas}</div>
+                <div className="stats-label">TOTAL</div>
+              </div>
+
+              <div className="stats-divider"></div>
+
+              {/* Tarjeta 2: Pendientes */}
+              <div className="stats-card">
+                <div className="stats-number">{pendientes}</div>
+                <div className="stats-label">PENDIENTES</div>
+              </div>
+
+              <div className="stats-divider"></div>
+
+              {/* Tarjeta 3: Completadas */}
+              <div className="stats-card">
+                <div className="stats-number">{completadas}</div>
+                <div className="stats-label">COMPLETADAS</div>
+              </div>
+
+              <div className="stats-divider"></div>
+
+              {/* Tarjeta 4: Porcentaje */}
+              <div className="stats-card">
+                <div className="stats-number">{porcentajeCompletadas}%</div>
+                <div className="stats-label">PROGRESO</div>
+              </div>
+            </div>
+
+            {/* Barra de progreso */}
+            <div className="progress-bar-container">
+              <div className="progress-info">
+                <span className="progress-label">PROGRESO GENERAL</span>
+                <span className="progress-percentage">
+                  {porcentajeCompletadas}%
+                </span>
+              </div>
+              <div className="progress-bar">
+                <div
+                  className="progress-fill"
+                  style={{ width: `${porcentajeCompletadas}%` }}
+                ></div>
+              </div>
+              <div className="progress-stats">
+                <span className="progress-completed">
+                  {completadas} completadas
+                </span>
+                <span className="progress-total">de {totalTareas} tareas</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {tareas.length === 0 ? (
         <div className="no-tasks-message">
           <FileText size={48} color="#9ca3af" />
           <p>No tienes tareas asignadas en este momento</p>
+          <button onClick={cargarTareasDesdeAPI} className="refresh-btn">
+            Actualizar
+          </button>
         </div>
       ) : (
         <div className="tasks-grid">
@@ -335,6 +451,7 @@ const Tareashacer = () => {
               onViewDetails={handleViewTaskDetails}
               variant="default"
               gradientStart={task.color}
+              entregada={!!task.entrega?.fecha_entrega}
             />
           ))}
         </div>
@@ -357,8 +474,8 @@ const Tareashacer = () => {
             </div>
 
             <div className="modal-header-student">
-              <img 
-                src={selectedTask.icon} 
+              <img
+                src={selectedTask.icon}
                 alt={selectedTask.subject}
                 className="modal-icon-student"
                 style={{ width: "48px", height: "48px" }}
@@ -366,7 +483,11 @@ const Tareashacer = () => {
               <div className="modal-header-student-title">
                 <span className="subject-tag">{selectedTask.subject}</span>
                 <h2>{selectedTask.title}</h2>
-                <span className="status-badge">{selectedTask.status}</span>
+                <span
+                  className={`status-badge ${selectedTask.status?.toLowerCase()}`}
+                >
+                  {selectedTask.status}
+                </span>
               </div>
             </div>
 
@@ -377,12 +498,30 @@ const Tareashacer = () => {
                   Fecha de entrega:{" "}
                   {new Date(selectedTask.dueDate).toLocaleDateString("es-ES")}
                 </span>
+                {selectedTask.priority && (
+                  <span
+                    className={`priority-badge ${selectedTask.priority.toLowerCase()}`}
+                  >
+                    {selectedTask.priority}
+                  </span>
+                )}
               </div>
 
               {/* Si ya fue entregada */}
               {selectedTask.entrega?.fecha_entrega && (
-                <div className="entrega-status">
-                  <span>✅ Entregado el {new Date(selectedTask.entrega.fecha_entrega).toLocaleDateString("es-ES")}</span>
+                <div className="entrega-status delivered">
+                  <span>
+                    Entregado el{" "}
+                    {new Date(
+                      selectedTask.entrega.fecha_entrega
+                    ).toLocaleDateString("es-ES")}
+                  </span>
+                  {selectedTask.entrega.calificacion && (
+                    <span className="calificacion">
+                      Calificación:{" "}
+                      <strong>{selectedTask.entrega.calificacion}</strong>
+                    </span>
+                  )}
                 </div>
               )}
 
@@ -393,6 +532,31 @@ const Tareashacer = () => {
                 </div>
                 <p>{selectedTask.description}</p>
               </div>
+
+              {/* Archivo entregado por el estudiante */}
+              {selectedTask.entrega?.archivo_estudiante && (
+                <div className="section-box materials-box">
+                  <div className="section-header">
+                    <FileText size={16} color="#16a34a" />
+                    <strong>Archivo entregado</strong>
+                  </div>
+                  <div className="material-item">
+                    <div className="material-info">
+                      <div className="material-icon">
+                        <FileText size={20} color="#16a34a" />
+                      </div>
+                      <div>
+                        <div className="material-name">
+                          {selectedTask.entrega.archivo_estudiante
+                            .split("/")
+                            .pop()}
+                        </div>
+                        <div className="material-type">Tu entrega</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Archivo del profesor */}
               {selectedTask.archivo && (
@@ -413,13 +577,30 @@ const Tareashacer = () => {
                         <div className="material-type">Archivo adjunto</div>
                       </div>
                     </div>
-                    <button 
+                    <button
                       className="download-btn"
                       onClick={handleDescargarArchivo}
                     >
                       <Download size={16} /> Descargar
                     </button>
                   </div>
+                </div>
+              )}
+
+              {selectedTask.url && (
+                <div className="section-box">
+                  <div className="section-header">
+                    <FileText size={16} color="#2563eb" />
+                    <strong>Enlace</strong>
+                  </div>
+                  <a
+                    href={selectedTask.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="url-link"
+                  >
+                    {selectedTask.url}
+                  </a>
                 </div>
               )}
 
@@ -435,7 +616,9 @@ const Tareashacer = () => {
                       className="upload-area"
                       onDragOver={handleDragOver}
                       onDrop={handleDrop}
-                      onClick={() => document.getElementById("fileInput").click()}
+                      onClick={() =>
+                        document.getElementById("fileInput").click()
+                      }
                     >
                       <UploadCloud size={40} color="#2563eb" />
                       <p>Arrastra archivos aquí o haz clic para seleccionar</p>
@@ -453,7 +636,15 @@ const Tareashacer = () => {
                     {uploadedFiles.length > 0 && (
                       <div className="uploaded-files-list">
                         <div className="uploaded-file">
-                          {uploadedFiles[0].name}
+                          <FileText size={16} />
+                          {uploadedFiles[0].name} (
+                          {(uploadedFiles[0].size / 1024 / 1024).toFixed(2)} MB)
+                          <button
+                            className="remove-file"
+                            onClick={() => setUploadedFiles([])}
+                          >
+                            <X size={14} />
+                          </button>
                         </div>
                       </div>
                     )}
@@ -474,6 +665,17 @@ const Tareashacer = () => {
                   </div>
                 </>
               )}
+
+              {/* Retroalimentación del profesor */}
+              {selectedTask.entrega?.retroalimentacion && (
+                <div className="section-box feedback-box">
+                  <div className="section-header">
+                    <MessageSquare size={16} color="#16a34a" />
+                    <strong>Retroalimentación del Profesor</strong>
+                  </div>
+                  <p>{selectedTask.entrega.retroalimentacion}</p>
+                </div>
+              )}
             </div>
 
             <div className="modal-footer-student">
@@ -481,12 +683,12 @@ const Tareashacer = () => {
                 Cerrar
               </button>
               {!selectedTask.entrega?.fecha_entrega && (
-                <button 
-                  className="btn-primary-student" 
+                <button
+                  className="btn-primary-student"
                   onClick={handleSubmit}
                   disabled={uploadedFiles.length === 0}
                 >
-                  Enviar Tarea
+                  <UploadCloud size={16} /> Enviar Tarea
                 </button>
               )}
             </div>

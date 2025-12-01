@@ -21,6 +21,8 @@ import base64
 from fastapi import Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import update
+import urllib.parse
+
 
 
 
@@ -2266,10 +2268,16 @@ def descargar_archivo_tarea(
         if not file_path.exists():
             raise HTTPException(status_code=404, detail="Archivo no existe en el servidor")
         
+        # Obtener nombre del archivo y codificarlo
+        filename = file_path.name
+        encoded_filename = urllib.parse.quote(filename)  # Codificar para URL
+        
         return StreamingResponse(
             open(file_path, "rb"),
             media_type="application/octet-stream",
-            headers={"Content-Disposition": f"attachment; filename={file_path.name}"}
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            }
         )
         
     except HTTPException:
