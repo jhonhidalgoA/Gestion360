@@ -21,7 +21,7 @@ const subjectColors = {
   "Tecnología": { bg: "rgba(100, 116, 139, 0.9)" },
   "Computación": { bg: "rgba(100, 116, 139, 0.9)" },
   "Recreo": { bg: "rgba(237, 234, 228, 0.9)" },
-  "Descanso": { bg: "rgba(237, 234, 228, 0.9)" },
+  "Descanso": { bg: "rgba(242, 240, 236, 0.9)" },
   "Almuerzo": { bg: "rgba(250, 250, 210, 0.9)" },
   "C. Lectora": { bg: "#96ceb4" },
   "Ética": { bg: "#a29bfe" },

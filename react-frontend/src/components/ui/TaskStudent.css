@@ -1,208 +1,217 @@
-.task-card-student {
-  background:  #0ab7f6ff;
-  border: 1px solid #d0d9e8; 
-  border-radius: 10px;
-  padding: 1.5rem;  
-  height:auto;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
+/* Task Card Styles - Modern & Professional */
+
+.schedule-card-student,
+.task-card {
+  position: relative;
+  border-radius: 16px;
+  padding: 24px;  
+  cursor: pointer;
+  overflow: hidden; 
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-
-.task-card.compact .task-description {
-  display: none;
-}
-
-
+/* Header */
 .task-header {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
- 
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
 }
 
 .task-meta {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
-.task-icon {
-  font-size: 2.0rem;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+.subject-icon {
+  width: 80px;
+  height: 80px;  
+  object-fit: cover; 
+  padding: 8px;  
 }
+
+
 
 
 .subject-tag {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: white; 
-  padding: 0.25rem 0.75rem;
- 
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95); 
+  padding: 6px 12px;
+  
+}
+
+.task-card.compact .subject-tag {
+  font-size: 18px;
+  padding: 4px 10px;
 }
 
 
-.priority-tag {
-  margin-left: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: bold;
-  padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
-  color: white;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
 
-.priority-tag.high {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-.priority-tag.medium {
-  background: linear-gradient(135deg, #eab308, #ca8a04);
-  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
-}
-
-.priority-tag.low {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-}
-
-
+/* Status Tag */
 .status-tag {
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: bold;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .status-tag.completed {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 .status-tag.in-progress {
-  background: linear-gradient(135deg, #eab308, #ca8a04);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
 }
 
 .status-tag.pending {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.schedule-card-student:hover .status-tag,
+.task-card:hover .status-tag {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 
-.task-title {
-  font-weight: bold;
-  color:white;
-  font-size: 1.6rem;
-  
-  line-height: 1.3;
- 
-}
-
+/* Description */
 .task-description {
-  color: white;
-  font-size: 1.0rem;  
-  line-height: 1.4;
+  font-size: 18px;
+  color: #fff;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
   text-align:center;
-  margin-top: -30px;
+  
 }
 
-
+/* Footer */
 .task-footer {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-top: 1.5rem;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.task-card.compact .task-footer {
+  margin-top: 12px;
 }
 
 .due-date {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: black;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 8px 14px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.task-card.compact .due-date {
+  font-size: 13px;
+  padding: 6px 12px;
+}
+
+.schedule-card-student:hover .due-date,
+.task-card:hover .due-date {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.icon-small {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .date-text {
-  font-size: 0.875rem;
-  font-weight: 500;
+  white-space: nowrap;
 }
 
+/* Details Button */
 .details-btn {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1f2937;
   border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 0.875rem;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.3px;
 }
 
 .details-btn:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-
-.icon-small {
-  width: 2rem;
-  height: 2rem;
-  color: black;
+.details-btn:active {
+  transform: translateY(0);
 }
 
 /* Responsive Design */
-
 @media (max-width: 768px) {
+  .schedule-card-student,
   .task-card {
-    padding: 1rem;
+    padding: 18px;
   }
-  
-  .task-header {
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: flex-start;
+
+  .task-title {
+    font-size: 18px;
   }
-  
-  .task-meta {
-    width: 100%;
-    justify-content: space-between;
+
+  .task-description {
+    font-size: 13px;
   }
-  
+
   .task-footer {
     flex-direction: column;
-    gap: 0.75rem;
-    align-items: flex-start;
+    align-items: stretch;
   }
-  
+
   .details-btn {
     width: 100%;
+    padding: 12px;
+  }
+
+  .due-date {
     justify-content: center;
   }
 }
 
-/* Animation for new tasks */
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+@media (max-width: 480px) {
+  .task-header {
+    flex-direction: column;
+    gap: 10px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-.task-card {
-  animation: slideInUp 0.5s ease-out;
+  .status-tag {
+    align-self: flex-start;
+  }
+
+  .subject-icon {
+    width: 40px;
+    height: 40px;
+  }
 }

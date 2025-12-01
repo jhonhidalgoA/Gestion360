@@ -24,14 +24,13 @@ from backend.routes.docente import router as docente_router
 
 
 
-
 # Configuración General
-
 app = FastAPI(title="Gestión 360 API")
 
 app.include_router(event_router)
-
 app.include_router(docente_router)
+
+
 
 # Habilitar CORS para el frontend
 app.add_middleware(
@@ -90,6 +89,7 @@ def root():
 # --- LOGIN CORREGIDO ---
 @app.post("/login")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
+    print("DEBUG LOGIN:", data.username, data.password)
     user = db.query(User).filter(User.username == data.username).first()
     
     if not user or not verify_password(data.password, user.password_hash):

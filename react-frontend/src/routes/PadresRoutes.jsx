@@ -5,7 +5,7 @@ import ReportesVer from "../pages/PadreFamilia/ReportesVer/ReportesVer";
 
 const padresRoutes = [
   {
-    path: "/padrefamilia",
+    path: "/padres",
     element: (
       <PrivateRoute roles={["padre"]}>
         <PadreFamilia />

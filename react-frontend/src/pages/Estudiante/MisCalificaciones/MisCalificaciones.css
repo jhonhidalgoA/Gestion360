@@ -230,10 +230,6 @@
 /* ============================================
    ICONOS
    ============================================ */
-.icon {
-  width: 16px;
-  height: 16px;
-}
 
 .icon-gray {
   color: #6b7280;
@@ -318,25 +314,3 @@
 
 
 
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-@media (max-width: 1200px) {
-  .areas-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .areas-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .schedules-containers {
-    padding: 30px 15px;
-  }
-
-  .legend-items {
-    gap: 1.5rem;
-  }
-}

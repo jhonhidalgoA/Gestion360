@@ -1,5 +1,5 @@
 import "./MisCalificaciones.css";
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import NavbarModulo from "../../../components/layout/Navbar/NavbarModulo";
 import {
@@ -9,12 +9,189 @@ import {
   CheckCircle,
   AlertCircle,
   Star,
+  Loader2,
 } from "lucide-react";
 
 const Calificaciones = () => {
   const navigate = useNavigate();
-  const [expandedAreas, setExpandedAreas] = useState({});
   
+  // Estados
+  const [expandedAreas, setExpandedAreas] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [datosEstudiante, setDatosEstudiante] = useState(null);
+  const [academicAreas, setAcademicAreas] = useState([]);
+  
+  // Estado corregido: variable no utilizada eliminada o comentada
+  // const [periodoActual, setPeriodoActual] = useState(4);
+  const periodoActual = 4; // Si no necesitas modificarlo, usa una constante
+
+  // Obtener datos del estudiante logueado - CORREGIDO
+  const cargarCalificaciones = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log("=== BUSCANDO DATOS DEL USUARIO ===");
+      
+      let numeroDocumento = null;
+      let nombreCompleto = null;
+      
+      // Opción 1: Verificar si existe directamente "username" en localStorage
+      const usernameDirecto = localStorage.getItem("username");
+      console.log("username directo:", usernameDirecto);
+      
+      if (usernameDirecto) {
+        numeroDocumento = usernameDirecto;
+        // Intentar obtener el nombre completo si existe
+        const fullNameDirecto = localStorage.getItem("fullName");
+        if (fullNameDirecto) nombreCompleto = fullNameDirecto;
+      }
+      
+      // Opción 2: Buscar en objeto "user"
+      if (!numeroDocumento) {
+        const userDataString = localStorage.getItem("user");
+        console.log("user object:", userDataString);
+        
+        if (userDataString) {
+          try {
+            const userData = JSON.parse(userDataString);
+            numeroDocumento = userData.username || userData.numero_documento;
+            nombreCompleto = userData.fullName || userData.nombre;
+          } catch (e) {
+            console.error("Error parseando user:", e);
+          }
+        }
+      }
+      
+      // Opción 3: Buscar en otras claves comunes
+      if (!numeroDocumento) {
+        const authUser = localStorage.getItem("authUser");
+        const currentUser = localStorage.getItem("currentUser");
+        
+        if (authUser) {
+          const userData = JSON.parse(authUser);
+          numeroDocumento = userData.username || userData.numero_documento;
+          nombreCompleto = userData.fullName || userData.nombre;
+        } else if (currentUser) {
+          const userData = JSON.parse(currentUser);
+          numeroDocumento = userData.username || userData.numero_documento;
+          nombreCompleto = userData.fullName || userData.nombre;
+        }
+      }
+      
+      console.log("Número de documento encontrado:", numeroDocumento);
+      console.log("Nombre completo:", nombreCompleto);
+      console.log("=================================");
+
+      if (!numeroDocumento) {
+        throw new Error("No se encontró el número de documento. Por favor, inicia sesión nuevamente.");
+      }
+
+      console.log("✅ Cargando calificaciones para:", numeroDocumento, "Período:", periodoActual);
+
+      // Llamar al endpoint - CAMBIA ESTA URL SI TU BACKEND ESTÁ EN OTRO PUERTO
+      const response = await fetch(
+        `http://localhost:8000/api/estudiante/calificaciones-por-documento/${numeroDocumento}/${periodoActual}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al cargar las calificaciones");
+      }
+
+      const data = await response.json();
+
+      // Guardar datos del estudiante (usa el nombre del localStorage si existe)
+      setDatosEstudiante({
+        ...data.estudiante,
+        nombre: data.estudiante.nombre || nombreCompleto || "Estudiante"
+      });
+
+      // Mapear las áreas a la estructura del componente
+      const areasFormateadas = mapearAreas(data.areas);
+      setAcademicAreas(areasFormateadas);
+
+    } catch (err) {
+      console.error("Error cargando calificaciones:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [periodoActual]); // Dependencia incluida
+
+  useEffect(() => {
+    cargarCalificaciones();
+  }, [cargarCalificaciones]); // Dependencia incluida correctamente
+
+  // Mapear áreas del backend a la estructura con colores
+  const mapearAreas = (areas) => {
+    const coloresPorArea = {
+      "Ciencias Exactas": {
+        id: "exactas",
+        color: "area-orange",
+        bgLight: "area-orange-light",
+        borderColor: "area-orange-border",
+      },
+      "Lenguaje": {
+        id: "lenguaje",
+        color: "area-purple",
+        bgLight: "area-purple-light",
+        borderColor: "area-purple-border",
+      },
+      "Ciencias Sociales": {
+        id: "sociales",
+        color: "area-yellow",
+        bgLight: "area-yellow-light",
+        borderColor: "area-yellow-border",
+      },
+      "Ciencias Naturales": {
+        id: "naturales",
+        color: "area-blue",
+        bgLight: "area-blue-light",
+        borderColor: "area-blue-border",
+      },
+      "Tecnología": {
+        id: "tecnologia",
+        color: "area-cyan",
+        bgLight: "area-cyan-light",
+        borderColor: "area-cyan-border",
+      },
+      "Artes": {
+        id: "artes",
+        color: "area-pink",
+        bgLight: "area-pink-light",
+        borderColor: "area-pink-border",
+      },
+      "Deportes": {
+        id: "deportes",
+        color: "area-green",
+        bgLight: "area-green-light",
+        borderColor: "area-green-border",
+      },
+      "Formación": {
+        id: "formacion",
+        color: "area-indigo",
+        bgLight: "area-indigo-light",
+        borderColor: "area-indigo-border",
+      },
+    };
+
+    return areas.map((area) => {
+      const estilos = coloresPorArea[area.name] || {
+        id: area.name.toLowerCase().replace(/\s+/g, "_"),
+        color: "area-gray",
+        bgLight: "area-gray-light",
+        borderColor: "area-gray-border",
+      };
+
+      return {
+        ...estilos,
+        name: area.name,
+        subjects: area.subjects,
+      };
+    });
+  };
+
   const handleBack = () => {
     navigate("/estudiante");
   };
@@ -26,7 +203,6 @@ const Calificaciones = () => {
     }));
   };
 
-  
   const getStatusIcon = (nota) => {
     if (nota === null) return <Clock className="icon icon-gray" />;
     if (nota >= 4.5) return <Star className="icon icon-yellow" />;
@@ -48,94 +224,69 @@ const Calificaciones = () => {
     return (suma / notasValidas.length).toFixed(1);
   };
 
-  
-  const academicAreas = [
-    {
-      id: "exactas",
-      name: "Matemáticas",
-      color: "area-orange",
-      bgLight: "area-orange-light",
-      borderColor: "area-orange-border",
-      subjects: [
-        { name: "Matemáticas", ih: 4, nota: null },
-        { name: "Geometría", ih: 1, nota: null },
-        { name: "Estadística", ih: 1, nota: null },
-      ],
-    },
-    {
-      id: "lenguaje",
-      name: "Humanidades",
-      color: "area-purple",
-      bgLight: "area-purple-light",
-      borderColor: "area-purple-border",
-      subjects: [
-        { name: "Castellano", ih: 4, nota: null },
-        { name: "Inglés", ih: 4, nota: null },
-        { name: "C. Lectora", ih: 1, nota: null },
-      ],
-    },
-    {
-      id: "sociales",
-      name: "Ciencias Sociales",
-      color: "area-yellow",
-      bgLight: "area-yellow-light",
-      borderColor: "area-yellow-border",
-      subjects: [
-        { name: "Ciencias Sociales", ih: 3, nota: null },
-        { name: "Historia y Geografía", ih: 3, nota: null },
-      ],
-    },
-    {
-      id: "naturales",
-      name: "Ciencias Naturales",
-      color: "area-blue",
-      bgLight: "area-blue-light",
-      borderColor: "area-blue-border",
-      subjects: [
-        { name: "Biología", ih: 2, nota: null },
-        { name: "Física", ih: 1, nota: null },
-        { name: "Química", ih: 1, nota: null },
-      ],
-    },
-    {
-      id: "tecnologia",
-      name: "Tecnología e Informática",
-      color: "area-cyan",
-      bgLight: "area-cyan-light",
-      borderColor: "area-cyan-border",
-      subjects: [{ name: "Tecnología e Informática", ih: 2, nota: null }],
-    },
-    {
-      id: "artes",
-      name: "Eduacion Artística y Cultural",
-      color: "area-pink",
-      bgLight: "area-pink-light",
-      borderColor: "area-pink-border",
-      subjects: [{ name: "Artística", ih: 2, nota: null }],
-    },
-    {
-      id: "deportes",
-      name: "Educación Física y Deportes",
-      color: "area-green",
-      bgLight: "area-green-light",
-      borderColor: "area-green-border",
-      subjects: [{ name: "E. Física", ih: 2, nota: null }],
-    },
-    {
-      id: "formacion",
-      name: "Educación Religiosa",
-      color: "area-indigo",
-      bgLight: "area-indigo-light",
-      borderColor: "area-indigo-border",
-      subjects: [
-        { name: "Ética", ih: 1, nota: null },
-        { name: "Cátedra de Paz", ih: 1, nota: null },
-        { name: "Religión", ih: 1, nota: null },
-      ],
-    },
-  ];
+  // Renderizado de loading
+  if (loading) {
+    return (
+      <div className="schedules-containers">
+        <NavbarModulo />
+        <div className="page-container">
+          <div style={{ 
+            display: "flex", 
+            justifyContent: "center", 
+            alignItems: "center", 
+            minHeight: "400px",
+            flexDirection: "column",
+            gap: "16px"
+          }}>
+            <Loader2 className="animate-spin" size={48} />
+            <p>Cargando calificaciones...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
- 
+  // Renderizado de error
+  if (error) {
+    return (
+      <div className="schedules-containers">
+        <NavbarModulo />
+        <div className="page-container">
+          <button onClick={handleBack} className="back-button">
+            <span className="back-icon">←</span>
+            Volver al inicio
+          </button>
+          <div style={{
+            background: "#fee",
+            border: "1px solid #fcc",
+            borderRadius: "8px",
+            padding: "20px",
+            marginTop: "20px",
+            textAlign: "center"
+          }}>
+            <AlertCircle size={48} color="#c33" style={{ marginBottom: "12px" }} />
+            <h3 style={{ color: "#c33", marginBottom: "8px" }}>Error al cargar calificaciones</h3>
+            <p>{error}</p>
+            <button 
+              onClick={cargarCalificaciones}
+              style={{
+                marginTop: "16px",
+                padding: "10px 20px",
+                background: "#3498db",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer"
+              }}
+            >
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="schedules-containers">
       <NavbarModulo />
@@ -149,7 +300,14 @@ const Calificaciones = () => {
       </div>
 
       <div className="page-title">
-        <h6>Informe de Calificaciones – Período: 4, Año 2025</h6>
+        <h6>
+          Informe de Calificaciones – Período: {periodoActual}, Año 2025
+        </h6>
+        {datosEstudiante && (
+          <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
+            Estudiante: {datosEstudiante.nombre} - Documento: {datosEstudiante.documento}
+          </p>
+        )}
       </div>
 
       {/* Legend Section */}
@@ -178,7 +336,7 @@ const Calificaciones = () => {
       <div className="areas-grid">
         {academicAreas.map((area) => {
           const promedio = calcularPromedioArea(area.subjects);
-          const isExpanded = expandedAreas[area.id];
+          const isExpanded = expandedAreas[area.id] || false;
           const status = getStatusBadge(promedio);
 
           return (
@@ -226,7 +384,7 @@ const Calificaciones = () => {
 
                         <div className="subject-footer">
                           <span className="subject-grade">
-                            {subject.nota || "—"}
+                            {subject.nota !== null ? subject.nota.toFixed(1) : "—"}
                           </span>
                           <span
                             className={`subject-status ${

@@ -1909,3 +1909,106 @@ def get_mis_planes(
         })
     
     return resultado
+
+
+@router.get("/estudiante/calificaciones-por-documento/{numero_documento}/{periodo_id}")
+def get_calificaciones_estudiante_por_documento(
+    numero_documento: str,
+    periodo_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene todas las calificaciones de un estudiante para un período específico,
+    usando el número de documento (username). Agrupadas por área académica.
+    """
+    try:
+        # Buscar estudiante por número de documento
+        estudiante = db.execute(
+            select(Estudiante).where(Estudiante.numero_documento == numero_documento)
+        ).scalar_one_or_none()
+        
+        if not estudiante:
+            raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+
+        # Verificar que el período existe
+        periodo = db.get(Periodo, periodo_id)
+        if not periodo:
+            raise HTTPException(status_code=404, detail="Período no encontrado")
+
+        # Obtener todas las asignaturas (excluyendo Descanso y Almuerzo)
+        asignaturas = db.execute(
+            select(Asignatura).where(
+                Asignatura.area != "Descanso",
+                Asignatura.area != "Almuerzo"
+            )
+        ).scalars().all()
+
+        # Obtener todas las calificaciones del estudiante en este período
+        calificaciones = db.execute(
+            select(Calificacion)
+            .where(
+                Calificacion.estudiante_id == estudiante.id,
+                Calificacion.periodo == periodo_id
+            )
+        ).scalars().all()
+
+        # Agrupar calificaciones por área
+        areas_dict = {}
+        
+        for asig in asignaturas:
+            area = asig.area
+            if area not in areas_dict:
+                areas_dict[area] = {
+                    "name": area,
+                    "subjects": []
+                }
+            
+            # Normalizar nombre de asignatura para buscar calificaciones
+            nombre_asig_normalizado = normalizar_asignatura(asig.name)
+            
+            # Filtrar calificaciones de esta asignatura
+            calificaciones_asig = [
+                c for c in calificaciones
+                if normalizar_asignatura(c.asignatura) == nombre_asig_normalizado
+            ]
+            
+            # Calcular promedio
+            notas_validas = [c.nota for c in calificaciones_asig if c.nota is not None]
+            nota_promedio = None
+            if notas_validas:
+                nota_promedio = round(sum(notas_validas) / len(notas_validas), 2)
+            
+            # Agregar asignatura al área
+            areas_dict[area]["subjects"].append({
+                "name": asig.name,
+                "ih": asig.hours_per_week,
+                "nota": nota_promedio
+            })
+
+        # Convertir el diccionario a lista
+        areas_list = list(areas_dict.values())
+
+        return {
+            "estudiante": {
+                "id": estudiante.id,
+                "nombre": f"{estudiante.nombres} {estudiante.apellidos}",
+                "documento": estudiante.numero_documento or "N/A"
+            },
+            "periodo": {
+                "id": periodo.id,
+                "nombre": periodo.nombre
+            },
+            "areas": areas_list
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error al obtener calificaciones: {str(e)}"
+        )
+
+
+
+

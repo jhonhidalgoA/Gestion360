@@ -83,6 +83,9 @@ class Padre(Base):
     __tablename__ = "padres"
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
+    usuario = relationship("User", backref="padre")
+
     nombres = Column(String(100), nullable=False)
     apellidos = Column(String(100), nullable=False)
     tipo_documento = Column(String(30))

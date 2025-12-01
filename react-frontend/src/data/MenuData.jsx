@@ -191,7 +191,7 @@ const menuConfig = {
       title: "Mi Horario",
       path: "/estudiante/horario",
       iconUrl:scheduleImg,
-      gradient: "linear-gradient(135deg, #90d40aff)"
+      gradient: "linear-gradient(135deg, #00B4D8)"
     },
     {
       id: 2,     
