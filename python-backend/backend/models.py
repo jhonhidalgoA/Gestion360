@@ -261,6 +261,13 @@ class TareaEstudiante(Base):
     visto: Mapped[bool] = mapped_column(default=False)
     entregado: Mapped[bool] = mapped_column(default=False)
     
+    # Campos nuevos que agregaremos
+    archivo_estudiante: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    comentario: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    fecha_entrega: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    calificacion: Mapped[Optional[float]] = mapped_column(nullable=True)
+    retroalimentacion: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
 class AsignaturaGrado(Base):
     __tablename__ = "asignatura_grado"
 

@@ -35,13 +35,14 @@ function AuthProvider({ children }) {
       console.log("Respuesta del backend:", data);
 
       const userData = {
-        username: data.username, // 👈 Este es el teacherDocumentNumber del backend
+        username: data.username, 
         fullName: data.full_name,
         role: data.rol ? data.rol.toLowerCase() : '', 
         accessToken: data.access_token,
         redirect: data.redirect,
         correo: data.correo || data.email || data.username,
-        grado_id: data.grado_id || null, 
+        grado_id: data.grado_id || null,
+        estudiante_id: data.estudiante_id || null, 
       };
 
       setUser(userData);

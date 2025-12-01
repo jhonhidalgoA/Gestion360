@@ -20,6 +20,7 @@ import qrcode
 import base64
 from fastapi import Depends, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import update
 
 
 
@@ -2009,6 +2010,313 @@ def get_calificaciones_estudiante_por_documento(
             detail=f"Error al obtener calificaciones: {str(e)}"
         )
 
+# 01 - diciembre - 2025
+@router.get("/tareas-estudiante/{estudiante_id}")
+def get_tareas_estudiante(
+    estudiante_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene todas las tareas asignadas a un estudiante específico.
+    FILTRA POR EL GRADO DEL ESTUDIANTE.
+    """
+    try:
+        # 1. PRIMERO obtener el estudiante para saber su grado
+        estudiante = db.get(Estudiante, estudiante_id)
+        if not estudiante:
+            raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+        
+        grado_id_estudiante = estudiante.grado_id
+        print(f"DEBUG: Estudiante {estudiante_id} - Grado {grado_id_estudiante}")
+        
+        # 2. Obtener tareas del estudiante QUE COINCIDAN CON SU GRADO
+        query = db.execute(
+            select(Tarea, TareaEstudiante)
+            .join(TareaEstudiante, Tarea.id == TareaEstudiante.tarea_id)
+            .where(
+                TareaEstudiante.estudiante_id == estudiante_id,
+                Tarea.grupo_id == grado_id_estudiante  # <-- FILTRO CLAVE AQUÍ
+            )
+            .order_by(Tarea.fecha_fin.desc())
+        )
+        
+        tareas_estudiante = query.all()
+        
+        print(f"DEBUG: Encontradas {len(tareas_estudiante)} tareas para estudiante {estudiante_id}")
+        
+        # Si no hay tareas asignadas, buscar tareas de su grado
+        if not tareas_estudiante:
+            print(f"DEBUG: No hay tareas asignadas, buscando tareas del grado {grado_id_estudiante}")
+            tareas_grado = db.execute(
+                select(Tarea)
+                .where(Tarea.grupo_id == grado_id_estudiante)
+                .order_by(Tarea.fecha_fin.desc())
+            ).scalars().all()
+            
+            print(f"DEBUG: Encontradas {len(tareas_grado)} tareas en el grado {grado_id_estudiante}")
+            
+            resultado = []
+            for tarea in tareas_grado:
+                # Buscar si ya existe relación
+                tarea_est = db.execute(
+                    select(TareaEstudiante)
+                    .where(
+                        TareaEstudiante.tarea_id == tarea.id,
+                        TareaEstudiante.estudiante_id == estudiante_id
+                    )
+                ).scalar_one_or_none()
+                
+                # Si no existe, crearla automáticamente
+                if not tarea_est:
+                    print(f"DEBUG: Creando asignación para tarea {tarea.id}")
+                    tarea_est = TareaEstudiante(
+                        tarea_id=tarea.id,
+                        estudiante_id=estudiante_id,
+                        visto=False,
+                        entregado=False
+                    )
+                    db.add(tarea_est)
+                
+                # Determinar estado
+                hoy = date.today()
+                if tarea_est.fecha_entrega:
+                    estado = "Completado"
+                elif tarea.fecha_fin < hoy:
+                    estado = "Atrasado"
+                elif tarea.fecha_inicio <= hoy <= tarea.fecha_fin:
+                    estado = "En proceso"
+                else:
+                    estado = "Pendiente"
+                
+                # Determinar prioridad
+                dias_restantes = (tarea.fecha_fin - hoy).days
+                if dias_restantes < 2:
+                    prioridad = "Alta"
+                elif dias_restantes < 5:
+                    prioridad = "Media"
+                else:
+                    prioridad = "Baja"
+                
+                # Obtener información del grado
+                grado = db.get(Grado, tarea.grupo_id)
+                
+                resultado.append({
+                    "id": str(tarea.id),
+                    "subject": tarea.asignatura,
+                    "title": tarea.tema,
+                    "description": tarea.descripcion,
+                    "dueDate": tarea.fecha_fin.isoformat(),
+                    "startDate": tarea.fecha_inicio.isoformat(),
+                    "status": estado,
+                    "priority": prioridad,
+                    "grado": grado.nombre if grado else "N/A",
+                    "url": tarea.url or "",
+                    "archivo": tarea.archivo or "",
+                    "entrega": {
+                        "archivo_estudiante": tarea_est.archivo_estudiante or "",
+                        "comentario": tarea_est.comentario or "",
+                        "fecha_entrega": tarea_est.fecha_entrega.isoformat() if tarea_est.fecha_entrega else None,
+                        "calificacion": tarea_est.calificacion,
+                        "retroalimentacion": tarea_est.retroalimentacion or ""
+                    }
+                })
+            
+            db.commit()
+            return resultado
+        
+        # Si ya tenía tareas asignadas
+        resultado = []
+        for tarea, tarea_est in tareas_estudiante:
+            # Obtener información del grado
+            grado = db.get(Grado, tarea.grupo_id)
+            
+            # Determinar estado
+            hoy = date.today()
+            if tarea_est.fecha_entrega:
+                estado = "Completado"
+            elif tarea.fecha_fin < hoy:
+                estado = "Atrasado"
+            elif tarea.fecha_inicio <= hoy <= tarea.fecha_fin:
+                estado = "En proceso"
+            else:
+                estado = "Pendiente"
+            
+            # Determinar prioridad según fecha de entrega
+            dias_restantes = (tarea.fecha_fin - hoy).days
+            if dias_restantes < 2:
+                prioridad = "Alta"
+            elif dias_restantes < 5:
+                prioridad = "Media"
+            else:
+                prioridad = "Baja"
+            
+            resultado.append({
+                "id": str(tarea.id),
+                "subject": tarea.asignatura,
+                "title": tarea.tema,
+                "description": tarea.descripcion,
+                "dueDate": tarea.fecha_fin.isoformat(),
+                "startDate": tarea.fecha_inicio.isoformat(),
+                "status": estado,
+                "priority": prioridad,
+                "grado": grado.nombre if grado else "N/A",
+                "url": tarea.url or "",
+                "archivo": tarea.archivo or "",
+                # Datos de entrega del estudiante
+                "entrega": {
+                    "archivo_estudiante": tarea_est.archivo_estudiante or "",
+                    "comentario": tarea_est.comentario or "",
+                    "fecha_entrega": tarea_est.fecha_entrega.isoformat() if tarea_est.fecha_entrega else None,
+                    "calificacion": tarea_est.calificacion,
+                    "retroalimentacion": tarea_est.retroalimentacion or ""
+                }
+            })
+        
+        return resultado
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR en get_tareas_estudiante: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al obtener tareas: {str(e)}")
 
 
+
+@router.post("/entregar-tarea/{tarea_id}/{estudiante_id}")
+async def entregar_tarea(
+    tarea_id: str,
+    estudiante_id: int,
+    comentario: str = Form(""),
+    archivo: UploadFile = File(None),
+    db: Session = Depends(get_db)
+):
+    """
+    Permite al estudiante entregar una tarea.
+    Guarda el archivo y actualiza el registro en tareas_estudiantes.
+    """
+    try:
+        # Verificar que la tarea existe y está asignada al estudiante
+        tarea_est = db.execute(
+            select(TareaEstudiante)
+            .where(
+                TareaEstudiante.tarea_id == uuid.UUID(tarea_id),
+                TareaEstudiante.estudiante_id == estudiante_id
+            )
+        ).scalar_one_or_none()
+        
+        if not tarea_est:
+            raise HTTPException(status_code=404, detail="Tarea no encontrada o no asignada")
+        
+        # Guardar archivo si existe
+        archivo_path = None
+        if archivo and archivo.filename:
+            uploads_dir = Path("uploads/entregas")
+            uploads_dir.mkdir(parents=True, exist_ok=True)
+            filename = f"{uuid.uuid4()}_{archivo.filename}"
+            file_path = uploads_dir / filename
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(archivo.file, buffer)
+            archivo_path = str(file_path)
+        
+        # OPCIÓN: Usar datetime.now() directamente en el return
+        fecha_entrega_actual = datetime.now()
+        
+        # Actualizar registro usando update directo
+        db.execute(
+            update(TareaEstudiante)
+            .where(
+                TareaEstudiante.tarea_id == uuid.UUID(tarea_id),
+                TareaEstudiante.estudiante_id == estudiante_id
+            )
+            .values(
+                archivo_estudiante=archivo_path,
+                comentario=comentario,
+                fecha_entrega=fecha_entrega_actual,
+                entregado=True
+            )
+        )
+        
+        db.commit()
+        
+        return {
+            "success": True,
+            "message": "Tarea entregada correctamente",
+            "fecha_entrega": fecha_entrega_actual.isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al entregar tarea: {str(e)}")
+
+@router.get("/descargar-archivo-tarea/{tarea_id}")
+def descargar_archivo_tarea(
+    tarea_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Descarga el archivo adjunto de una tarea (del docente).
+    """
+    try:
+        tarea = db.get(Tarea, uuid.UUID(tarea_id))
+        if not tarea or not tarea.archivo:
+            raise HTTPException(status_code=404, detail="Archivo no encontrado")
+        
+        file_path = Path(tarea.archivo)
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="Archivo no existe en el servidor")
+        
+        return StreamingResponse(
+            open(file_path, "rb"),
+            media_type="application/octet-stream",
+            headers={"Content-Disposition": f"attachment; filename={file_path.name}"}
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al descargar archivo: {str(e)}")
+
+
+@router.get("/test-tareas/{estudiante_id}")
+def test_tareas_estudiante(
+    estudiante_id: int,
+    db: Session = Depends(get_db)
+):
+    """Endpoint temporal para debug"""
+    estudiante = db.get(Estudiante, estudiante_id)
+    
+    if not estudiante:
+        return {"error": "Estudiante no encontrado"}
+    
+    # Ver qué tareas debería ver
+    tareas_correctas = db.execute(
+        select(Tarea)
+        .where(Tarea.grupo_id == estudiante.grado_id)
+    ).scalars().all()
+    
+    # Ver qué tareas está viendo actualmente
+    tareas_actuales = db.execute(
+        select(Tarea)
+        .join(TareaEstudiante, Tarea.id == TareaEstudiante.tarea_id)
+        .where(TareaEstudiante.estudiante_id == estudiante_id)
+    ).scalars().all()
+    
+    return {
+        "estudiante": {
+            "id": estudiante.id,
+            "nombre": f"{estudiante.nombres} {estudiante.apellidos}",
+            "grado_id": estudiante.grado_id
+        },
+        "tareas_que_deberia_ver": [
+            {"id": str(t.id), "asignatura": t.asignatura, "tema": t.tema, "grupo_id": t.grupo_id}
+            for t in tareas_correctas
+        ],
+        "tareas_que_esta_viendo": [
+            {"id": str(t.id), "asignatura": t.asignatura, "tema": t.tema, "grupo_id": t.grupo_id}
+            for t in tareas_actuales
+        ],
+        "total_correctas": len(tareas_correctas),
+        "total_actuales": len(tareas_actuales)
+    }
 

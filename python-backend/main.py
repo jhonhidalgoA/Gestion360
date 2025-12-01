@@ -86,10 +86,8 @@ def root():
     return {"message": "API funcionando correctamente "}
 
 
-# --- LOGIN CORREGIDO ---
 @app.post("/login")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
-    print("DEBUG LOGIN:", data.username, data.password)
     user = db.query(User).filter(User.username == data.username).first()
     
     if not user or not verify_password(data.password, user.password_hash):
@@ -98,23 +96,26 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     role_name = "sin_rol"
     if user.role:
         role_name = str(user.role.name).lower()
-        
+    
     grado_id = None   
-    username_final = user.username  # 👈 Valor por defecto
+    estudiante_id = None  # <-- NUEVA VARIABLE
+    username_final = user.username
 
-    # 🔸 Si es docente, obtener su teacherDocumentNumber real
+    # 🔸 Si es docente
     if role_name == "docente":
         docente = db.query(Docente).filter(Docente.user_id == user.id).first()
-        if docente and docente.teacherDocumentNumber is not None:  # ✅ Aquí se corrige
-            username_final = docente.teacherDocumentNumber  # ✅ Esto es un string, no una columna
+        if docente and docente.teacherDocumentNumber is not None:
+            username_final = docente.teacherDocumentNumber
 
-    # Si es estudiante, obtener grado
+    # 🔸 Si es estudiante - OBTENER ESTUDIANTE_ID
     elif role_name == "estudiante":
         estudiante = db.query(Estudiante).filter(Estudiante.user_id == user.id).first()
         if estudiante:
             grado_id = estudiante.grado_id 
+            estudiante_id = estudiante.id  # <-- ESTA ES LA LÍNEA CLAVE
+            username_final = estudiante.numero_documento  # Usar documento del estudiante
 
-    # Token y redirección
+    # Token
     token_data = {"sub": str(user.id), "rol": role_name}
     access_token = create_access_token(token_data)
 
@@ -131,6 +132,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     user.last_active = datetime.utcnow()
     db.commit()
 
+    # 🔥 RESPONSE CON ESTUDIANTE_ID
     return {
         "username": username_final,
         "user_id": str(user.id),  
@@ -138,9 +140,13 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
         "rol": role_name,
         "redirect": redirect,
         "access_token": access_token,
-        "grado_id": grado_id 
+        "grado_id": grado_id,
+        "estudiante_id": estudiante_id  
     }
-
+    
+    
+    
+    
 # --- MODULO ADMINISTRADOR --- #
 
 #-- Registro estudiante -- #
