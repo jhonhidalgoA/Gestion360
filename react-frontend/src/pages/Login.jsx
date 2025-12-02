@@ -7,6 +7,7 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Nuevo estado
   const { login, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -20,6 +21,11 @@ const Login = () => {
     } else {
       setError("Documento o Contraseña incorrectos");
     }
+  };
+
+  // Función para alternar visibilidad de contraseña
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -65,7 +71,7 @@ const Login = () => {
                 lock_open
               </i>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"} // Cambia dinámicamente
                 name="password"
                 id="password"
                 autoComplete="off"
@@ -78,10 +84,11 @@ const Login = () => {
               />
               <i
                 className="material-symbols-outlined icon-right"
-                aria-label="visibility"
-                id="togglePassword"
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                onClick={togglePasswordVisibility} // Agregar onClick
+                style={{ cursor: "pointer" }} // Asegurar que muestre cursor pointer
               >
-                visibility_off
+                {showPassword ? "visibility" : "visibility_off"} {/* Cambiar ícono dinámicamente */}
               </i>
             </div>
           </div>

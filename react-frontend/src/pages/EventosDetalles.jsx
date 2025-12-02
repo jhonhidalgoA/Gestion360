@@ -39,7 +39,7 @@ const EventosDetalles = () => {
   return (
     <div className="events-school">
       <Navbar />
-      <div className="header">
+      <div className="headers">
         <h1>Eventos</h1>
         <p>Eventos y actividades de nuestra Comunidad Educativa</p>
       </div>

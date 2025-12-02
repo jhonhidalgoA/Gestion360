@@ -49,28 +49,9 @@ const menuConfig = {
       title: "Editar Menú Escolar",
       path: "/menu-escolar",
       gradient: "linear-gradient(135deg, #7B1FA2)",
-    },
-    {
-      id: 7,
-      icon: "article",
-      title: "Editar Noticias",
-      path: "/noticias",
-      gradient: "linear-gradient(135deg, #0097A7, #006064)",
-    },
-    {
-      id: 8,
-      icon: "description",
-      title: "Agregar Circulares",
-      path: "/circulares",
-      gradient: "linear-gradient(135deg, #B8860B)",
-    },
-    {
-      id: 9,
-      icon: "forum",
-      title: "Comunicación con Padres",
-      path: "/comunicacion",
-      gradient: "linear-gradient(135deg, #F08080)",
-    },
+    }   
+    
+    
   ],
   docente: [
     {
@@ -109,34 +90,27 @@ const menuConfig = {
       gradient: "linear-gradient(135deg, #000080)",
     },
     {
-      id: 6,
-      icon: "forum",
-      title: "Comunicación con Padres",
-      path: "/comunicacion",
-      gradient: "linear-gradient(135deg, #ec407a, #d81b60)",
-    },
-    {
-      id: 7,
+      id:6,
       icon: "calendar_month",
       title: "Ver Calendario",
       path: "/calendario",
       gradient: "linear-gradient(135deg, #6B8E23)",
     },
     {
+      id: 7,
+      icon: "forum",
+      title: "Comunicación con Padres",
+      path: "/comunicacion",
+      gradient: "linear-gradient(135deg, #ec407a, #d81b60)",
+    },
+    
+    {
       id: 8,
       icon: "folder_eye",
       title: "Observador",
       path: "/observador",
       gradient: "linear-gradient(135deg, #7f8c8d, #636e72)",
-    },
-    {
-      id: 9,
-      icon: "family_restroom",
-      title: "Agenda de Reuniones",
-      path: "/atencion",
-      gradient: "linear-gradient(135deg, #7B68EE)",
-      iconSize: 100,
-    },
+    },   
   ],
   padre: [
     {

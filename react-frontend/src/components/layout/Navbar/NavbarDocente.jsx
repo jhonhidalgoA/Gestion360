@@ -50,7 +50,24 @@ const NavbarSection = ({ title, icon, color }) => {
             Colegio <span className="modal-title-360">STEM 360</span>
           </>
         }
-        message="¿Estás seguro de que deseas cerrar sesión?"
+        message={
+          <div style={{ textAlign: "center" }}>
+            <span
+              className="material-symbols-outlined"
+              style={{
+                fontSize: "75px",
+                color: "#d3d62eff", 
+                display: "block",
+                
+              }}
+            >
+              warning
+            </span>
+            <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+              ¿Estás seguro de que deseas cerrar sesión?
+            </div>
+          </div>
+        }
         buttons={[
           {
             text: "Confirmar",

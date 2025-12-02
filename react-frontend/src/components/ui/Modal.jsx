@@ -1,7 +1,7 @@
 import { IoClose } from "react-icons/io5";
 import "./Modal.css";
 
-const Modal = ({ isOpen, onClose, title, message, buttons = [] }) => {
+const Modal = ({ isOpen, onClose, title, message, buttons = [], tipo = "" }) => {
   if (!isOpen) return null;
 
   return (
@@ -22,7 +22,9 @@ const Modal = ({ isOpen, onClose, title, message, buttons = [] }) => {
           {buttons.map((btn, index) => (
             <button
               key={index}
-              className={`btn ${btn.className || ""}`}
+              className={`btn ${btn.className || ""} ${
+                btn.variant === "success" || tipo === "exito" ? "btn-success" : ""
+              }`}
               onClick={btn.onClick || onClose}
             >
               {btn.icon && <span className="btn-icon">{btn.icon}</span>}

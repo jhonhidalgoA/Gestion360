@@ -96,7 +96,7 @@ class Padre(Base):
     ocupacion = Column(String(100))
     parentesco = Column(String(20)) 
 
-    # 🔗 Relación con estudiante
+    # Relación con estudiante
     estudiante_id = Column(ForeignKey("estudiantes.id", ondelete="CASCADE"))
     estudiante = relationship("Estudiante", backref="padres")
 

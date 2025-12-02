@@ -53,7 +53,7 @@ return (
                 {item.title}
               </ScrollLink>
             ) : (
-              // En otras páginas, navega a "/"
+              
               <RouterLink
                 to={`/#${item.to}`} 
                 className={item.cName}

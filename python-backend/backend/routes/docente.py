@@ -1,34 +1,60 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, File, UploadFile
-from sqlalchemy.orm import Session
-from sqlalchemy import select, delete, text
-from backend.database import get_db
-from pathlib import Path
-import uuid
-import shutil
-import json
-from io import BytesIO
-import unicodedata
-from backend.models import Grado, Asignatura, Periodo, Estudiante, Calificacion, DuracionClase, Asistencia, Tarea, TareaEstudiante, Estandar, AsignaturaGrado, Dba, EvidenciaAprendizaje 
-from backend.models import TipoActividad, ProyectoTransversal, PlanClase, Docente
-from weasyprint import HTML
-from datetime import datetime, date
-from fastapi.responses import StreamingResponse
-from fastapi import Body, HTTPException
-from io import BytesIO
-from backend.schemas import BoletinCompletoResponse
-import qrcode
+# --- Python estándar ---
 import base64
-from fastapi import Depends, Query
-from sqlalchemy.orm import Session
-from sqlalchemy import update
+import json
+import qrcode
+import shutil
+import unicodedata
 import urllib.parse
+import uuid
+from datetime import date, datetime
+from io import BytesIO
+from pathlib import Path
+
+# --- FastAPI ---
+from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, Query, UploadFile
+from fastapi.responses import StreamingResponse
+
+# --- SQLAlchemy ---
+from sqlalchemy import delete, select, text, update, or_
+from sqlalchemy.orm import Session
 
 
+# --- Importaciones de proyectos ---
+from backend.database import get_db
+from backend.models import (
+    Asignatura,
+    Asistencia,
+    AsignaturaGrado,
+    Calificacion,
+    Dba,
+    Docente,
+    DuracionClase,
+    Estudiante,
+    EvidenciaAprendizaje,
+    Estandar,
+    Grado,
+    Periodo,
+    PlanClase,
+    ProyectoTransversal,
+    Tarea,
+    TareaEstudiante,
+    TipoActividad,
+)
+from backend.schemas import BoletinCompletoResponse
+
+# --- librerias externas ---
+from weasyprint import HTML
 
 
-
+# -------------------------------
+#   Router principal
+# -------------------------------
 router = APIRouter(prefix="/api", tags=["docente"])
 
+
+# -------------------------------
+#   listar-grados
+# -------------------------------
 @router.get("/grados", summary="Obtener lista de grados")
 def get_grados(db: Session = Depends(get_db)):
     try:
@@ -36,7 +62,11 @@ def get_grados(db: Session = Depends(get_db)):
         return [{"id": g.id, "nombre": g.nombre} for g in grados]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+   
+    
+# -------------------------------
+#   listar-asignaturas
+# -------------------------------
 @router.get("/asignaturas", summary="Obtener lista de asignaturas")
 def get_asignaturas(db: Session = Depends(get_db)):
     try:
@@ -44,7 +74,11 @@ def get_asignaturas(db: Session = Depends(get_db)):
         return [{"id": a.subject_id, "nombre": a.name} for a in asignaturas]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+    
+    
+# -------------------------------
+#   listar-periodos-academicos
+# -------------------------------
 @router.get("/periodos", summary="Obtener lista de periodos")
 def get_periodos(db: Session = Depends(get_db)):
     try:
@@ -126,8 +160,11 @@ def get_estudiantes_por_grado(
     except Exception as e:
         print(f"Error en /estudiantes-por-grado: {str(e)}")
         raise HTTPException(status_code=500, detail="Error al cargar calificaciones")
+
      
-    
+# -------------------------------
+#   Guardar-calificaciones
+# -------------------------------    
 @router.post("/guardar-calificaciones")
 def guardar_calificaciones(
     data: dict,
@@ -172,6 +209,10 @@ def guardar_calificaciones(
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
     
+    
+# -------------------------------
+#   Duracion-clases
+# -------------------------------    
 @router.get("/duracion-clase")
 def get_duracion_clase(db: Session = Depends(get_db)):
     try:
@@ -180,6 +221,10 @@ def get_duracion_clase(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+    
+# -------------------------------
+#   Registrar-asistencia  
+# -------------------------------    
 @router.post("/guardar-asistencia")
 def guardar_asistencia(request: dict, db: Session = Depends(get_db)):
     try:
@@ -219,6 +264,9 @@ def guardar_asistencia(request: dict, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Error al guardar: {str(e)}") 
 
 
+# -------------------------------
+#   Asistencia-por-grupo
+# -------------------------------
 @router.get("/asistencia-por-grupo/{grupo_id}")
 def get_asistencia_por_grupo(
     grupo_id: int,
@@ -272,7 +320,9 @@ def get_estudiantes_por_grupo_asignatura(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-    
+# -------------------------------
+#   Enviar-tareas-a-estudiantes
+# -------------------------------    
 @router.post("/enviar-tarea")
 async def enviar_tarea(
     grupo: str = Form(...),
@@ -348,8 +398,9 @@ def get_estudiante(estudiante_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))       
 
 
-
-
+# -------------------------------
+#   Generar-calificaciones PDF
+# -------------------------------
 def generar_calificaciones_pdf_en_memoria(buffer, datos_estudiante, notas, asignatura, periodo):
     nombre = datos_estudiante["nombre_completo"]
     grado = datos_estudiante["grado"]
@@ -786,7 +837,9 @@ def get_estudiantes_por_grado_simple(grado_id: int, db: Session = Depends(get_db
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))   
 
-# --- GENERAR BOLETÍN PDF --- #     
+# -------------------------------
+#   Generar-boletin-PDF
+# -------------------------------  
     
 def generar_boletin_pdf_en_memoria(buffer, datos_boletin):
     
@@ -1355,9 +1408,7 @@ def generar_certificado_escolar_pdf(buffer, estudiante, grado_nombre):
         <div class="footer-info">
             <span>Colegio STEM 360</span>
             <span>Página 1 de 1</span>
-        </div>
-
-       
+        </div>       
     </body>
     </html>
     """
@@ -1528,68 +1579,197 @@ def get_proyectos_transversales(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))    
     
-
-
 def generar_plan_clase_pdf(buffer, plan_data):
     """
-    Genera un PDF del plan de clase usando WeasyPrint.
+    Genera un PDF del plan de clase usando WeasyPrint con diseño moderno.
+    Genera automáticamente un código QR con los datos del plan.
+    
+    Args:
+        buffer: Buffer donde se escribirá el PDF
+        plan_data: Diccionario con los datos del plan de clase
     """
+    import qrcode
+    import base64
+    from io import BytesIO
+    from datetime import datetime
+    
+    # --- GENERAR CÓDIGO QR ---
+    qr_text = f"""
+    COLEGIO STEM 360
+    Plan de Clase
+    Tema: {plan_data['tema']}
+    Asignatura: {plan_data['asignatura_nombre']}
+    Grado: {plan_data['grado_nombre']}
+    Periodo: {plan_data['periodo_nombre']}
+    Fecha: {plan_data['fecha_inicio']} al {plan_data['fecha_fin']}
+    Generado: {datetime.now().strftime('%d/%m/%Y %H:%M')}
+    """.strip()
+    
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.ERROR_CORRECT_L,  # <-- CORREGIDO AQUÍ
+        box_size=14,
+        border=4,
+    )
+    qr.add_data(qr_text)
+    qr.make(fit=True)
+    
+    qr_img = qr.make_image(fill_color="black", back_color="white")
+    qr_buffer = BytesIO()
+    qr_img.save(qr_buffer, "PNG")
+    qr_base64 = base64.b64encode(qr_buffer.getvalue()).decode("utf-8")
+    
+    # --- HTML CONTENT ---
     html_content = f"""
     <!DOCTYPE html>
     <html lang="es">
     <head>
         <meta charset="UTF-8">
         <style>
-            body {{
-                font-family: Arial, sans-serif;
-                font-size: 11pt;
-                color: #000;
-                margin: 2cm;
-                line-height: 1.5;
+            @page {{
+                size: Letter;
+                margin: 1.5cm;
             }}
+            
+            body {{
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-size: 10pt;
+                color: #2c3e50;
+                margin: 0;
+                line-height: 1.6;
+            }}
+            
             .header {{
                 text-align: center;
-                margin-bottom: 20pt;
+                margin-bottom: 25pt;
+                padding-bottom: 15pt;
+                border-bottom: 2pt solid #3498db;
             }}
+            
             .titulo {{
-                font-size: 18pt;
+                font-size: 20pt;
                 font-weight: bold;
                 color: #2c3e50;
+                letter-spacing: 1pt;
                 margin-bottom: 5pt;
             }}
+            
             .subtitulo {{
-                font-size: 14pt;
+                font-size: 15pt;
+                font-weight: 600;
                 color: #3498db;
-                margin-bottom: 15pt;
+                letter-spacing: 0.5pt;
             }}
+            
+            .info-grid {{
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10pt;
+                margin-bottom: 25pt;
+                background: #f8f9fa;
+                padding: 15pt;
+                border-radius: 5pt;                
+            }}
+            
+            .info-item {{
+                margin-bottom: 8pt;
+            }}
+            
+            .info-label {{
+                font-weight: 600;
+                color: #5a6c7d;
+                font-size: 9pt;
+                text-transform: uppercase;
+                letter-spacing: 0.3pt;
+                margin-bottom: 2pt;
+            }}
+            
+            .info-valor {{
+                color: #2c3e50;
+                font-size: 10pt;
+            }}
+            
             .seccion {{
                 margin-bottom: 20pt;
+                page-break-inside: avoid;
             }}
+            
             .seccion-titulo {{
-                font-weight: bold;
+                font-weight: 600;
+                font-size: 11pt;
                 color: #2c3e50;
-                margin-bottom: 8pt;
-                border-bottom: 1pt solid #3498db;
-                padding-bottom: 4pt;
+                margin-bottom: 10pt;
+                padding: 8pt 12pt;
+                background: linear-gradient(to right, #3498db 0%, #5dade2 100%);
+                color: white;
+                border-radius: 3pt;
+                text-transform: uppercase;
+                letter-spacing: 0.5pt;                
             }}
+            
             .contenido {{
-                margin-left: 10pt;
+                padding: 12pt;
+                background: #ffffff;                
+                margin-left: 5pt;
+                line-height: 1.7;
             }}
-            .tabla-info {{
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20pt;
+            
+            .tema-destacado {{
+                background: #fff9e6;                
+                padding: 12pt;
+                margin: 15pt 0;
+                border-radius: 0 3pt 3pt 0;
             }}
-            .tabla-info td {{
-                padding: 6pt;
-                vertical-align: top;
+            
+            .tema-label {{
+                font-weight: 600;
+                color: #f39c12;
+                font-size: 11pt;
+                text-transform: uppercase;
+                margin-bottom: 5pt;
             }}
-            .label {{
-                font-weight: bold;
-                width: 20%;
+            
+            .tema-texto {{
+                color: #2c3e50;
+                font-size: 11pt;
+                font-weight: 500;
             }}
-            .valor {{
-                width: 80%;
+            
+            .footer {{
+                margin-top: 30pt;
+                padding-top: 15pt;
+                border-top: 2pt solid #ecf0f1;
+                font-size: 8pt;
+                color: #95a5a6;
+                text-align: center;
+            }}
+            
+            .qr-section {{
+                text-align: center;
+                margin-top: 30pt;
+                padding-top: 20pt;
+                border-top: 1pt solid #ecf0f1;
+            }}
+            
+            .qr-code {{
+                width: 150pt;
+                height: 150pt;
+                margin: 0 auto 10pt auto;
+            }}
+            
+            .qr-label {{
+                font-size: 10pt;
+                color: #7f8c8d;
+                font-weight: 500;
+            }}
+            .footer-info {{
+                display: flex;
+                justify-content: space-between;
+                font-size: 9pt;
+                color: #7f8c8d;
+                margin-top: 10pt;
+                padding-top: 10pt;
+                border-top: 0.5pt solid #ECF0F1;
             }}
         </style>
     </head>
@@ -1599,70 +1779,83 @@ def generar_plan_clase_pdf(buffer, plan_data):
             <div class="subtitulo">PLAN DE CLASE</div>
         </div>
 
-        <table class="tabla-info">
-            <tr>
-                <td class="label">Fecha(s):</td>
-                <td class="valor">{plan_data['fecha_inicio']} al {plan_data['fecha_fin']}</td>
-            </tr>
-            <tr>
-                <td class="label">Período:</td>
-                <td class="valor">{plan_data['periodo_nombre']}</td>
-            </tr>
-            <tr>
-                <td class="label">Grado:</td>
-                <td class="valor">{plan_data['grado_nombre']}</td>
-            </tr>
-            <tr>
-                <td class="label">Asignatura:</td>
-                <td class="valor">{plan_data['asignatura_nombre']}</td>
-            </tr>
-            <tr>
-                <td class="label">Tipo:</td>
-                <td class="valor">{plan_data['tipo_actividad_etiqueta']}</td>
-            </tr>
-            <tr>
-                <td class="label">Tema:</td>
-                <td class="valor">{plan_data['tema']}</td>
-            </tr>
-        </table>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Fecha(s):</div>
+                <div class="info-valor">{plan_data['fecha_inicio']} al {plan_data['fecha_fin']}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Período:</div>
+                <div class="info-valor">{plan_data['periodo_nombre']}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Grado:</div>
+                <div class="info-valor">{plan_data['grado_nombre']}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Asignatura:</div>
+                <div class="info-valor">{plan_data['asignatura_nombre']}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Tipo de Actividad:</div>
+                <div class="info-valor">{plan_data['tipo_actividad_etiqueta']}</div>
+            </div>
+            {"<div class='info-item'><div class='info-label'>Proyecto Transversal:</div><div class='info-valor'>" + plan_data['proyecto_etiqueta'] + "</div></div>" if plan_data.get('proyecto_etiqueta') else ""}
+        </div>
+
+        <div class="tema-destacado">
+            <div class="tema-label">Tema a desarrollar:</div>
+            <div class="tema-texto">{plan_data['tema']}</div>
+        </div>
 
         <div class="seccion">
-            <div class="seccion-titulo">Estándar</div>
+            <div class="seccion-titulo">📚 Estándar:</div>
             <div class="contenido">{plan_data['estandar_nombre']}</div>
         </div>
 
         <div class="seccion">
-            <div class="seccion-titulo">Derechos Básicos de Aprendizaje (DBA)</div>
+            <div class="seccion-titulo">🎯 Derechos Básicos de Aprendizaje (DBA)</div>
             <div class="contenido">{plan_data['dba_descripcion']}</div>
         </div>
 
-        {"<div class='seccion'><div class='seccion-titulo'>Evidencia de Aprendizaje</div><div class='contenido'>" + plan_data['evidencia_descripcion'] + "</div></div>" if plan_data.get('evidencia_descripcion') else ""}
+        {"<div class='seccion'><div class='seccion-titulo'>✓ Evidencia de Aprendizaje</div><div class='contenido'>" + plan_data['evidencia_descripcion'] + "</div></div>" if plan_data.get('evidencia_descripcion') else ""}
 
-        {"<div class='seccion'><div class='seccion-titulo'>Competencias</div><div class='contenido'>" + plan_data['competencias'] + "</div></div>" if plan_data.get('competencias') else ""}
+        {"<div class='seccion'><div class='seccion-titulo'>💡 Competencias</div><div class='contenido'>" + plan_data['competencias'] + "</div></div>" if plan_data.get('competencias') else ""}
 
-        {"<div class='seccion'><div class='seccion-titulo'>Proyecto Transversal</div><div class='contenido'>" + plan_data['proyecto_etiqueta'] + "</div></div>" if plan_data.get('proyecto_etiqueta') else ""}
+        {"<div class='seccion'><div class='seccion-titulo'>🎯 Objetivos</div><div class='contenido'>" + plan_data['objetivos'] + "</div></div>" if plan_data.get('objetivos') else ""}
 
-        {"<div class='seccion'><div class='seccion-titulo'>Objetivos</div><div class='contenido'>" + plan_data['objetivos'] + "</div></div>" if plan_data.get('objetivos') else ""}
+        {"<div class='seccion'><div class='seccion-titulo'>🔍 Saberes Previos</div><div class='contenido'>" + plan_data['saberes_previos'] + "</div></div>" if plan_data.get('saberes_previos') else ""}
 
-        {"<div class='seccion'><div class='seccion-titulo'>Saberes Previos</div><div class='contenido'>" + plan_data['saberes_previos'] + "</div></div>" if plan_data.get('saberes_previos') else ""}
+        {"<div class='seccion'><div class='seccion-titulo'>🔬 Análisis</div><div class='contenido'>" + plan_data['analiza'] + "</div></div>" if plan_data.get('analiza') else ""}
 
-        {"<div class='seccion'><div class='seccion-titulo'>¿Cómo analiza el docente?</div><div class='contenido'>" + plan_data['analiza'] + "</div></div>" if plan_data.get('analiza') else ""}
+        {"<div class='seccion'><div class='seccion-titulo'>📖 Contenidos</div><div class='contenido'>" + plan_data['contenidos'] + "</div></div>" if plan_data.get('contenidos') else ""}
 
-        {"<div class='seccion'><div class='seccion-titulo'>Contenidos</div><div class='contenido'>" + plan_data['contenidos'] + "</div></div>" if plan_data.get('contenidos') else ""}
+        {"<div class='seccion'><div class='seccion-titulo'>📊 Evaluación</div><div class='contenido'>" + plan_data['evaluacion'] + "</div></div>" if plan_data.get('evaluacion') else ""}
 
-        {"<div class='seccion'><div class='seccion-titulo'>Evaluación</div><div class='contenido'>" + plan_data['evaluacion'] + "</div></div>" if plan_data.get('evaluacion') else ""}
+        {"<div class='seccion'><div class='seccion-titulo'>📝 Observaciones</div><div class='contenido'>" + plan_data['observaciones'] + "</div></div>" if plan_data.get('observaciones') else ""}
 
-        {"<div class='seccion'><div class='seccion-titulo'>Observaciones</div><div class='contenido'>" + plan_data['observaciones'] + "</div></div>" if plan_data.get('observaciones') else ""}
+        {"<div class='seccion'><div class='seccion-titulo'>📚 Bibliografía</div><div class='contenido'>" + plan_data['bibliografia'] + "</div></div>" if plan_data.get('bibliografia') else ""}
 
-        {"<div class='seccion'><div class='seccion-titulo'>Bibliografía</div><div class='contenido'>" + plan_data['bibliografia'] + "</div></div>" if plan_data.get('bibliografia') else ""}
-
-        <div style="margin-top: 40pt; font-size: 10pt; color: #7f8c8d; text-align: center;">
-            Documento generado el {datetime.now().strftime('%d/%m/%Y a las %H:%M')}
+        <!-- Código QR generado automáticamente -->
+        <div class="qr-section">
+            <img src="data:image/png;base64,{qr_base64}" class="qr-code" alt="Código QR">
+            <div class="qr-label">Código de verificación - Gestión 360</div>
         </div>
+
+        <div class="footer">
+            Documento generado el {datetime.now().strftime('%d/%m/%Y a las %H:%M')}<br>
+            Sistema de Gestión Administrativa y Procesos Académicos (SGAPA) - Versión 1.0
+        </div>
+         <div class="footer-info">
+            <span>Colegio STEM 360</span>
+            <span>Página 1 de 1</span>
+        </div>  
     </body>
     </html>
     """
-    HTML(string=html_content).write_pdf(buffer) 
+    HTML(string=html_content).write_pdf(buffer)
+
+
     
 @router.get("/pdf/plan-clase/{plan_id}")
 def generar_pdf_plan_clase(plan_id: int, db: Session = Depends(get_db)):
@@ -2328,3 +2521,193 @@ def test_tareas_estudiante(
         "total_actuales": len(tareas_actuales)
     }
 
+
+# -------------------------------
+#   Buscar-plan-clase
+# -------------------------------
+
+
+@router.get("/planes/buscar")
+def buscar_planes(
+    username: str = Query(..., description="Número de documento del docente"),
+    termino: str = Query("", description="Término de búsqueda"),
+    db: Session = Depends(get_db)
+):
+    """
+    Busca planes por asignatura, grado, periodo o tipo_actividad.
+    """
+    # Buscar docente
+    docente = db.query(Docente).filter(
+        Docente.teacherDocumentNumber == username
+    ).first()
+    
+    if not docente or docente.user_id is None:
+        return []
+    
+    # Construir query base
+    query = db.query(PlanClase).filter(
+        PlanClase.docente_user_id == docente.user_id
+    )
+    
+    # Aplicar filtro si hay término de búsqueda
+    if termino:
+        term_lower = f"%{termino.lower()}%"
+        query = query.filter(
+            or_(
+                PlanClase.asignatura_nombre.ilike(term_lower),
+                PlanClase.tipo_actividad.ilike(term_lower),
+                PlanClase.tema.ilike(term_lower),
+                # Buscar también en grados y periodos relacionados
+                Grado.nombre.ilike(term_lower),
+                Periodo.nombre.ilike(term_lower)
+            )
+        ).join(Grado, PlanClase.grado_id == Grado.id)\
+         .join(Periodo, PlanClase.periodo_id == Periodo.id)
+    
+    planes = query.all()
+    
+    # Formatear respuesta
+    resultado = []
+    for p in planes:
+        periodo = db.get(Periodo, p.periodo_id) if p.periodo_id else None
+        grado = db.get(Grado, p.grado_id) if p.grado_id else None
+        
+        resultado.append({
+            "id": p.id,
+            "name": p.tema,
+            "asignatura": p.asignatura_nombre,
+            "grado": grado.nombre if grado else "N/A",
+            "periodo": periodo.nombre if periodo else "N/A",
+            "datestart": p.fecha_inicio.isoformat() if p.fecha_inicio else "",
+            "dateEnd": p.fecha_fin.isoformat() if p.fecha_fin else "",
+            "plan": p.tipo_actividad or "Clase"
+        })
+    
+    return resultado
+
+
+@router.delete("/planes/{plan_id}")
+def eliminar_plan_clase(
+    plan_id: int,
+    username: str = Query(..., description="Número de documento del docente"),
+    db: Session = Depends(get_db)
+):
+    """
+    Elimina un plan de clase (solo el docente dueño puede eliminarlo).
+    """
+    # Buscar docente
+    docente = db.query(Docente).filter(
+        Docente.teacherDocumentNumber == username
+    ).first()
+    
+    if not docente or docente.user_id is None:
+        raise HTTPException(status_code=404, detail="Docente no encontrado")
+    
+    # Buscar plan y verificar propiedad
+    plan = db.get(PlanClase, plan_id)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan no encontrado")
+    
+    if plan.docente_user_id != docente.user_id:
+        raise HTTPException(status_code=403, detail="No autorizado para eliminar este plan")
+    
+    # Eliminar plan
+    db.delete(plan)
+    db.commit()
+    
+    return {"message": "Plan eliminado correctamente"}
+
+
+@router.get("/planes/{plan_id}")
+def obtener_plan_completo(
+    plan_id: int,
+    db: Session = Depends(get_db)
+):
+    
+    plan = db.get(PlanClase, plan_id)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan no encontrado")
+    
+    # Obtener datos relacionados
+    periodo = db.get(Periodo, plan.periodo_id) if plan.periodo_id else None
+    grado = db.get(Grado, plan.grado_id) if plan.grado_id else None
+    estandar = db.get(Estandar, plan.estandar_id) if plan.estandar_id else None
+    dba = db.get(Dba, plan.dba_id) if plan.dba_id else None
+    evidencia = db.get(EvidenciaAprendizaje, plan.evidencia_id) if plan.evidencia_id else None
+    
+    return {
+        "id": plan.id,
+        "fecha_inicio": plan.fecha_inicio.isoformat() if plan.fecha_inicio else None,
+        "fecha_fin": plan.fecha_fin.isoformat() if plan.fecha_fin else None,
+        "periodo_id": plan.periodo_id,
+        "periodo_nombre": periodo.nombre if periodo else "",
+        "grado_id": plan.grado_id,
+        "grado_nombre": grado.nombre if grado else "",
+        "asignatura_nombre": plan.asignatura_nombre,
+        "tipo_actividad": plan.tipo_actividad,
+        "tema": plan.tema,
+        "estandar_id": plan.estandar_id,
+        "estandar_nombre": estandar.nombre if estandar else "",
+        "dba_id": plan.dba_id,
+        "dba_descripcion": dba.descripcion if dba else "",
+        "evidencia_id": plan.evidencia_id,
+        "evidencia_descripcion": evidencia.descripcion if evidencia else "",
+        "competencias": plan.competencias or "",
+        "proyecto_transversal": plan.proyecto_transversal or "",
+        "objetivos": plan.objetivos or "",
+        "saberes_previos": plan.saberes_previos or "",
+        "analiza": plan.analiza or "",
+        "contenidos": plan.contenidos or "",
+        "evaluacion": plan.evaluacion or "",
+        "observaciones": plan.observaciones or "",
+        "bibliografia": plan.bibliografia or ""
+    }
+
+@router.put("/planes/{plan_id}")
+def actualizar_plan_clase(
+    plan_id: int,
+    data: dict,
+    username: str = Query(..., description="Número de documento del docente"),
+    db: Session = Depends(get_db)
+):
+    """
+    Actualiza un plan de clase existente.
+    """
+    # Buscar docente
+    docente = db.query(Docente).filter(
+        Docente.teacherDocumentNumber == username
+    ).first()
+    
+    if not docente or docente.user_id is None:
+        raise HTTPException(status_code=404, detail="Docente no encontrado")
+    
+    # Buscar plan y verificar propiedad
+    plan = db.get(PlanClase, plan_id)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan no encontrado")
+    
+    if plan.docente_user_id != docente.user_id:
+        raise HTTPException(status_code=403, detail="No autorizado para editar este plan")
+    
+    # Actualizar campos
+    campos_permitidos = [
+        "fecha_inicio", "fecha_fin", "periodo_id", "grado_id",
+        "asignatura_nombre", "tipo_actividad", "tema", "estandar_id",
+        "dba_id", "evidencia_id", "competencias", "proyecto_transversal",
+        "objetivos", "saberes_previos", "analiza", "contenidos",
+        "evaluacion", "observaciones", "bibliografia"
+    ]
+    
+    for campo in campos_permitidos:
+        if campo in data and data[campo] is not None:
+            # Convertir fechas de string a date
+            if campo in ["fecha_inicio", "fecha_fin"] and isinstance(data[campo], str):
+                from datetime import datetime
+                setattr(plan, campo, datetime.strptime(data[campo], "%Y-%m-%d").date())
+            else:
+                setattr(plan, campo, data[campo])
+    
+    db.commit()
+    db.refresh(plan)
+    
+    return {"message": "Plan actualizado correctamente", "plan_id": plan.id}

@@ -41,25 +41,11 @@
 .card-content .card-span {
   font-size: 15px;
   font-weight: 700;
-  color: var(--primary-purple);
+  color: #0056b3;
   letter-spacing: 1.5px;
 }
 
-/* Línea divisoria decorativa */
-.card-content .custom-hr {
-  border: none;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--accent-orange) 20%,
-    var(--accent-orange) 80%,
-    transparent
-  );
-  width: 80%;
-  margin: var(--spacing-sm) auto var(--spacing-lg);
-  border-radius: 2px;
-}
+
 
 /* Título del evento */
 .card-content h4:last-of-type { 
@@ -87,7 +73,7 @@
 /* Fecha */
 .class-button .date {  
   font-size: 16px;
-  font-weight: 400;
+  font-weight: bold;
   color: var(--text-secondary);
   letter-spacing: 0.3px;
 }
@@ -113,12 +99,12 @@
   transform: translateX(-50%);
   width: 0;
   height: 2px;
-  background-color: var(--link-purple-hover);
+  background-color: #0056b3;
   transition: width var(--transition-fast);
 }
 
 .class-button .btn-card:hover {
-  color: var(--link-purple-hover);
+  color: #0056b3;
   
 }
 
@@ -128,13 +114,11 @@
 
 /* Focus para accesibilidad */
 .class-button .btn-card:focus {
-  outline: 2px solid var(--link-purple);
+  outline: 2px solid #0056b3;
   outline-offset: 2px;
 }
 
-/* ========================================
-   BOTÓN DE CARGAR MÁS
-   ======================================== */
+
 .button {
   display: flex;
   justify-content: center;
@@ -142,9 +126,7 @@
   padding: var(--spacing-lg) 0;
 }
 
-/* ========================================
-   RESPONSIVE DESIGN
-   ======================================== */
+
 
 /* Móviles pequeños (hasta 480px) */
 @media (max-width: 480px) {
@@ -238,7 +220,7 @@
   }
   
   .card-content .card-span {
-    color: var(--primary-purple-dark);
+    color: blue;
   }
   
   .class-button .btn-card {

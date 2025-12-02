@@ -31,7 +31,7 @@ const Contacto = () => {
             <li>
               {" "}
               <img src={location_icon} alt="" />
-              1934 Roscoe Street, Chicago <br /> IL 3166, United States{" "}
+              Calle 2 # 34-04, Salamina <br /> Caldas, Colombia{" "}
             </li>
           </ul>
         </div>
@@ -44,11 +44,11 @@ const Contacto = () => {
               placeholder="ej: Juan P"
               required
             />
-            <label htmlFor="">Teléfono</label>
+            <label htmlFor="">Correo Electrónico</label>
              <input
-              type="text"
-              name="phone"
-              placeholder="ej: 310 XXX XXX" 
+              type="email"
+              name="email"
+              placeholder="ej: jhon@example.com" 
               required
             />
             <label htmlFor="">Escribe tu mensaje</label>

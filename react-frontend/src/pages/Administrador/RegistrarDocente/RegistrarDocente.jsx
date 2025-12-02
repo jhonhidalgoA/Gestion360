@@ -7,6 +7,7 @@ import TabDocenteDatos from "./TabDocenteDatos";
 import TabDocenteProfesional from "./TabDocenteProfesional";
 import ModalListaDocente from "./ModalListaDocente";
 import "./RegistrarDocente.css";
+import { FaSave } from "react-icons/fa";
 
 const RegistrarDocente = () => {
   const [activeTab, setActiveTab] = useState("docente");
@@ -253,7 +254,8 @@ const RegistrarDocente = () => {
         buttons={[
           {
             text: "Aceptar",
-            variant: "success",
+            className: "btn-save",
+            icon: <FaSave className="icon-large"  />,
             onClick: () => setIsSuccessModalOpen(false),
           },
         ]}

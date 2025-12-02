@@ -282,8 +282,31 @@ const Calificaciones = () => {
 
         setMensajeModal({
           isOpen: true,
-          title: "Colegio STEM 360",
-          message: "Calificaciones guardadas correctamente.",
+          title: (
+            <>
+              Colegio{" "}
+              <span style={{ color: "#2e83c5", fontWeight: "bold" }}>
+                STEM 360
+              </span>
+            </>
+          ),
+          message: (
+            <div style={{ textAlign: "center" }}>
+              <span
+                className="material-symbols-outlined"
+                style={{
+                  fontSize: "80px",
+                  color: "#48bb78",                  
+                  display: "block",
+                }}
+              >
+                check_circle
+              </span>
+              <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+                Calificaciones guardadas correctamente.
+              </div>
+            </div>
+          ),
           tipo: "exito",
         });
       } else {
@@ -645,7 +668,7 @@ const Calificaciones = () => {
               <div
                 style={{
                   background: "white",
-                  borderRadius: "12px",
+                  borderRadius: "10px",
                   padding: "24px",
                   width: "90%",
                   maxWidth: "500px",
@@ -730,7 +753,7 @@ const Calificaciones = () => {
                       padding: "10px 20px",
                       borderRadius: "6px",
                       border: "none",
-                      background: "#3182ce",
+                      background: "#092b4aff",
                       color: "white",
                       cursor: "pointer",
                       fontSize: "14px",
@@ -756,6 +779,7 @@ const Calificaciones = () => {
             }
             title={mensajeModal.title}
             message={mensajeModal.message}
+            tipo={mensajeModal.tipo}
             buttons={[
               {
                 text: "Cerrar",

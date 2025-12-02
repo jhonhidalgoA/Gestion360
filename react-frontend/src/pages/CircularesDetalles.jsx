@@ -11,7 +11,7 @@ const CircularesDetalles = () => {
   return (
     <div className="circulares-container">
       <Navbar />
-      <div className="header">
+      <div className="headers">
         <h1>Circulares</h1>
         <p>Últimas actualizaciones académicas y administrativas.</p>
       </div>

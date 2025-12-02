@@ -361,8 +361,31 @@ const Asistencia = () => {
 
         setMensajeModal({
           isOpen: true,
-          title: "Colegio STEM 360",
-          message: "Asistencia guardada correctamente.",
+          title: (
+            <>
+              Colegio{" "}
+              <span style={{ color: "#2e83c5", fontWeight: "bold" }}>
+                STEM 360
+              </span>
+            </>
+          ),
+          message: (
+            <div style={{ textAlign: "center" }}>
+              <span
+                className="material-symbols-outlined"
+                style={{
+                  fontSize: "80px",
+                  color: "#48bb78",
+                  display: "block",
+                }}
+              >
+                check_circle
+              </span>
+              <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+                Asistencia guardada correctamente.
+              </div>
+            </div>
+          ),
           tipo: "exito",
         });
       } else {

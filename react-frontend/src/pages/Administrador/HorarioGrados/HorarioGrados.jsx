@@ -589,6 +589,7 @@ const HorarioGrados = () => {
             <div className="horario-grados-modal-body">
               <p dangerouslySetInnerHTML={{ __html: modal.message }} />
             </div>
+
             <div className="horario-grados-modal-footer">
               {!modal.single && (
                 <button

@@ -21,7 +21,7 @@ const Card = ({
     
   };
 
-   console.log("🎬 Card renderizada - showCarousel:", showCarousel);
+   console.log("Card renderizada - showCarousel:", showCarousel);
 
   return (
     <>

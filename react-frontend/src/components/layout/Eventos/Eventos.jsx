@@ -9,7 +9,7 @@ const Eventos = ({ cardsToShow = 2, showDetailsButton = false, showMoreButton = 
   const displayedEvents = eventsData.slice(0, cardsToShow); 
 
   return (
-    <div className="event-container">
+    <div>
       {displayedEvents.map((event) => (
         <EventCard
           key={event.id}

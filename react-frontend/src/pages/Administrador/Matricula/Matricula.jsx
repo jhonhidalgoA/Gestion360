@@ -4,7 +4,7 @@ import { getDefaultValues } from "../Matricula/config/defaultValues";
 import {
   validateTab,
   formatMatriculaData,
-  mapMatriculaToFrontend, // ✅ importado
+  mapMatriculaToFrontend, 
 } from "../Matricula/utils/formHelpers";
 import { postMatricula } from "../Matricula/utils/apiHelpers";
 import ModalListaEstudiantes from "../Matricula/ModalListaEstudiante";
@@ -16,6 +16,7 @@ import Botones from "../../../components/ui/Botones";
 import Modal from "../../../components/ui/Modal";
 import "./Matricula.css";
 import { FaExclamation } from "react-icons/fa";
+import { FaSave } from "react-icons/fa";
 
 const Matricula = () => {
   const [activeTab, setActiveTab] = useState("estudiante");
@@ -162,7 +163,8 @@ const Matricula = () => {
         buttons={[
           {
             text: "Aceptar",
-            variant: "success",
+            className: "btn-save",
+            icon: <FaSave />,
             onClick: () => setIsSuccessModalOpen(false),
           },
         ]}

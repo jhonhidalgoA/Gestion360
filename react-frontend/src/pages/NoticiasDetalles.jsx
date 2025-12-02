@@ -10,7 +10,7 @@ const NoticiasDetalle = () => {
   return (
     <div className="news-school">
       <Navbar />
-      <div className="header">
+      <div className="headers">
         <h1>Noticias</h1>
         <p>Noticias y actividades de nuestra Comunidad Educativa</p>
       </div>

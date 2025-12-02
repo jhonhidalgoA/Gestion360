@@ -9,21 +9,21 @@
     background-attachment: fixed;    
 }
 
-.header {
+.headers {
   text-align: center;
-  margin-bottom: 40px;  
+  margin-bottom: 20px;  
   padding: 20px;
   border-radius: 12px;
   
 }
 
-.header h1 {
+.headers h1 {
   font-size: 2.5rem;
   color:white;
   margin-top: 60px;  
 }
 
-.header p {
+.headers p {
   font-size: 1.5rem;
   color:white;
   

@@ -378,6 +378,9 @@ const EditarMenu = () => {
             <button className="close" onClick={cerrarModal}>
               <X size={28} />
             </button>
+            <div className="title-school-menu">
+               <h2>Colegio <span className="modal-title-360-menu">STEM 360</span></h2>
+            </div>           
             <h2>Editar Plato</h2>
             <form id="editarForm" onSubmit={handleSubmit}>
               <label htmlFor="nombre">Nombre del Plato:</label>
