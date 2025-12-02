@@ -9,24 +9,34 @@ const PlanesCard = ({
   datestart,
   dateEnd,
   plan,
+  onVer,      // ← Recibir las funciones
+  onEditar,   // ← Recibir las funciones
+  onEliminar  // ← Recibir las funciones
 }) => {
   // Formatear fechas al estilo anglosajón: "Nov 3 – 17, 2025"
   const formatDateRange = (start, end) => {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+    if (!start || !end) return 'Fechas no disponibles';
+    
+    try {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
 
-    const startPart = startDate.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
+      const startPart = startDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
 
-    const endPart = endDate.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+      const endPart = endDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
 
-    return `${startPart} – ${endPart}`;
+      return `${startPart} – ${endPart}`;
+    } catch (error) {
+      console.error("Error formateando fechas:", error);
+      return 'Fechas no disponibles';
+    }
   };
 
   return (
@@ -54,17 +64,40 @@ const PlanesCard = ({
         </div>
       </div>
       <div className="planes-button">
-        <button>
+        {/* Botón VER - Conectado a onVer */}
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            onVer && onVer();
+          }}
+          title="Ver PDF del plan"
+        >
           <span className="material-symbols-outlined icons-planes-right">
             visibility
           </span>
         </button>
-        <button>
+
+        {/* Botón EDITAR - Conectado a onEditar */}
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            onEditar && onEditar();
+          }}
+          title="Editar plan"
+        >
           <span className="material-symbols-outlined icons-planes-right">
             edit
           </span>
         </button>
-        <button>
+
+        {/* Botón ELIMINAR - Conectado a onEliminar */}
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            onEliminar && onEliminar();
+          }}
+          title="Eliminar plan"
+        >
           <span className="material-symbols-outlined icons-planes-right">
             delete
           </span>

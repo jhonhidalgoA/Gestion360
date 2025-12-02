@@ -469,54 +469,54 @@ const Reportes = () => {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(600px, 1fr))",
               gap: "16px",
             }}
           >
             <ReporteCard
               icon="menu_book"
-              title="Calificaciones"
+              title="Calificaciones por Asignatura"
               subtitle="Reporte notas por materia del periodo"
               onClick={handleCalificacionesClick}
-              bgColor="#3b82f6"
-            />
-            <ReporteCard
-              icon="calendar_today"
-              title="Asistencia"
-              subtitle="Control de asistencia e inasistencias"
-              onClick={handleValidateOnly}
-              bgColor="#10b981"
-            />
-            <ReporteCard
-              icon="assignment_turned_in"
-              title="Certificado Escolar PDF"
-              subtitle="Certificado escolar de estudio"
-              onClick={handleCertificadoClick}
-              bgColor="#9333ea"
+              iconColor="#1976d2"
             />
             <ReporteCard
               icon="description"
               title="Boletín de Calificaciones PDF"
               subtitle="Boletín completo con todas las materias"
               onClick={handleBoletinClick}
-              bgColor="#f59e0b"
+              iconColor="#f59e0b"
             />
+            <ReporteCard
+              icon="calendar_today"
+              title="Asistencia"
+              subtitle="Control de asistencia e inasistencias"
+              onClick={handleValidateOnly}
+              iconColor="#10b981"
+            />
+            <ReporteCard
+              icon="assignment_turned_in"
+              title="Certificado Escolar PDF"
+              subtitle="Certificado escolar de estudio"
+              onClick={handleCertificadoClick}
+              iconColor="#9333ea"
+            />
+            
             <ReporteCard
               icon="assignment"
               title="Observador Escolar"
               subtitle="Comportamiento y observaciones"
               onClick={handleValidateOnly}
-              bgColor="#ec4899"
+              iconColor="#ec4899"
             />
             <ReporteCard
               icon="school"
               title="Historial Académico"
               subtitle="Registro completo de todos los periodos"
               onClick={handleValidateOnly}
-              bgColor="#4f46e5"
+              iconColor="#4f46e5"
             />
           </div>
-
           <ActionButtons
             onDelete={handleDelete}
             deleteLoading={loading.borrar}
