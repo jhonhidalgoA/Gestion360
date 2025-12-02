@@ -73,7 +73,7 @@
 * cd frontend
 * npm install
 * npm start
-* 
+ 
 🌐 Acceso
 
 * Frontend: http://localhost:3000
@@ -91,7 +91,7 @@
 * Ingrid Carolina Velasco Gómez
 
 👨‍💻 AUTOR
-Jhon Fredy Hidalgo Arango
+* Jhon Fredy Hidalgo Arango
 
 
 
